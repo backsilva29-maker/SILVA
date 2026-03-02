@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🏗️ Obra Torre L'iris</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            padding: 12px;
+            padding-bottom: 80px;
+        }
+
+        /* CABEÇALHO */
+        .header {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            color: white;
+            padding: 24px 20px;
+            border-radius: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* ABAS */
+        .tabs {
+            display: flex;
+            background: white;
+            padding: 6px;
+            border-radius: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            gap: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 34px;
+            color: #64748b;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: #0f172a;
+            color: white;
+            box-shadow: 0 4px 8px rgba(15,23,42,0.2);
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* PROGRESSO */
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            padding: 16px 8px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 30px;
+            overflow: hidden;
+            margin: 15px 0 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 30px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* CRONOGRAMA */
+        .week-item {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .week-title {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .week-date {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .week-task {
+            color: #334155;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-concluido { background: #dcfce7; color: #166534; }
+        .status-andamento { background: #fef9c3; color: #854d0e; }
+        .status-pendente { background: #f1f5f9; color: #334155; }
+
+        /* AMBIENTES */
+        .ambiente-item {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 5px solid;
+        }
+
+        .ambiente-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .ambiente-nome {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .ambiente-area {
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ambiente-detail {
+            color: #475569;
+            font-size: 14px;
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ORÇAMENTO */
+        .orcamento-categoria {
+            margin-bottom: 25px;
+        }
+
+        .categoria-titulo {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+            font-size: 16px;
+            background: #f1f5f9;
+            padding: 10px 16px;
+            border-radius: 30px;
+        }
+
+        .item-orcamento {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .item-nome {
+            font-size: 14px;
+            color: #334155;
+            flex: 1;
+        }
+
+        .item-valor {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .item-quant {
+            color: #64748b;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        /* FORMULÁRIO DE EDIÇÃO */
+        .edit-form {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .edit-group {
+            margin-bottom: 16px;
+        }
+
+        .edit-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .edit-input, .edit-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .edit-input:focus, .edit-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        /* FOTOS */
+        .foto-placeholder {
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            height: 200px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            border: 2px dashed #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        /* BOTÕES FIXOS */
+        .fixed-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.9);
+        }
+
+        .fixed-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .btn-edit { background: #0f172a; color: white; }
+        .btn-save { background: #10b981; color: white; }
+        .btn-client { background: white; color: #0f172a; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <h1>🏗️ Torre L'iris</h1>
+        <p>Av. Conselheiro Furtado, 1044</p>
+        <p>Apto 1702/1704 · Seu Aldebaner</p>
+        <div class="tags">
+            <span class="tag">📅 Mar/2026</span>
+            <span class="tag">👤 Proprietário</span>
+            <span class="tag">📐 247m²</span>
+        </div>
+    </div>
+
+    <!-- ABAS -->
+    <div class="tabs" id="tabs">
+        <div class="tab active" onclick="mudarAba('cronograma')">📅 Cronograma</div>
+        <div class="tab" onclick="mudarAba('ambientes')">🏠 Ambientes</div>
+        <div class="tab" onclick="mudarAba('orcamento')">💰 Orçamento</div>
+        <div class="tab" onclick="mudarAba('fotos')">📸 Fotos</div>
+    </div>
+
+    <!-- CONTEÚDO DAS ABAS -->
+    <div id="conteudo"></div>
+
+    <!-- BOTÕES FIXOS -->
+    <div class="fixed-buttons">
+        <button class="fixed-btn btn-edit" onclick="modoEdicao()">✏️ Editar</button>
+        <button class="fixed-btn btn-client" onclick="modoCliente()">👁️ Cliente</button>
+    </div>
+
+    <script>
+        // DADOS DA OBRA
+        let dados = {
+            proprietario: "Seu Aldebaner",
+            dataAtual: "02/03/2026",
+            progresso: {
+                concluido: 5,
+                andamento: 6,
+                pendente: 5
+            },
+            cronograma: [
+                { semana: 1, periodo: "02-08/03", tarefa: "Chapisco e Reboco", status: "concluido" },
+                { semana: 2, periodo: "09-15/03", tarefa: "Alvenaria", status: "andamento" },
+                { semana: 3, periodo: "16-22/03", tarefa: "Instalações Elétricas", status: "pendente" },
+                { semana: 4, periodo: "23-29/03", tarefa: "Instalações Hidráulicas", status: "pendente" }
+            ],
+            ambientes: [
+                { nome: "BHO Andrey", area: 3.66, revestimento: "YORK WH HARD (63059)", metais: "Doka Matt Black", status: "concluido" },
+                { nome: "BHO Delbanor", area: 4.29, revestimento: "Zesty Off White (211090E)", bancada: "Quartzito Fantastic Brown", status: "concluido" },
+                { nome: "BHO Isabel", area: 4.22, revestimento: "YORK WH HARD + GOUACHE", metais: "Rainbow", status: "andamento" },
+                { nome: "BHO Maria", area: 4.03, revestimento: "Highlands Lake (204193E)", metais: "Rose Gold", status: "pendente" },
+                { nome: "BHO Vitor", area: 5.03, revestimento: "Aeterna bianco (29648E)", bancada: "Calacatta Macchia Vecchia", status: "pendente" },
+                { nome: "Suíte Vitor", area: 22.19, pintura: "Suvinil Luar", closet: "4,32m²", status: "andamento" },
+                { nome: "Suíte Maria", area: 16.16, pintura: "Suvinil Ouro Branco", status: "andamento" },
+                { nome: "Suíte Andrey", area: 13.98, status: "pendente" },
+                { nome: "Suíte Delbanor", area: 18.55, status: "pendente" },
+                { nome: "Sala Estar/Jantar", area: 47.27, status: "pendente" },
+                { nome: "Cozinha", area: 18.26, status: "pendente" },
+                { nome: "Gourmet", area: 28.70, status: "pendente" },
+                { nome: "Lavabo", area: 3.34, status: "pendente" }
+            ],
+            orcamento: [
+                { categoria: "SERVIÇOS PRELIMINARES", itens: [
+                    { nome: "Placa de obra", quant: "35m²", valor: 1639.05 },
+                    { nome: "Administração da obra", quant: "5 meses", valor: 38139.75 }
+                ]},
+                { categoria: "DEMOLIÇÕES", itens: [
+                    { nome: "Demolição de alvenaria", quant: "5,14m³", valor: 764.84 },
+                    { nome: "Remoção de entulho", quant: "30m³", valor: 2739.60 }
+                ]},
+                { categoria: "PAREDES", itens: [
+                    { nome: "Alvenaria tijolo", quant: "132,6m²", valor: 5929.87 }
+                ]},
+                { categoria: "REVESTIMENTOS", itens: [
+                    { nome: "Chapisco", quant: "265,2m²", valor: 3110.80 },
+                    { nome: "Reboco impermeabilizante", quant: "265,2m²", valor: 13260.00 }
+                ]},
+                { categoria: "PAVIMENTAÇÃO", itens: [
+                    { nome: "Camada regularizadora", quant: "205,45m²", valor: 5602.62 },
+                    { nome: "YORK WH HARD 90x90", quant: "192,79m²", valor: 24650.13 },
+                    { nome: "Zesty Off White", quant: "4,29m²", valor: 548.52 },
+                    { nome: "Aeterna bianco", quant: "5,03m²", valor: 643.14 },
+                    { nome: "Qatari City", quant: "3,34m²", valor: 427.05 },
+                    { nome: "GIARDINO BE", quant: "28,7m²", valor: 3669.58 }
+                ]},
+                { categoria: "INSTALAÇÕES ELÉTRICAS", itens: [
+                    { nome: "Tomadas e interruptores", quant: "43 unidades", valor: 4382.41 },
+                    { nome: "Spots PAR20", quant: "39 unidades", valor: 999.18 },
+                    { nome: "Fitas de LED", quant: "15 unidades", valor: 1777.95 },
+                    { nome: "Perfis de LED", quant: "18 unidades", valor: 946.44 }
+                ]},
+                { categoria: "INSTALAÇÕES HIDRÁULICAS", itens: [
+                    { nome: "Pontos de água/esgoto", quant: "41 pontos", valor: 2270.10 },
+                    { nome: "Louças e metais", quant: "31 unidades", valor: 2571.51 }
+                ]},
+                { categoria: "ESQUADRIAS", itens: [
+                    { nome: "Portas", quant: "18 unidades", valor: 7761.94 }
+                ]},
+                { categoria: "FORRO", itens: [
+                    { nome: "Forro gesso acartonado", quant: "234,15m²", valor: 14627.35 }
+                ]},
+                { categoria: "PINTURA", itens: [
+                    { nome: "Selador e emassamento", quant: "691,5m²", valor: 19095.77 },
+                    { nome: "Pintura acrílica", quant: "691,5m²", valor: 28257.58 }
+                ]}
+            ]
+        };
+
+        let abaAtual = 'cronograma';
+        let modoEditando = false;
+
+        function mudarAba(aba) {
+            abaAtual = aba;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderizarConteudo();
+        }
+
+        function modoEdicao() {
+            modoEditando = true;
+            renderizarConteudo();
+        }
+
+        function modoCliente() {
+            modoEditando = false;
+            renderizarConteudo();
+        }
+
+        function salvarDados() {
+            alert('✅ Dados salvos com sucesso!');
+            modoEditando = false;
+            renderizarConteudo();
+        }
+
+        function renderizarConteudo() {
+            let html = '';
+
+            if (abaAtual === 'cronograma') {
+                html = `
+                    <div class="card">
+                        <div class="card-title">📊 Progresso Geral</div>
+                        <div class="progress-stats">
+                            <div class="stat-item"><span class="stat-number">${dados.progresso.concluido}</span><div class="stat-label">Concluídos</div></div>
+                            <div class="stat-item"><span class="stat-number">${dados.progresso.andamento}</span><div class="stat-label">Andamento</div></div>
+                            <div class="stat-item"><span class="stat-number">${dados.progresso.pendente}</span><div class="stat-label">Pendentes</div></div>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${Math.round((dados.progresso.concluido/(dados.progresso.concluido+dados.progresso.andamento+dados.progresso.pendente))*100)}%;"></div></div>
+                        <div style="text-align: center; color: #64748b; font-size: 14px;">${Math.round((dados.progresso.concluido/(dados.progresso.concluido+dados.progresso.andamento+dados.progresso.pendente))*100)}% concluído</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📅 Cronograma - Março/2026</div>
+                        ${dados.cronograma.map(sem => `
+                            <div class="week-item" style="border-left-color: ${sem.status === 'concluido' ? '#10b981' : sem.status === 'andamento' ? '#f59e0b' : '#94a3b8'};">
+                                <div class="week-header">
+                                    <span class="week-title">Semana ${sem.semana}</span>
+                                    <span class="week-date">${sem.periodo}</span>
+                                </div>
+                                <div class="week-task">${sem.tarefa}</div>
+                                <div>
+                                    ${modoEditando ? 
+                                        `<select class="edit-select" onchange="atualizarStatusCronograma(${sem.semana}, this.value)">
+                                            <option ${sem.status === 'pendente' ? 'selected' : ''} value="pendente">⏱️ Pendente</option>
+                                            <option ${sem.status === 'andamento' ? 'selected' : ''} value="andamento">⏳ Em andamento</option>
+                                            <option ${sem.status === 'concluido' ? 'selected' : ''} value="concluido">✅ Concluído</option>
+                                        </select>` :
+                                        `<span class="status-badge status-${sem.status}">${
+                                            sem.status === 'concluido' ? '✅ Concluído' : 
+                                            sem.status === 'andamento' ? '⏳ Em andamento' : '⏱️ Pendente'
+                                        }</span>`
+                                    }
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            else if (abaAtual === 'ambientes') {
+                html = `<div class="card">`;
+                dados.ambientes.forEach(amb => {
+                    html += `
+                        <div class="ambiente-item" style="border-left-color: ${amb.status === 'concluido' ? '#10b981' : amb.status === 'andamento' ? '#f59e0b' : '#94a3b8'};">
+                            <div class="ambiente-header">
+                                <span class="ambiente-nome">${amb.nome}</span>
+                                <span class="ambiente-area">${amb.area}m²</span>
+                            </div>
+                            ${amb.revestimento ? `<div class="ambiente-detail">🧱 ${amb.revestimento}</div>` : ''}
+                            ${amb.metais ? `<div class="ambiente-detail">🔧 ${amb.metais}</div>` : ''}
+                            ${amb.bancada ? `<div class="ambiente-detail">🪨 ${amb.bancada}</div>` : ''}
+                            ${amb.pintura ? `<div class="ambiente-detail">🎨 ${amb.pintura}</div>` : ''}
+                            ${modoEditando ? 
+                                `<select class="edit-select" style="margin-top: 10px;" onchange="atualizarStatusAmbiente('${amb.nome}', this.value)">
+                                    <option ${amb.status === 'pendente' ? 'selected' : ''} value="pendente">⏱️ Pendente</option>
+                                    <option ${amb.status === 'andamento' ? 'selected' : ''} value="andamento">⏳ Em andamento</option>
+                                    <option ${amb.status === 'concluido' ? 'selected' : ''} value="concluido">✅ Concluído</option>
+                                </select>` :
+                                `<div style="margin-top: 8px;"><span class="status-badge status-${amb.status}">${
+                                    amb.status === 'concluido' ? '✅ Concluído' : 
+                                    amb.status === 'andamento' ? '⏳ Em andamento' : '⏱️ Pendente'
+                                }</span></div>`
+                            }
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            else if (abaAtual === 'orcamento') {
+                html = `<div class="card"><div class="card-title">💰 Orçamento Analítico</div>`;
+                dados.orcamento.forEach(cat => {
+                    html += `<div class="orcamento-categoria"><div class="categoria-titulo">${cat.categoria}</div>`;
+                    cat.itens.forEach(item => {
+                        html += `
+                            <div class="item-orcamento">
+                                <span class="item-nome">${item.nome} <span style="color:#94a3b8;">${item.quant}</span></span>
+                                <span class="item-valor">R$ ${item.valor.toFixed(2).replace('.',',')}</span>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            }
+
+            else if (abaAtual === 'fotos') {
+                html = `
+                    <div class="card">
+                        <div class="card-title">📸 Registro Fotográfico</div>
+                        <div class="foto-placeholder" onclick="alert('Em breve: upload de fotos')">
+                            📱 Toque para adicionar foto
+                        </div>
+                        <p style="text-align: center; color: #64748b;">⏱️ Última atualização: ${dados.dataAtual}</p>
+                    </div>
+                `;
+            }
+
+            if (modoEditando) {
+                html += `
+                    <div class="edit-form">
+                        <div class="card-title">✏️ Editando dados</div>
+                        <div class="edit-group">
+                            <label class="edit-label">Proprietário</label>
+                            <input class="edit-input" value="${dados.proprietario}" id="editProprietario">
+                        </div>
+                        <button class="btn btn-success" onclick="salvarEdicoes()">💾 Salvar alterações</button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('conteudo').innerHTML = html;
+        }
+
+        function atualizarStatusCronograma(semana, status) {
+            dados.cronograma[semana-1].status = status;
+        }
+
+        function atualizarStatusAmbiente(nome, status) {
+            const amb = dados.ambientes.find(a => a.nome === nome);
+            if (amb) amb.status = status;
+        }
+
+        function salvarEdicoes() {
+            const novoProprietario = document.getElementById('editProprietario')?.value;
+            if (novoProprietario) dados.proprietario = novoProprietario;
+            salvarDados();
+        }
+
+        // Inicializar
+        renderizarConteudo();
+    </script>
+</body>
+</html>
