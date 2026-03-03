@@ -3,280 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🏗️ Sistema Inteligente - Torre L'iris</title>
+    <title>🏗️ Obra Torre L'iris</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background: #f1f5f9; padding: 16px; padding-bottom: 90px; }
-        
-        .header {
-            background: linear-gradient(145deg, #0f172a, #1e293b);
-            color: white; padding: 24px; border-radius: 32px; margin-bottom: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .imagem-ap {
-            width: 70px; height: 70px; border-radius: 20px; background: rgba(255,255,255,0.1);
-            position: absolute; right: 20px; top: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px dashed rgba(255,255,255,0.2); overflow: hidden;
-        }
-        
-        .input-transparent {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 30px;
-            padding: 10px 18px;
-            color: white;
-            font-size: 15px;
-            width: 100%;
-            margin: 6px 0;
-        }
-        
-        .tabs {
-            display: flex; background: white; padding: 6px; border-radius: 40px; margin-bottom: 24px;
-            gap: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            flex: 1; text-align: center; padding: 14px 0; font-size: 14px; font-weight: 600;
-            border-radius: 34px; color: #64748b; cursor: pointer;
-            min-width: 90px;
-        }
-        .tab.active { background: #0f172a; color: white; }
-        
-        .card {
-            background: white; border-radius: 28px; padding: 24px; margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
-        }
-        
-        .card-title {
-            font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0; padding-bottom: 16px;
-        }
-        
-        .dashboard-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;
-        }
-        .dashboard-card {
-            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
-            padding: 20px; border-radius: 24px; border: 1px solid #e2e8f0;
-        }
-        .dashboard-valor { font-size: 28px; font-weight: 800; color: #0f172a; }
-        .dashboard-label { font-size: 13px; color: #64748b; margin-top: 4px; }
-        
-        .progresso-container {
-            width: 100%; height: 10px; background: #e2e8f0; border-radius: 30px; margin: 12px 0; overflow: hidden;
-        }
-        .progresso-bar {
-            height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 30px;
-            transition: width 0.3s;
-        }
-        
-        .ambiente-item {
-            background: #f8fafc; border-radius: 24px; padding: 20px; margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
-        }
-        .ambiente-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .ambiente-nome { font-weight: 700; font-size: 16px; }
-        .ambiente-area { background: #e2e8f0; padding: 4px 12px; border-radius: 30px; font-size: 12px; }
-        
-        .subtarefa-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 16px; background: white; border-radius: 20px; margin: 8px 0;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .funcionario-card {
-            background: #f8fafc; border-radius: 24px; padding: 20px; margin: 20px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .ponto-grid {
-            display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;
-        }
-        .ponto-dia {
-            background: white; padding: 12px; border-radius: 16px; text-align: center; min-width: 90px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .tabela-container {
-            overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; margin: 20px 0;
-        }
-        .tabela {
-            width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1200px;
-        }
-        .tabela th {
-            background: #f8fafc; color: #1e293b; font-weight: 600; padding: 16px 12px;
-            border-bottom: 2px solid #cbd5e1;
-        }
-        .tabela td {
-            padding: 14px 12px; border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .input-tabela {
-            width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 16px;
-            font-size: 13px;
-        }
-        
-        .btn {
-            padding: 10px 20px; border: none; border-radius: 30px; font-weight: 600;
-            font-size: 13px; cursor: pointer;
-        }
-        .btn-primary { background: #0f172a; color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-        
-        .fixed-buttons {
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 16px;
-            background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 8px;
-            background: rgba(255,255,255,0.95);
-            flex-wrap: wrap;
-        }
-        
-        .fixed-btn {
-            flex: 1; padding: 16px; border: none; border-radius: 30px; font-weight: 700;
-            font-size: 14px; cursor: pointer; min-width: 100px;
-        }
-        .btn-edit { background: #0f172a; color: white; }
-        .btn-add { background: #8b5cf6; color: white; }
-        
-        .badge {
-            padding: 4px 10px; border-radius: 30px; font-size: 11px; font-weight: 600;
-        }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #f0f2f5; }
         
         /* MODAL DE LOGIN */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center;
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
         }
         .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 350px;
-            text-align: center;
+            background: white; padding: 40px; border-radius: 48px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
         .modal-input {
-            width: 100%;
-            padding: 15px;
-            margin: 15px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 30px;
-            font-size: 16px;
+            width: 100%; padding: 18px; margin: 15px 0;
+            border: 2px solid #e0e0e0; border-radius: 40px;
+            font-size: 16px; transition: all 0.3s;
         }
+        .modal-input:focus { border-color: #0f172a; outline: none; }
         .modal-btn {
-            width: 100%;
-            padding: 15px;
-            background: #0f172a;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+            width: 100%; padding: 18px; margin: 8px 0;
+            border: none; border-radius: 40px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: transform 0.2s;
         }
-        .admin-badge {
-            background: #10b981;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            margin-left: 10px;
+        .modal-btn:active { transform: scale(0.98); }
+        .btn-admin { background: #0f172a; color: white; }
+        .btn-client { background: #3b82f6; color: white; }
+        
+        /* DASHBOARD DO CLIENTE (SUPER INOVADOR) */
+        .cliente-dashboard {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
+        .cliente-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .cliente-titulo {
+            font-size: 28px; font-weight: 800; margin-bottom: 10px;
+        }
+        .cliente-endereco {
+            font-size: 16px; opacity: 0.9; margin-bottom: 5px;
+        }
+        .cliente-data {
+            font-size: 14px; opacity: 0.8;
+        }
+        
+        /* CARDS DO DASHBOARD */
+        .cliente-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+            margin-bottom: 25px;
+        }
+        .cliente-card {
+            background: white; border-radius: 30px; padding: 22px 16px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .cliente-card:hover { transform: translateY(-5px); }
+        .card-icone {
+            width: 60px; height: 60px; background: #f0f2f5; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px; font-size: 28px;
+        }
+        .card-valor {
+            font-size: 36px; font-weight: 800; color: #0f172a;
+        }
+        .card-label {
+            font-size: 14px; color: #64748b; margin-top: 5px;
+        }
+        
+        /* GRÁFICOS DE PROGRESSO */
+        .progresso-section {
+            background: white; border-radius: 40px; padding: 30px 20px;
+            margin: 25px 0; box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .progresso-titulo {
+            font-size: 20px; font-weight: 700; color: #0f172a;
+            margin-bottom: 25px; text-align: center;
+        }
+        .progresso-item {
+            margin-bottom: 25px;
+        }
+        .progresso-header {
+            display: flex; justify-content: space-between;
+            margin-bottom: 8px; font-weight: 600;
+        }
+        .progresso-nome { font-size: 16px; color: #1e293b; }
+        .progresso-percentual { font-size: 16px; color: #3b82f6; }
+        .progresso-barra-container {
+            width: 100%; height: 12px; background: #e2e8f0;
+            border-radius: 30px; overflow: hidden;
+        }
+        .progresso-barra {
+            height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 30px; transition: width 0.5s ease;
+            width: 0%;
+        }
+        .progresso-sub {
+            display: flex; justify-content: space-between;
+            margin-top: 5px; font-size: 12px; color: #94a3b8;
+        }
+        
+        /* TIMELINE */
+        .timeline-section {
+            background: white; border-radius: 40px; padding: 30px 20px;
+            margin: 25px 0; box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .timeline-item {
+            display: flex; gap: 15px; margin-bottom: 25px;
+            position: relative;
+        }
+        .timeline-marcador {
+            width: 16px; height: 16px; background: #3b82f6;
+            border-radius: 50%; margin-top: 5px;
+            position: relative;
+        }
+        .timeline-marcador::before {
+            content: ''; position: absolute; top: 20px; left: 7px;
+            width: 2px; height: 50px; background: #cbd5e1;
+        }
+        .timeline-conteudo {
+            flex: 1; background: #f8fafc; padding: 16px;
+            border-radius: 20px;
+        }
+        .timeline-mes {
+            font-weight: 700; margin-bottom: 8px; color: #0f172a;
+        }
+        .timeline-progresso {
+            height: 6px; background: #e2e8f0; border-radius: 10px;
+            margin: 10px 0; overflow: hidden;
+        }
+        .timeline-bar {
+            height: 100%; background: #3b82f6; border-radius: 10px;
+        }
+        
+        /* ADMIN (TUDO EDITÁVEL) */
+        .admin-container {
+            padding: 20px; background: #f8fafc;
+        }
+        .admin-tabs {
+            display: flex; background: white; padding: 6px;
+            border-radius: 40px; margin-bottom: 24px; gap: 4px;
+            flex-wrap: wrap;
+        }
+        .admin-tab {
+            flex: 1; text-align: center; padding: 14px 0;
+            font-size: 14px; font-weight: 600; border-radius: 34px;
+            color: #64748b; cursor: pointer; min-width: 90px;
+        }
+        .admin-tab.active { background: #0f172a; color: white; }
+        
+        .admin-card {
+            background: white; border-radius: 28px; padding: 24px;
+            margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .admin-card-title {
+            font-size: 20px; font-weight: 700; color: #0f172a;
+            margin-bottom: 20px; border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+        
+        .input-admin {
+            width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0;
+            border-radius: 30px; font-size: 14px; margin: 5px 0;
+        }
+        .input-admin:focus { outline: none; border-color: #3b82f6; }
+        
+        .btn {
+            padding: 12px 24px; border: none; border-radius: 30px;
+            font-weight: 600; font-size: 14px; cursor: pointer;
+            margin: 5px; transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: #0f172a; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-sm { padding: 8px 16px; font-size: 12px; }
+        
+        .tabela-container { overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .tabela { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
+        .tabela th { background: #f8fafc; padding: 16px; text-align: left; }
+        .tabela td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        
+        .badge { padding: 4px 10px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
     </style>
 </head>
 <body>
     <!-- MODAL DE LOGIN -->
-    <div id="loginModal" class="modal" style="display: flex;">
+    <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">🔐 Acesso ao Sistema</h2>
-            <p style="color: #64748b; margin-bottom: 20px;">Digite a senha de administrador</p>
-            <input type="password" id="senhaInput" class="modal-input" placeholder="Senha" value="">
-            <button class="modal-btn" onclick="verificarSenha()">Entrar</button>
-            <button class="modal-btn" style="background: #64748b; margin-top: 10px;" onclick="entrarComoCliente()">Entrar como Cliente</button>
+            <h2 style="margin-bottom: 10px;">🏗️ Obra Torre L'iris</h2>
+            <p style="color: #64748b; margin-bottom: 30px;">Acesse o sistema</p>
+            <input type="password" id="senhaInput" class="modal-input" placeholder="Senha de admin">
+            <button class="modal-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
+            <button class="modal-btn btn-client" onclick="entrarComoCliente()">Entrar como Cliente</button>
         </div>
     </div>
 
-    <div class="header">
-        <div class="imagem-ap" onclick="if(admin) uploadImagemAp()" id="containerImagemAp">🏢</div>
-        
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="text" id="tituloObra" class="input-transparent" value="Torre L'iris Residence" style="font-size: 24px; font-weight: bold;" onchange="if(admin) dados.titulo=this.value" readonly>
-            <span id="adminBadge" class="admin-badge" style="display: none;">Admin</span>
-        </div>
-        
-        <input type="text" id="enderecoObra" class="input-transparent" value="Av. Conselheiro Furtado, 1044" onchange="if(admin) dados.endereco=this.value" readonly>
-        
-        <div style="display: flex; gap: 10px; margin: 10px 0;">
-            <input type="text" class="input-transparent" value="Seu Aldebaner" placeholder="Proprietário" onchange="if(admin) dados.proprietario=this.value" readonly>
-            <input type="text" class="input-transparent" value="Isabela Kalume" placeholder="Arquiteto" onchange="if(admin) dados.arquiteta=this.value" readonly>
-        </div>
-        
-        <div style="margin: 15px 0;">
-            <label style="font-size: 13px;">📅 Data de início:</label>
-            <input type="date" id="dataInicio" class="input-transparent" value="2026-03-02" onchange="if(admin) {dados.dataInicio=this.value; renderizarConteudo()}" readonly>
-        </div>
-        
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <span style="background: rgba(255,255,255,0.15); padding: 6px 16px; border-radius: 30px;" id="periodoDisplay">📅 Mar/2026 - Jul/2026</span>
-            <span style="background: rgba(255,255,255,0.15); padding: 6px 16px; border-radius: 30px;">💰 R$ <span id="totalOrcamentoHeader">234.943,54</span></span>
-        </div>
-    </div>
-
-    <div class="tabs">
-        <div class="tab active" onclick="mudarAba('dashboard')">📊 Dashboard</div>
-        <div class="tab" onclick="mudarAba('ambientes')">🏠 Ambientes</div>
-        <div class="tab" onclick="mudarAba('orcamento')">💰 Orçamento</div>
-        <div class="tab" onclick="mudarAba('materiais')">📦 Materiais</div>
-        <div class="tab" onclick="mudarAba('maoobra')">👷 Mão de Obra</div>
-        <div class="tab" onclick="mudarAba('fotos')">📸 Fotos</div>
-    </div>
-
+    <!-- CONTEÚDO SERÁ INSERIDO AQUI -->
     <div id="conteudo"></div>
-
-    <div id="botoesAdmin" style="display: none;">
-        <div class="fixed-buttons">
-            <button class="fixed-btn btn-edit" onclick="modoEdicao = !modoEdicao; renderizarConteudo()">✏️ Editar</button>
-            <button class="fixed-btn btn-add" onclick="adicionarItem()">➕ Adicionar</button>
-            <button class="fixed-btn btn-edit" onclick="exportarDados()">📥 Exportar</button>
-        </div>
-    </div>
 
     <script>
         // ============================================
-        // CONTROLE DE ACESSO
+        // CONFIGURAÇÕES
         // ============================================
-        let admin = false;
         const SENHA_ADMIN = "torre2026";
+        let admin = false;
+        let abaAdminAtual = 'ambientes';
 
+        // ============================================
+        // DADOS DA OBRA (TUDO EM BRANCO E EDITÁVEL)
+        // ============================================
+        let dados = {
+            // INFORMAÇÕES GERAIS (TUDO EM BRANCO)
+            titulo: "",
+            endereco: "",
+            proprietario: "",
+            arquiteto: "",
+            dataInicio: "",
+            
+            // AMBIENTES (CADA UM COM SUAS TAREFAS)
+            ambientes: [],
+
+            // ORÇAMENTO
+            orcamento: [],
+
+            // MATERIAIS
+            materiais: [],
+
+            // MÃO DE OBRA
+            maoObra: {
+                funcionarios: []
+            },
+
+            // FOTOS
+            fotos: []
+        };
+
+        // ============================================
+        // FUNÇÕES DE PERSISTÊNCIA
+        // ============================================
+        function salvarDados() {
+            localStorage.setItem('dadosObra', JSON.stringify(dados));
+        }
+
+        function carregarDados() {
+            let salvos = localStorage.getItem('dadosObra');
+            if (salvos) {
+                try {
+                    dados = JSON.parse(salvos);
+                } catch (e) {}
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES DE LOGIN
+        // ============================================
         function verificarSenha() {
             let senha = document.getElementById('senhaInput').value;
             if (senha === SENHA_ADMIN) {
                 admin = true;
                 document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('adminBadge').style.display = 'inline-block';
-                document.getElementById('botoesAdmin').style.display = 'block';
-                
-                // Habilita campos para edição
-                document.querySelectorAll('.input-transparent').forEach(campo => {
-                    campo.removeAttribute('readonly');
-                });
-                
-                renderizarConteudo();
+                carregarDados();
+                renderizarAdmin();
             } else {
                 alert('Senha incorreta!');
             }
@@ -285,283 +290,462 @@
         function entrarComoCliente() {
             admin = false;
             document.getElementById('loginModal').style.display = 'none';
-            document.getElementById('adminBadge').style.display = 'none';
-            document.getElementById('botoesAdmin').style.display = 'none';
-            
-            // Mantém campos readonly
-            document.querySelectorAll('.input-transparent').forEach(campo => {
-                campo.setAttribute('readonly', true);
+            carregarDados();
+            renderizarCliente();
+        }
+
+        // ============================================
+        // FUNÇÕES DE CÁLCULO
+        // ============================================
+        function calcularProgressoGeral() {
+            let totalTarefas = 0;
+            let concluidas = 0;
+            dados.ambientes.forEach(amb => {
+                amb.tarefas.forEach(t => {
+                    totalTarefas++;
+                    if (t.concluido) concluidas++;
+                });
             });
-            
-            renderizarConteudo();
-        }
-
-        // ============================================
-        // DADOS COMPLETOS
-        // ============================================
-        let dados = {
-            titulo: "Torre L'iris Residence",
-            endereco: "Av. Conselheiro Furtado, 1044",
-            proprietario: "Seu Aldebaner",
-            arquiteta: "Isabela Kalume",
-            dataInicio: "2026-03-02",
-            
-            bdi: { geral: 25.5, maoObra: 32.0 },
-            
-            ambientes: [
-                { 
-                    id: 1, nome: "BHO Andrey", area: "3,66m²", 
-                    tarefas: [
-                        { nome: "Chapisco", concluido: false, tipo: "revestimento" },
-                        { nome: "Reboco", concluido: false, tipo: "revestimento" },
-                        { nome: "Revestimento", concluido: false, tipo: "revestimento" },
-                        { nome: "Metais", concluido: false, tipo: "instalacao" }
-                    ]
-                },
-                { 
-                    id: 2, nome: "BHO Delbanor", area: "4,29m²",
-                    tarefas: [
-                        { nome: "Chapisco", concluido: false, tipo: "revestimento" },
-                        { nome: "Reboco", concluido: false, tipo: "revestimento" },
-                        { nome: "Revestimento", concluido: false, tipo: "revestimento" },
-                        { nome: "Bancada", concluido: false, tipo: "acabamento" }
-                    ]
-                },
-                { 
-                    id: 3, nome: "BHO Isabel", area: "4,22m²",
-                    tarefas: [
-                        { nome: "Chapisco", concluido: false, tipo: "revestimento" },
-                        { nome: "Reboco", concluido: false, tipo: "revestimento" },
-                        { nome: "Revestimento", concluido: false, tipo: "revestimento" },
-                        { nome: "Metais", concluido: false, tipo: "instalacao" }
-                    ]
-                }
-            ],
-
-            orcamento: [
-                { codigo: "001", categoria: "SERVIÇOS PRELIMINARES", descricao: "Placa de obra", un: "m²", quant: 35, unitario: 46.35, total: 1639.05 },
-                { codigo: "002", categoria: "SERVIÇOS PRELIMINARES", descricao: "Administração", un: "meses", quant: 5, unitario: 7627.95, total: 38139.75 }
-            ],
-
-            materiais: [
-                { codigo: "MAT001", descricao: "Cimento CP-II", un: "sc", quant: 450, unitario: 32.50, total: 14625.00,
-                  fornecedor: "Cemex", contato: "(11) 1234-5678", dataCompra: "15/02/2026", dataPrevista: "20/02/2026",
-                  status: "entregue", notaFiscal: "NF-12345" }
-            ],
-
-            maoObra: {
-                funcionarios: [
-                    {
-                        id: 1, nome: "João Silva", funcao: "Pedreiro", valorHora: 25.00,
-                        ponto: [
-                            { data: "02/03/2026", presente: true, horas: 8 },
-                            { data: "03/03/2026", presente: true, horas: 8 }
-                        ],
-                        pagamentos: [
-                            { data: "05/03/2026", valor: 400.00, status: "pago" }
-                        ]
-                    }
-                ]
-            },
-
-            fotos: []
-        };
-
-        // ============================================
-        // FUNÇÕES
-        // ============================================
-        let abaAtual = 'dashboard';
-        let modoEdicao = false;
-
-        function mudarAba(aba) {
-            abaAtual = aba;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderizarConteudo();
-        }
-
-        function calcularProgressoAmbiente(ambiente) {
-            let total = ambiente.tarefas.length;
-            let concluidas = ambiente.tarefas.filter(t => t.concluido).length;
-            return total > 0 ? Math.round((concluidas / total) * 100) : 0;
+            return totalTarefas > 0 ? Math.round((concluidas / totalTarefas) * 100) : 0;
         }
 
         function calcularProgressoPorTipo(tipo) {
-            let totalTarefas = 0;
-            let tarefasConcluidas = 0;
-            
+            let total = 0;
+            let concluidas = 0;
             dados.ambientes.forEach(amb => {
-                amb.tarefas.forEach(tarefa => {
-                    if (tarefa.tipo === tipo) {
-                        totalTarefas++;
-                        if (tarefa.concluido) tarefasConcluidas++;
+                amb.tarefas.forEach(t => {
+                    if (t.tipo === tipo) {
+                        total++;
+                        if (t.concluido) concluidas++;
                     }
                 });
             });
-            
-            return totalTarefas > 0 ? Math.round((tarefasConcluidas / totalTarefas) * 100) : 0;
+            return total > 0 ? Math.round((concluidas / total) * 100) : 0;
         }
 
-        function renderizarConteudo() {
-            let html = '';
+        function listarTiposExistentes() {
+            let tipos = [];
+            dados.ambientes.forEach(amb => {
+                amb.tarefas.forEach(t => {
+                    if (!tipos.includes(t.tipo)) tipos.push(t.tipo);
+                });
+            });
+            return tipos;
+        }
+
+        // ============================================
+        // DASHBOARD DO CLIENTE (SUPER INOVADOR)
+        // ============================================
+        function renderizarCliente() {
+            let progressoGeral = calcularProgressoGeral();
+            let tipos = listarTiposExistentes();
             
-            let progressoRevestimento = calcularProgressoPorTipo('revestimento');
-            let progressoPintura = calcularProgressoPorTipo('pintura');
-            let progressoInstalacao = calcularProgressoPorTipo('instalacao');
-            
-            if (abaAtual === 'dashboard') {
-                html = `
-                <div class="card">
-                    <div class="card-title">📊 DASHBOARD</div>
-                    
-                    <h3 style="margin: 20px 0 10px;">📈 Progresso por Tipo</h3>
-                    
-                    <div style="margin: 15px 0;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>🧱 Revestimento</span>
-                            <span><strong>${progressoRevestimento}%</strong></span>
-                        </div>
-                        <div class="progresso-container">
-                            <div class="progresso-bar" style="width: ${progressoRevestimento}%;"></div>
-                        </div>
+            // Nomes bonitos para os tipos
+            const nomesTipos = {
+                'revestimento': '🧱 Revestimento',
+                'pintura': '🎨 Pintura',
+                'instalacao': '🔧 Instalações',
+                'acabamento': '🪚 Acabamento',
+                'marcenaria': '🪑 Marcenaria',
+                'estrutura': '🏗️ Estrutura',
+                'demolicao': '🔨 Demolição',
+                'alvenaria': '🧱 Alvenaria',
+                'telhado': '🏠 Telhado',
+                'hidraulica': '💧 Hidráulica',
+                'eletrica': '⚡ Elétrica'
+            };
+
+            let html = `
+            <div class="cliente-dashboard">
+                <!-- HEADER COM INFO DA OBRA -->
+                <div class="cliente-header">
+                    <div class="cliente-titulo">${dados.titulo || "Obra sem nome"}</div>
+                    <div class="cliente-endereco">${dados.endereco || "Endereço não informado"}</div>
+                    <div class="cliente-data">Proprietário: ${dados.proprietario || "Não informado"}</div>
+                    <div class="cliente-data" style="margin-top: 10px;">Início: ${dados.dataInicio || "Não definido"}</div>
+                </div>
+
+                <!-- CARDS DE RESUMO -->
+                <div class="cliente-grid">
+                    <div class="cliente-card">
+                        <div class="card-icone">📊</div>
+                        <div class="card-valor">${progressoGeral}%</div>
+                        <div class="card-label">Progresso Geral</div>
                     </div>
-                    
-                    <div style="margin: 15px 0;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>🎨 Pintura</span>
-                            <span><strong>${progressoPintura}%</strong></span>
-                        </div>
-                        <div class="progresso-container">
-                            <div class="progresso-bar" style="width: ${progressoPintura}%;"></div>
-                        </div>
+                    <div class="cliente-card">
+                        <div class="card-icone">🏠</div>
+                        <div class="card-valor">${dados.ambientes.length}</div>
+                        <div class="card-label">Ambientes</div>
                     </div>
-                    
-                    <div style="margin: 15px 0;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>🔧 Instalações</span>
-                            <span><strong>${progressoInstalacao}%</strong></span>
-                        </div>
-                        <div class="progresso-container">
-                            <div class="progresso-bar" style="width: ${progressoInstalacao}%;"></div>
-                        </div>
+                    <div class="cliente-card">
+                        <div class="card-icone">📦</div>
+                        <div class="card-valor">${dados.materiais.length}</div>
+                        <div class="card-label">Materiais</div>
                     </div>
-                </div>`;
-            }
-            
-            else if (abaAtual === 'ambientes') {
-                html = '<div class="card">';
-                html += `<div class="card-title">🏠 Ambientes</div>`;
-                
-                dados.ambientes.forEach(amb => {
-                    let progresso = calcularProgressoAmbiente(amb);
-                    
-                    html += `<div class="ambiente-item">
-                        <div class="ambiente-header">
-                            <span class="ambiente-nome">${amb.nome}</span>
-                            <span class="ambiente-area">${amb.area}</span>
-                        </div>
-                        
-                        <div class="progresso-container">
-                            <div class="progresso-bar" style="width: ${progresso}%;"></div>
-                        </div>`;
-                    
-                    amb.tarefas.forEach((tarefa, idx) => {
-                        html += `<div class="subtarefa-item">
-                            <span>${tarefa.nome}</span>
-                            ${admin ? 
-                                `<input type="checkbox" ${tarefa.concluido ? 'checked' : ''} onchange="toggleTarefa(${amb.id}, ${idx})">` :
-                                `<span class="badge ${tarefa.concluido ? 'badge-success' : 'badge-warning'}">${tarefa.concluido ? '✅' : '⏳'}</span>`
+                    <div class="cliente-card">
+                        <div class="card-icone">👷</div>
+                        <div class="card-valor">${dados.maoObra.funcionarios.length}</div>
+                        <div class="card-label">Funcionários</div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICOS DE PROGRESSO POR TIPO -->
+                <div class="progresso-section">
+                    <div class="progresso-titulo">📈 Progresso da Obra</div>`;
+
+            if (tipos.length === 0) {
+                html += `<p style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum serviço iniciado ainda</p>`;
+            } else {
+                tipos.forEach(tipo => {
+                    let progresso = calcularProgressoPorTipo(tipo);
+                    let totalTipo = 0;
+                    let concluidasTipo = 0;
+                    dados.ambientes.forEach(amb => {
+                        amb.tarefas.forEach(t => {
+                            if (t.tipo === tipo) {
+                                totalTipo++;
+                                if (t.concluido) concluidasTipo++;
                             }
-                        </div>`;
+                        });
                     });
-                    
-                    html += '</div>';
+
+                    html += `
+                    <div class="progresso-item">
+                        <div class="progresso-header">
+                            <span class="progresso-nome">${nomesTipos[tipo] || tipo}</span>
+                            <span class="progresso-percentual">${progresso}%</span>
+                        </div>
+                        <div class="progresso-barra-container">
+                            <div class="progresso-barra" style="width: ${progresso}%;"></div>
+                        </div>
+                        <div class="progresso-sub">
+                            <span>${concluidasTipo} concluídas</span>
+                            <span>${totalTipo} total</span>
+                        </div>
+                    </div>`;
                 });
-                
-                html += '</div>';
             }
 
-            else if (abaAtual === 'orcamento') {
-                html = `<div class="card">
-                    <div class="card-title">💰 Orçamento</div>
-                    <div class="tabela-container">
-                        <table class="tabela">
-                            <thead><tr><th>Cód</th><th>Descrição</th><th>R$ Total</th></tr></thead>
-                            <tbody>`;
-                
-                dados.orcamento.forEach(item => {
-                    html += `<tr><td>${item.codigo}</td><td>${item.descricao}</td><td>R$ ${item.total.toFixed(2)}</td></tr>`;
-                });
-                
-                html += `</tbody></table></div></div>`;
-            }
+            html += `</div>`;
 
-            else if (abaAtual === 'materiais') {
-                html = `<div class="card">
-                    <div class="card-title">📦 Materiais</div>
-                    <div class="tabela-container">
-                        <table class="tabela">
-                            <thead><tr><th>Material</th><th>Status</th></tr></thead>
-                            <tbody>`;
+            // TIMELINE SIMPLES
+            if (dados.ambientes.length > 0) {
+                html += `
+                <div class="timeline-section">
+                    <div class="progresso-titulo">⏳ Próximas etapas</div>`;
                 
-                dados.materiais.forEach(item => {
-                    html += `<tr><td>${item.descricao}</td><td>${item.status}</td></tr>`;
-                });
-                
-                html += `</tbody></table></div></div>`;
-            }
-
-            else if (abaAtual === 'maoobra') {
-                html = `<div class="card">
-                    <div class="card-title">👷 Mão de Obra</div>`;
-                
-                dados.maoObra.funcionarios.forEach(func => {
-                    html += `<div class="funcionario-card"><h3>${func.nome} - ${func.funcao}</h3></div>`;
+                dados.ambientes.slice(0, 3).forEach(amb => {
+                    let progresso = Math.round(amb.tarefas.filter(t => t.concluido).length / amb.tarefas.length * 100) || 0;
+                    html += `
+                    <div class="timeline-item">
+                        <div class="timeline-marcador"></div>
+                        <div class="timeline-conteudo">
+                            <div class="timeline-mes">${amb.nome}</div>
+                            <div style="font-size: 14px; color: #64748b;">${amb.tarefas.length} tarefas</div>
+                            <div class="timeline-progresso">
+                                <div class="timeline-bar" style="width: ${progresso}%;"></div>
+                            </div>
+                        </div>
+                    </div>`;
                 });
                 
                 html += `</div>`;
             }
 
-            else if (abaAtual === 'fotos') {
-                html = `<div class="card">
-                    <div class="card-title">📸 Fotos</div>
-                    <p>Nenhuma foto ainda</p>
-                </div>`;
-            }
-
             document.getElementById('conteudo').innerHTML = html;
         }
 
-        function toggleTarefa(ambienteId, tarefaIdx) {
-            if (!admin) return;
-            let amb = dados.ambientes.find(a => a.id === ambienteId);
+        // ============================================
+        // ÁREA DO ADMIN (TUDO EDITÁVEL)
+        // ============================================
+        function renderizarAdmin() {
+            let html = `
+            <div class="admin-container">
+                <!-- DADOS GERAIS DA OBRA -->
+                <div class="admin-card">
+                    <div class="admin-card-title">📋 Dados da Obra</div>
+                    <input class="input-admin" placeholder="Nome da obra" value="${dados.titulo}" onchange="dados.titulo=this.value; salvarDados();">
+                    <input class="input-admin" placeholder="Endereço completo" value="${dados.endereco}" onchange="dados.endereco=this.value; salvarDados();">
+                    <input class="input-admin" placeholder="Proprietário" value="${dados.proprietario}" onchange="dados.proprietario=this.value; salvarDados();">
+                    <input class="input-admin" placeholder="Arquiteto" value="${dados.arquiteto}" onchange="dados.arquiteto=this.value; salvarDados();">
+                    <input class="input-admin" placeholder="Data de início" value="${dados.dataInicio}" onchange="dados.dataInicio=this.value; salvarDados();">
+                </div>
+
+                <!-- TABS DO ADMIN -->
+                <div class="admin-tabs">
+                    <div class="admin-tab ${abaAdminAtual === 'ambientes' ? 'active' : ''}" onclick="mudarAbaAdmin('ambientes')">🏠 Ambientes</div>
+                    <div class="admin-tab ${abaAdminAtual === 'orcamento' ? 'active' : ''}" onclick="mudarAbaAdmin('orcamento')">💰 Orçamento</div>
+                    <div class="admin-tab ${abaAdminAtual === 'materiais' ? 'active' : ''}" onclick="mudarAbaAdmin('materiais')">📦 Materiais</div>
+                    <div class="admin-tab ${abaAdminAtual === 'maoobra' ? 'active' : ''}" onclick="mudarAbaAdmin('maoobra')">👷 Mão de Obra</div>
+                </div>`;
+
+            // AMBIENTES
+            if (abaAdminAtual === 'ambientes') {
+                html += `<div class="admin-card"><div class="admin-card-title">🏠 Ambientes</div>`;
+                
+                dados.ambientes.forEach((amb, idx) => {
+                    html += `
+                    <div style="background: #f8fafc; border-radius: 24px; padding: 20px; margin: 20px 0;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input class="input-admin" style="flex:2;" placeholder="Nome do ambiente" value="${amb.nome}" onchange="atualizarAmbiente(${amb.id}, 'nome', this.value)">
+                            <input class="input-admin" style="flex:1;" placeholder="Área" value="${amb.area}" onchange="atualizarAmbiente(${amb.id}, 'area', this.value)">
+                            <button class="btn btn-danger btn-sm" onclick="excluirAmbiente(${amb.id})">🗑️</button>
+                        </div>`;
+                    
+                    amb.tarefas.forEach((tarefa, tIdx) => {
+                        html += `
+                        <div style="display: flex; gap: 8px; margin: 10px 0; align-items: center;">
+                            <input class="input-admin" style="flex:2;" placeholder="Tarefa" value="${tarefa.nome}" onchange="atualizarTarefa(${amb.id}, ${tIdx}, 'nome', this.value)">
+                            <select class="input-admin" style="flex:1;" onchange="atualizarTarefa(${amb.id}, ${tIdx}, 'tipo', this.value)">
+                                <option value="revestimento" ${tarefa.tipo === 'revestimento' ? 'selected' : ''}>🧱 Revestimento</option>
+                                <option value="pintura" ${tarefa.tipo === 'pintura' ? 'selected' : ''}>🎨 Pintura</option>
+                                <option value="instalacao" ${tarefa.tipo === 'instalacao' ? 'selected' : ''}>🔧 Instalação</option>
+                                <option value="acabamento" ${tarefa.tipo === 'acabamento' ? 'selected' : ''}>🪚 Acabamento</option>
+                                <option value="marcenaria" ${tarefa.tipo === 'marcenaria' ? 'selected' : ''}>🪑 Marcenaria</option>
+                            </select>
+                            <input type="checkbox" ${tarefa.concluido ? 'checked' : ''} onchange="toggleTarefa(${amb.id}, ${tIdx})" style="width: 24px; height: 24px;">
+                            <button class="btn btn-danger btn-sm" onclick="excluirTarefa(${amb.id}, ${tIdx})">✕</button>
+                        </div>`;
+                    });
+                    
+                    html += `<button class="btn btn-success btn-sm" onclick="adicionarTarefa(${amb.id})">➕ Nova Tarefa</button>`;
+                    html += `</div>`;
+                });
+                
+                html += `<button class="btn btn-primary" style="width:100%;" onclick="adicionarAmbiente()">➕ Adicionar Ambiente</button>`;
+                html += `</div>`;
+            }
+
+            // ORÇAMENTO
+            else if (abaAdminAtual === 'orcamento') {
+                html += `<div class="admin-card"><div class="admin-card-title">💰 Orçamento</div>`;
+                html += `<button class="btn btn-success" onclick="adicionarItemOrcamento()">➕ Adicionar Item</button>`;
+                html += `<div class="tabela-container"><table class="tabela"><thead><tr><th>Cód</th><th>Descrição</th><th>Un</th><th>Quant</th><th>R$ Unit</th><th>R$ Total</th><th>Ações</th></tr></thead><tbody>`;
+                
+                dados.orcamento.forEach((item, idx) => {
+                    html += `<tr>
+                        <td><input class="input-admin" value="${item.codigo}" onchange="atualizarOrcamento(${idx}, 'codigo', this.value)"></td>
+                        <td><input class="input-admin" value="${item.descricao}" onchange="atualizarOrcamento(${idx}, 'descricao', this.value)"></td>
+                        <td><input class="input-admin" value="${item.un}" style="width:60px;" onchange="atualizarOrcamento(${idx}, 'un', this.value)"></td>
+                        <td><input class="input-admin" type="number" value="${item.quant}" style="width:80px;" onchange="atualizarOrcamento(${idx}, 'quant', this.value)"></td>
+                        <td><input class="input-admin" type="number" value="${item.unitario}" style="width:100px;" onchange="atualizarOrcamento(${idx}, 'unitario', this.value)"></td>
+                        <td>R$ ${item.total?.toFixed(2) || '0.00'}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="excluirOrcamento(${idx})">🗑️</button></td>
+                    </tr>`;
+                });
+                
+                html += `</tbody></table></div></div>`;
+            }
+
+            // MATERIAIS
+            else if (abaAdminAtual === 'materiais') {
+                html += `<div class="admin-card"><div class="admin-card-title">📦 Materiais</div>`;
+                html += `<button class="btn btn-success" onclick="adicionarMaterial()">➕ Adicionar Material</button>`;
+                html += `<div class="tabela-container"><table class="tabela"><thead><tr><th>Cód</th><th>Material</th><th>Un</th><th>Quant</th><th>Fornecedor</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+                
+                dados.materiais.forEach((item, idx) => {
+                    html += `<tr>
+                        <td><input class="input-admin" value="${item.codigo}" onchange="atualizarMaterial(${idx}, 'codigo', this.value)"></td>
+                        <td><input class="input-admin" value="${item.descricao}" onchange="atualizarMaterial(${idx}, 'descricao', this.value)"></td>
+                        <td><input class="input-admin" value="${item.un}" style="width:60px;" onchange="atualizarMaterial(${idx}, 'un', this.value)"></td>
+                        <td><input class="input-admin" type="number" value="${item.quant}" style="width:80px;" onchange="atualizarMaterial(${idx}, 'quant', this.value)"></td>
+                        <td><input class="input-admin" value="${item.fornecedor}" onchange="atualizarMaterial(${idx}, 'fornecedor', this.value)"></td>
+                        <td>
+                            <select class="input-admin" onchange="atualizarMaterial(${idx}, 'status', this.value)">
+                                <option value="pendente" ${item.status === 'pendente' ? 'selected' : ''}>⏱️ Pendente</option>
+                                <option value="transporte" ${item.status === 'transporte' ? 'selected' : ''}>🚚 Transporte</option>
+                                <option value="entregue" ${item.status === 'entregue' ? 'selected' : ''}>✅ Entregue</option>
+                            </select>
+                        </td>
+                        <td><button class="btn btn-danger btn-sm" onclick="excluirMaterial(${idx})">🗑️</button></td>
+                    </tr>`;
+                });
+                
+                html += `</tbody></table></div></div>`;
+            }
+
+            // MÃO DE OBRA
+            else if (abaAdminAtual === 'maoobra') {
+                html += `<div class="admin-card"><div class="admin-card-title">👷 Mão de Obra</div>`;
+                html += `<button class="btn btn-success" onclick="adicionarFuncionario()">➕ Adicionar Funcionário</button>`;
+                
+                dados.maoObra.funcionarios.forEach((func, idx) => {
+                    html += `
+                    <div style="background: #f8fafc; border-radius: 24px; padding: 20px; margin: 20px 0;">
+                        <div style="display: flex; gap: 10px;">
+                            <input class="input-admin" style="flex:2;" placeholder="Nome" value="${func.nome}" onchange="atualizarFuncionario(${idx}, 'nome', this.value)">
+                            <input class="input-admin" style="flex:1;" placeholder="Função" value="${func.funcao}" onchange="atualizarFuncionario(${idx}, 'funcao', this.value)">
+                            <input class="input-admin" style="flex:1;" placeholder="R$/hora" value="${func.valorHora}" onchange="atualizarFuncionario(${idx}, 'valorHora', this.value)">
+                            <button class="btn btn-danger btn-sm" onclick="excluirFuncionario(${idx})">🗑️</button>
+                        </div>
+                    </div>`;
+                });
+                
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            document.getElementById('conteudo').innerHTML = html;
+        }
+
+        // ============================================
+        // FUNÇÕES DE CRUD (AMBIENTES)
+        // ============================================
+        function mudarAbaAdmin(aba) {
+            abaAdminAtual = aba;
+            renderizarAdmin();
+        }
+
+        function adicionarAmbiente() {
+            let novoId = dados.ambientes.length > 0 ? Math.max(...dados.ambientes.map(a => a.id)) + 1 : 1;
+            dados.ambientes.push({
+                id: novoId,
+                nome: "Novo Ambiente",
+                area: "0m²",
+                tarefas: []
+            });
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        function atualizarAmbiente(id, campo, valor) {
+            let amb = dados.ambientes.find(a => a.id === id);
             if (amb) {
-                amb.tarefas[tarefaIdx].concluido = !amb.tarefas[tarefaIdx].concluido;
-                renderizarConteudo();
+                amb[campo] = valor;
+                salvarDados();
             }
         }
 
-        function adicionarItem() {
-            if (!admin) return;
-            alert('Função apenas para admin');
+        function excluirAmbiente(id) {
+            if (confirm("Excluir ambiente?")) {
+                dados.ambientes = dados.ambientes.filter(a => a.id !== id);
+                salvarDados();
+                renderizarAdmin();
+            }
         }
 
-        function exportarDados() {
-            if (!admin) return;
-            let blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'dados_obra.json';
-            link.click();
+        function adicionarTarefa(ambienteId) {
+            let amb = dados.ambientes.find(a => a.id === ambienteId);
+            if (amb) {
+                amb.tarefas.push({
+                    nome: "Nova tarefa",
+                    concluido: false,
+                    tipo: "revestimento"
+                });
+                salvarDados();
+                renderizarAdmin();
+            }
         }
 
-        function uploadImagemAp() {
-            if (!admin) return;
-            alert('Upload de imagem');
+        function atualizarTarefa(ambienteId, tarefaIdx, campo, valor) {
+            let amb = dados.ambientes.find(a => a.id === ambienteId);
+            if (amb && amb.tarefas[tarefaIdx]) {
+                amb.tarefas[tarefaIdx][campo] = valor;
+                salvarDados();
+            }
         }
 
-        // Inicializar
-        renderizarConteudo();
+        function toggleTarefa(ambienteId, tarefaIdx) {
+            let amb = dados.ambientes.find(a => a.id === ambienteId);
+            if (amb && amb.tarefas[tarefaIdx]) {
+                amb.tarefas[tarefaIdx].concluido = !amb.tarefas[tarefaIdx].concluido;
+                salvarDados();
+                renderizarAdmin();
+            }
+        }
+
+        function excluirTarefa(ambienteId, tarefaIdx) {
+            let amb = dados.ambientes.find(a => a.id === ambienteId);
+            if (amb) {
+                amb.tarefas.splice(tarefaIdx, 1);
+                salvarDados();
+                renderizarAdmin();
+            }
+        }
+
+        // ORÇAMENTO
+        function adicionarItemOrcamento() {
+            dados.orcamento.push({
+                codigo: String(dados.orcamento.length + 1).padStart(3, '0'),
+                descricao: "Novo item",
+                un: "un",
+                quant: 1,
+                unitario: 0,
+                total: 0
+            });
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        function atualizarOrcamento(idx, campo, valor) {
+            if (campo === 'quant' || campo === 'unitario') {
+                dados.orcamento[idx][campo] = parseFloat(valor) || 0;
+                dados.orcamento[idx].total = dados.orcamento[idx].quant * dados.orcamento[idx].unitario;
+            } else {
+                dados.orcamento[idx][campo] = valor;
+            }
+            salvarDados();
+        }
+
+        function excluirOrcamento(idx) {
+            dados.orcamento.splice(idx, 1);
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        // MATERIAIS
+        function adicionarMaterial() {
+            dados.materiais.push({
+                codigo: "MAT" + String(dados.materiais.length + 1).padStart(3, '0'),
+                descricao: "Novo material",
+                un: "un",
+                quant: 1,
+                unitario: 0,
+                fornecedor: "",
+                status: "pendente"
+            });
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        function atualizarMaterial(idx, campo, valor) {
+            dados.materiais[idx][campo] = valor;
+            salvarDados();
+        }
+
+        function excluirMaterial(idx) {
+            dados.materiais.splice(idx, 1);
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        // FUNCIONÁRIOS
+        function adicionarFuncionario() {
+            dados.maoObra.funcionarios.push({
+                id: dados.maoObra.funcionarios.length + 1,
+                nome: "Novo funcionário",
+                funcao: "Servente",
+                valorHora: 15.00,
+                ponto: [],
+                pagamentos: []
+            });
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        function atualizarFuncionario(idx, campo, valor) {
+            dados.maoObra.funcionarios[idx][campo] = campo === 'valorHora' ? parseFloat(valor) || 0 : valor;
+            salvarDados();
+        }
+
+        function excluirFuncionario(idx) {
+            dados.maoObra.funcionarios.splice(idx, 1);
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        // Carregar dados salvos
+        carregarDados();
     </script>
 </body>
 </html>
