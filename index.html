@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🏗️ Obra Torre L'iris</title>
+    <title>🏗️ Gestão de Obras</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background: #f0f2f5; }
@@ -35,11 +35,25 @@
         .btn-admin { background: #0f172a; color: white; }
         .btn-client { background: #3b82f6; color: white; }
         
-        /* DASHBOARD DO CLIENTE (SUPER INOVADOR) */
+        /* ESTILOS GLOBAIS */
+        .container { padding: 20px; }
+        
+        /* DASHBOARD DO CLIENTE */
+        .cliente-tabs {
+            display: flex; background: white; padding: 6px;
+            border-radius: 40px; margin-bottom: 24px; gap: 4px;
+        }
+        .cliente-tab {
+            flex: 1; text-align: center; padding: 14px 0;
+            font-size: 16px; font-weight: 600; border-radius: 34px;
+            color: #64748b; cursor: pointer;
+        }
+        .cliente-tab.active { background: #0f172a; color: white; }
+        
         .cliente-dashboard {
-            padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
         }
         .cliente-header {
             background: rgba(255,255,255,0.15);
@@ -61,7 +75,6 @@
             font-size: 14px; opacity: 0.8;
         }
         
-        /* CARDS DO DASHBOARD */
         .cliente-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
             margin-bottom: 25px;
@@ -85,7 +98,6 @@
             font-size: 14px; color: #64748b; margin-top: 5px;
         }
         
-        /* GRÁFICOS DE PROGRESSO */
         .progresso-section {
             background: white; border-radius: 40px; padding: 30px 20px;
             margin: 25px 0; box-shadow: 0 15px 30px rgba(0,0,0,0.1);
@@ -110,14 +122,12 @@
         .progresso-barra {
             height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6);
             border-radius: 30px; transition: width 0.5s ease;
-            width: 0%;
         }
         .progresso-sub {
             display: flex; justify-content: space-between;
             margin-top: 5px; font-size: 12px; color: #94a3b8;
         }
         
-        /* TIMELINE */
         .timeline-section {
             background: white; border-radius: 40px; padding: 30px 20px;
             margin: 25px 0; box-shadow: 0 15px 30px rgba(0,0,0,0.1);
@@ -129,11 +139,6 @@
         .timeline-marcador {
             width: 16px; height: 16px; background: #3b82f6;
             border-radius: 50%; margin-top: 5px;
-            position: relative;
-        }
-        .timeline-marcador::before {
-            content: ''; position: absolute; top: 20px; left: 7px;
-            width: 2px; height: 50px; background: #cbd5e1;
         }
         .timeline-conteudo {
             flex: 1; background: #f8fafc; padding: 16px;
@@ -150,10 +155,26 @@
             height: 100%; background: #3b82f6; border-radius: 10px;
         }
         
-        /* ADMIN (TUDO EDITÁVEL) */
-        .admin-container {
-            padding: 20px; background: #f8fafc;
+        /* GALERIA DE FOTOS */
+        .foto-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            margin-top: 20px;
         }
+        .foto-item {
+            aspect-ratio: 1; background: #f1f5f9; border-radius: 20px;
+            overflow: hidden; border: 1px solid #e2e8f0;
+        }
+        .foto-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .foto-placeholder {
+            aspect-ratio: 1; background: #f1f5f9; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 12px; border: 2px dashed #cbd5e1;
+        }
+        
+        /* ADMIN */
+        .admin-container { padding: 20px; background: #f8fafc; }
         .admin-tabs {
             display: flex; background: white; padding: 6px;
             border-radius: 40px; margin-bottom: 24px; gap: 4px;
@@ -208,15 +229,15 @@
     <!-- MODAL DE LOGIN -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 10px;">🏗️ Obra Torre L'iris</h2>
-            <p style="color: #64748b; margin-bottom: 30px;">Acesse o sistema</p>
+            <h2 style="margin-bottom: 10px;">🏗️ Sistema de Obras</h2>
+            <p style="color: #64748b; margin-bottom: 30px;">Acesse como administrador ou cliente</p>
             <input type="password" id="senhaInput" class="modal-input" placeholder="Senha de admin">
             <button class="modal-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
             <button class="modal-btn btn-client" onclick="entrarComoCliente()">Entrar como Cliente</button>
         </div>
     </div>
 
-    <!-- CONTEÚDO SERÁ INSERIDO AQUI -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo"></div>
 
     <script>
@@ -226,33 +247,22 @@
         const SENHA_ADMIN = "torre2026";
         let admin = false;
         let abaAdminAtual = 'ambientes';
+        let abaClienteAtual = 'dashboard'; // 'dashboard' ou 'fotos'
 
         // ============================================
         // DADOS DA OBRA (TUDO EM BRANCO E EDITÁVEL)
         // ============================================
         let dados = {
-            // INFORMAÇÕES GERAIS (TUDO EM BRANCO)
             titulo: "",
             endereco: "",
             proprietario: "",
             arquiteto: "",
             dataInicio: "",
             
-            // AMBIENTES (CADA UM COM SUAS TAREFAS)
             ambientes: [],
-
-            // ORÇAMENTO
             orcamento: [],
-
-            // MATERIAIS
             materiais: [],
-
-            // MÃO DE OBRA
-            maoObra: {
-                funcionarios: []
-            },
-
-            // FOTOS
+            maoObra: { funcionarios: [] },
             fotos: []
         };
 
@@ -295,23 +305,21 @@
         }
 
         // ============================================
-        // FUNÇÕES DE CÁLCULO
+        // FUNÇÕES DE CÁLCULO (para o dashboard)
         // ============================================
         function calcularProgressoGeral() {
-            let totalTarefas = 0;
-            let concluidas = 0;
+            let total = 0, concluidas = 0;
             dados.ambientes.forEach(amb => {
                 amb.tarefas.forEach(t => {
-                    totalTarefas++;
+                    total++;
                     if (t.concluido) concluidas++;
                 });
             });
-            return totalTarefas > 0 ? Math.round((concluidas / totalTarefas) * 100) : 0;
+            return total > 0 ? Math.round((concluidas / total) * 100) : 0;
         }
 
         function calcularProgressoPorTipo(tipo) {
-            let total = 0;
-            let concluidas = 0;
+            let total = 0, concluidas = 0;
             dados.ambientes.forEach(amb => {
                 amb.tarefas.forEach(t => {
                     if (t.tipo === tipo) {
@@ -334,30 +342,12 @@
         }
 
         // ============================================
-        // DASHBOARD DO CLIENTE (SUPER INOVADOR)
+        // DASHBOARD DO CLIENTE (com abas)
         // ============================================
         function renderizarCliente() {
-            let progressoGeral = calcularProgressoGeral();
-            let tipos = listarTiposExistentes();
-            
-            // Nomes bonitos para os tipos
-            const nomesTipos = {
-                'revestimento': '🧱 Revestimento',
-                'pintura': '🎨 Pintura',
-                'instalacao': '🔧 Instalações',
-                'acabamento': '🪚 Acabamento',
-                'marcenaria': '🪑 Marcenaria',
-                'estrutura': '🏗️ Estrutura',
-                'demolicao': '🔨 Demolição',
-                'alvenaria': '🧱 Alvenaria',
-                'telhado': '🏠 Telhado',
-                'hidraulica': '💧 Hidráulica',
-                'eletrica': '⚡ Elétrica'
-            };
-
             let html = `
             <div class="cliente-dashboard">
-                <!-- HEADER COM INFO DA OBRA -->
+                <!-- Cabeçalho com informações da obra -->
                 <div class="cliente-header">
                     <div class="cliente-titulo">${dados.titulo || "Obra sem nome"}</div>
                     <div class="cliente-endereco">${dados.endereco || "Endereço não informado"}</div>
@@ -365,7 +355,48 @@
                     <div class="cliente-data" style="margin-top: 10px;">Início: ${dados.dataInicio || "Não definido"}</div>
                 </div>
 
-                <!-- CARDS DE RESUMO -->
+                <!-- Abas do cliente -->
+                <div class="cliente-tabs">
+                    <div class="cliente-tab ${abaClienteAtual === 'dashboard' ? 'active' : ''}" onclick="mudarAbaCliente('dashboard')">📊 Dashboard</div>
+                    <div class="cliente-tab ${abaClienteAtual === 'fotos' ? 'active' : ''}" onclick="mudarAbaCliente('fotos')">📸 Fotos</div>
+                </div>
+
+                <div id="clienteConteudo"></div>
+            </div>
+            `;
+
+            document.getElementById('conteudo').innerHTML = html;
+            renderizarConteudoCliente();
+        }
+
+        function mudarAbaCliente(aba) {
+            abaClienteAtual = aba;
+            renderizarConteudoCliente();
+        }
+
+        function renderizarConteudoCliente() {
+            let container = document.getElementById('clienteConteudo');
+            if (!container) return;
+
+            if (abaClienteAtual === 'dashboard') {
+                let progressoGeral = calcularProgressoGeral();
+                let tipos = listarTiposExistentes();
+                const nomesTipos = {
+                    'revestimento': '🧱 Revestimento',
+                    'pintura': '🎨 Pintura',
+                    'instalacao': '🔧 Instalações',
+                    'acabamento': '🪚 Acabamento',
+                    'marcenaria': '🪑 Marcenaria',
+                    'estrutura': '🏗️ Estrutura',
+                    'demolicao': '🔨 Demolição',
+                    'alvenaria': '🧱 Alvenaria',
+                    'telhado': '🏠 Telhado',
+                    'hidraulica': '💧 Hidráulica',
+                    'eletrica': '⚡ Elétrica'
+                };
+
+                let html = `
+                <!-- Cards de resumo -->
                 <div class="cliente-grid">
                     <div class="cliente-card">
                         <div class="card-icone">📊</div>
@@ -389,109 +420,139 @@
                     </div>
                 </div>
 
-                <!-- GRÁFICOS DE PROGRESSO POR TIPO -->
+                <!-- Gráficos de progresso por tipo -->
                 <div class="progresso-section">
-                    <div class="progresso-titulo">📈 Progresso da Obra</div>`;
+                    <div class="progresso-titulo">📈 Progresso por Etapa</div>`;
 
-            if (tipos.length === 0) {
-                html += `<p style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum serviço iniciado ainda</p>`;
-            } else {
-                tipos.forEach(tipo => {
-                    let progresso = calcularProgressoPorTipo(tipo);
-                    let totalTipo = 0;
-                    let concluidasTipo = 0;
-                    dados.ambientes.forEach(amb => {
-                        amb.tarefas.forEach(t => {
-                            if (t.tipo === tipo) {
-                                totalTipo++;
-                                if (t.concluido) concluidasTipo++;
-                            }
+                if (tipos.length === 0) {
+                    html += `<p style="text-align: center; color: #94a3b8; padding: 20px;">Nenhuma atividade registrada</p>`;
+                } else {
+                    tipos.forEach(tipo => {
+                        let progresso = calcularProgressoPorTipo(tipo);
+                        let totalTipo = 0, concluidasTipo = 0;
+                        dados.ambientes.forEach(amb => {
+                            amb.tarefas.forEach(t => {
+                                if (t.tipo === tipo) {
+                                    totalTipo++;
+                                    if (t.concluido) concluidasTipo++;
+                                }
+                            });
                         });
-                    });
 
-                    html += `
-                    <div class="progresso-item">
-                        <div class="progresso-header">
-                            <span class="progresso-nome">${nomesTipos[tipo] || tipo}</span>
-                            <span class="progresso-percentual">${progresso}%</span>
-                        </div>
-                        <div class="progresso-barra-container">
-                            <div class="progresso-barra" style="width: ${progresso}%;"></div>
-                        </div>
-                        <div class="progresso-sub">
-                            <span>${concluidasTipo} concluídas</span>
-                            <span>${totalTipo} total</span>
-                        </div>
-                    </div>`;
-                });
-            }
-
-            html += `</div>`;
-
-            // TIMELINE SIMPLES
-            if (dados.ambientes.length > 0) {
-                html += `
-                <div class="timeline-section">
-                    <div class="progresso-titulo">⏳ Próximas etapas</div>`;
-                
-                dados.ambientes.slice(0, 3).forEach(amb => {
-                    let progresso = Math.round(amb.tarefas.filter(t => t.concluido).length / amb.tarefas.length * 100) || 0;
-                    html += `
-                    <div class="timeline-item">
-                        <div class="timeline-marcador"></div>
-                        <div class="timeline-conteudo">
-                            <div class="timeline-mes">${amb.nome}</div>
-                            <div style="font-size: 14px; color: #64748b;">${amb.tarefas.length} tarefas</div>
-                            <div class="timeline-progresso">
-                                <div class="timeline-bar" style="width: ${progresso}%;"></div>
+                        html += `
+                        <div class="progresso-item">
+                            <div class="progresso-header">
+                                <span class="progresso-nome">${nomesTipos[tipo] || tipo}</span>
+                                <span class="progresso-percentual">${progresso}%</span>
                             </div>
-                        </div>
-                    </div>`;
-                });
-                
-                html += `</div>`;
-            }
+                            <div class="progresso-barra-container">
+                                <div class="progresso-barra" style="width: ${progresso}%;"></div>
+                            </div>
+                            <div class="progresso-sub">
+                                <span>${concluidasTipo} concluídas</span>
+                                <span>${totalTipo} total</span>
+                            </div>
+                        </div>`;
+                    });
+                }
 
-            document.getElementById('conteudo').innerHTML = html;
+                html += `</div>`;
+
+                // Timeline (próximos ambientes)
+                if (dados.ambientes.length > 0) {
+                    html += `
+                    <div class="timeline-section">
+                        <div class="progresso-titulo">⏳ Próximos Ambientes</div>`;
+                    dados.ambientes.slice(0, 4).forEach(amb => {
+                        let progresso = amb.tarefas.length ? 
+                            Math.round(amb.tarefas.filter(t => t.concluido).length / amb.tarefas.length * 100) : 0;
+                        html += `
+                        <div class="timeline-item">
+                            <div class="timeline-marcador"></div>
+                            <div class="timeline-conteudo">
+                                <div class="timeline-mes">${amb.nome}</div>
+                                <div style="font-size: 14px; color: #64748b;">${amb.tarefas.length} tarefas</div>
+                                <div class="timeline-progresso">
+                                    <div class="timeline-bar" style="width: ${progresso}%;"></div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                container.innerHTML = html;
+            } 
+            else if (abaClienteAtual === 'fotos') {
+                let html = `
+                <div class="progresso-section">
+                    <div class="progresso-titulo">📸 Fotos da Obra</div>
+                    <div class="foto-grid">`;
+                
+                if (dados.fotos.length === 0) {
+                    html += `<div class="foto-placeholder" style="grid-column: span 3;">Nenhuma foto disponível</div>`;
+                } else {
+                    dados.fotos.forEach((foto, i) => {
+                        html += `<div class="foto-item"><img src="${foto.url}" alt="Foto ${i+1}" onclick="window.open('${foto.url}','_blank')"></div>`;
+                    });
+                }
+                html += `</div></div>`;
+                container.innerHTML = html;
+            }
         }
 
         // ============================================
-        // ÁREA DO ADMIN (TUDO EDITÁVEL)
+        // ÁREA DO ADMIN (completa)
         // ============================================
         function renderizarAdmin() {
             let html = `
             <div class="admin-container">
-                <!-- DADOS GERAIS DA OBRA -->
+                <!-- Dados gerais da obra -->
                 <div class="admin-card">
                     <div class="admin-card-title">📋 Dados da Obra</div>
                     <input class="input-admin" placeholder="Nome da obra" value="${dados.titulo}" onchange="dados.titulo=this.value; salvarDados();">
-                    <input class="input-admin" placeholder="Endereço completo" value="${dados.endereco}" onchange="dados.endereco=this.value; salvarDados();">
+                    <input class="input-admin" placeholder="Endereço" value="${dados.endereco}" onchange="dados.endereco=this.value; salvarDados();">
                     <input class="input-admin" placeholder="Proprietário" value="${dados.proprietario}" onchange="dados.proprietario=this.value; salvarDados();">
                     <input class="input-admin" placeholder="Arquiteto" value="${dados.arquiteto}" onchange="dados.arquiteto=this.value; salvarDados();">
                     <input class="input-admin" placeholder="Data de início" value="${dados.dataInicio}" onchange="dados.dataInicio=this.value; salvarDados();">
                 </div>
 
-                <!-- TABS DO ADMIN -->
+                <!-- Abas do admin -->
                 <div class="admin-tabs">
                     <div class="admin-tab ${abaAdminAtual === 'ambientes' ? 'active' : ''}" onclick="mudarAbaAdmin('ambientes')">🏠 Ambientes</div>
                     <div class="admin-tab ${abaAdminAtual === 'orcamento' ? 'active' : ''}" onclick="mudarAbaAdmin('orcamento')">💰 Orçamento</div>
                     <div class="admin-tab ${abaAdminAtual === 'materiais' ? 'active' : ''}" onclick="mudarAbaAdmin('materiais')">📦 Materiais</div>
                     <div class="admin-tab ${abaAdminAtual === 'maoobra' ? 'active' : ''}" onclick="mudarAbaAdmin('maoobra')">👷 Mão de Obra</div>
-                </div>`;
+                    <div class="admin-tab ${abaAdminAtual === 'fotosAdmin' ? 'active' : ''}" onclick="mudarAbaAdmin('fotosAdmin')">📸 Fotos</div>
+                </div>
+
+                <div id="adminConteudo"></div>
+            </div>
+            `;
+            document.getElementById('conteudo').innerHTML = html;
+            renderizarConteudoAdmin();
+        }
+
+        function mudarAbaAdmin(aba) {
+            abaAdminAtual = aba;
+            renderizarConteudoAdmin();
+        }
+
+        function renderizarConteudoAdmin() {
+            let container = document.getElementById('adminConteudo');
+            if (!container) return;
 
             // AMBIENTES
             if (abaAdminAtual === 'ambientes') {
-                html += `<div class="admin-card"><div class="admin-card-title">🏠 Ambientes</div>`;
-                
+                let html = `<div class="admin-card"><div class="admin-card-title">🏠 Ambientes</div>`;
                 dados.ambientes.forEach((amb, idx) => {
                     html += `
                     <div style="background: #f8fafc; border-radius: 24px; padding: 20px; margin: 20px 0;">
                         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <input class="input-admin" style="flex:2;" placeholder="Nome do ambiente" value="${amb.nome}" onchange="atualizarAmbiente(${amb.id}, 'nome', this.value)">
+                            <input class="input-admin" style="flex:2;" placeholder="Nome" value="${amb.nome}" onchange="atualizarAmbiente(${amb.id}, 'nome', this.value)">
                             <input class="input-admin" style="flex:1;" placeholder="Área" value="${amb.area}" onchange="atualizarAmbiente(${amb.id}, 'area', this.value)">
                             <button class="btn btn-danger btn-sm" onclick="excluirAmbiente(${amb.id})">🗑️</button>
                         </div>`;
-                    
                     amb.tarefas.forEach((tarefa, tIdx) => {
                         html += `
                         <div style="display: flex; gap: 8px; margin: 10px 0; align-items: center;">
@@ -507,21 +568,18 @@
                             <button class="btn btn-danger btn-sm" onclick="excluirTarefa(${amb.id}, ${tIdx})">✕</button>
                         </div>`;
                     });
-                    
                     html += `<button class="btn btn-success btn-sm" onclick="adicionarTarefa(${amb.id})">➕ Nova Tarefa</button>`;
                     html += `</div>`;
                 });
-                
                 html += `<button class="btn btn-primary" style="width:100%;" onclick="adicionarAmbiente()">➕ Adicionar Ambiente</button>`;
                 html += `</div>`;
+                container.innerHTML = html;
             }
-
             // ORÇAMENTO
             else if (abaAdminAtual === 'orcamento') {
-                html += `<div class="admin-card"><div class="admin-card-title">💰 Orçamento</div>`;
+                let html = `<div class="admin-card"><div class="admin-card-title">💰 Orçamento</div>`;
                 html += `<button class="btn btn-success" onclick="adicionarItemOrcamento()">➕ Adicionar Item</button>`;
                 html += `<div class="tabela-container"><table class="tabela"><thead><tr><th>Cód</th><th>Descrição</th><th>Un</th><th>Quant</th><th>R$ Unit</th><th>R$ Total</th><th>Ações</th></tr></thead><tbody>`;
-                
                 dados.orcamento.forEach((item, idx) => {
                     html += `<tr>
                         <td><input class="input-admin" value="${item.codigo}" onchange="atualizarOrcamento(${idx}, 'codigo', this.value)"></td>
@@ -529,20 +587,18 @@
                         <td><input class="input-admin" value="${item.un}" style="width:60px;" onchange="atualizarOrcamento(${idx}, 'un', this.value)"></td>
                         <td><input class="input-admin" type="number" value="${item.quant}" style="width:80px;" onchange="atualizarOrcamento(${idx}, 'quant', this.value)"></td>
                         <td><input class="input-admin" type="number" value="${item.unitario}" style="width:100px;" onchange="atualizarOrcamento(${idx}, 'unitario', this.value)"></td>
-                        <td>R$ ${item.total?.toFixed(2) || '0.00'}</td>
+                        <td>R$ ${(item.quant * item.unitario).toFixed(2)}</td>
                         <td><button class="btn btn-danger btn-sm" onclick="excluirOrcamento(${idx})">🗑️</button></td>
                     </tr>`;
                 });
-                
                 html += `</tbody></table></div></div>`;
+                container.innerHTML = html;
             }
-
             // MATERIAIS
             else if (abaAdminAtual === 'materiais') {
-                html += `<div class="admin-card"><div class="admin-card-title">📦 Materiais</div>`;
+                let html = `<div class="admin-card"><div class="admin-card-title">📦 Materiais</div>`;
                 html += `<button class="btn btn-success" onclick="adicionarMaterial()">➕ Adicionar Material</button>`;
                 html += `<div class="tabela-container"><table class="tabela"><thead><tr><th>Cód</th><th>Material</th><th>Un</th><th>Quant</th><th>Fornecedor</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
-                
                 dados.materiais.forEach((item, idx) => {
                     html += `<tr>
                         <td><input class="input-admin" value="${item.codigo}" onchange="atualizarMaterial(${idx}, 'codigo', this.value)"></td>
@@ -560,15 +616,13 @@
                         <td><button class="btn btn-danger btn-sm" onclick="excluirMaterial(${idx})">🗑️</button></td>
                     </tr>`;
                 });
-                
                 html += `</tbody></table></div></div>`;
+                container.innerHTML = html;
             }
-
             // MÃO DE OBRA
             else if (abaAdminAtual === 'maoobra') {
-                html += `<div class="admin-card"><div class="admin-card-title">👷 Mão de Obra</div>`;
+                let html = `<div class="admin-card"><div class="admin-card-title">👷 Mão de Obra</div>`;
                 html += `<button class="btn btn-success" onclick="adicionarFuncionario()">➕ Adicionar Funcionário</button>`;
-                
                 dados.maoObra.funcionarios.forEach((func, idx) => {
                     html += `
                     <div style="background: #f8fafc; border-radius: 24px; padding: 20px; margin: 20px 0;">
@@ -580,22 +634,32 @@
                         </div>
                     </div>`;
                 });
-                
                 html += `</div>`;
+                container.innerHTML = html;
             }
-
-            html += `</div>`;
-            document.getElementById('conteudo').innerHTML = html;
+            // FOTOS (ADMIN)
+            else if (abaAdminAtual === 'fotosAdmin') {
+                let html = `<div class="admin-card"><div class="admin-card-title">📸 Gerenciar Fotos</div>`;
+                html += `<button class="btn btn-success" onclick="adicionarFoto()">➕ Adicionar Fotos</button>`;
+                html += `<div class="foto-grid">`;
+                if (dados.fotos.length === 0) {
+                    html += `<div class="foto-placeholder" style="grid-column: span 3;">Nenhuma foto</div>`;
+                } else {
+                    dados.fotos.forEach((foto, i) => {
+                        html += `<div class="foto-item" style="position: relative;">
+                            <img src="${foto.url}" style="width:100%; height:100%; object-fit:cover;">
+                            <button class="btn btn-danger btn-sm" style="position: absolute; top: 5px; right: 5px;" onclick="excluirFoto(${i})">✕</button>
+                        </div>`;
+                    });
+                }
+                html += `</div></div>`;
+                container.innerHTML = html;
+            }
         }
 
         // ============================================
-        // FUNÇÕES DE CRUD (AMBIENTES)
+        // FUNÇÕES DE CRUD (Admin)
         // ============================================
-        function mudarAbaAdmin(aba) {
-            abaAdminAtual = aba;
-            renderizarAdmin();
-        }
-
         function adicionarAmbiente() {
             let novoId = dados.ambientes.length > 0 ? Math.max(...dados.ambientes.map(a => a.id)) + 1 : 1;
             dados.ambientes.push({
@@ -663,15 +727,13 @@
             }
         }
 
-        // ORÇAMENTO
         function adicionarItemOrcamento() {
             dados.orcamento.push({
                 codigo: String(dados.orcamento.length + 1).padStart(3, '0'),
                 descricao: "Novo item",
                 un: "un",
                 quant: 1,
-                unitario: 0,
-                total: 0
+                unitario: 0
             });
             salvarDados();
             renderizarAdmin();
@@ -680,7 +742,6 @@
         function atualizarOrcamento(idx, campo, valor) {
             if (campo === 'quant' || campo === 'unitario') {
                 dados.orcamento[idx][campo] = parseFloat(valor) || 0;
-                dados.orcamento[idx].total = dados.orcamento[idx].quant * dados.orcamento[idx].unitario;
             } else {
                 dados.orcamento[idx][campo] = valor;
             }
@@ -693,14 +754,12 @@
             renderizarAdmin();
         }
 
-        // MATERIAIS
         function adicionarMaterial() {
             dados.materiais.push({
                 codigo: "MAT" + String(dados.materiais.length + 1).padStart(3, '0'),
                 descricao: "Novo material",
                 un: "un",
                 quant: 1,
-                unitario: 0,
                 fornecedor: "",
                 status: "pendente"
             });
@@ -719,7 +778,6 @@
             renderizarAdmin();
         }
 
-        // FUNCIONÁRIOS
         function adicionarFuncionario() {
             dados.maoObra.funcionarios.push({
                 id: dados.maoObra.funcionarios.length + 1,
@@ -734,7 +792,11 @@
         }
 
         function atualizarFuncionario(idx, campo, valor) {
-            dados.maoObra.funcionarios[idx][campo] = campo === 'valorHora' ? parseFloat(valor) || 0 : valor;
+            if (campo === 'valorHora') {
+                dados.maoObra.funcionarios[idx][campo] = parseFloat(valor) || 0;
+            } else {
+                dados.maoObra.funcionarios[idx][campo] = valor;
+            }
             salvarDados();
         }
 
@@ -744,7 +806,36 @@
             renderizarAdmin();
         }
 
-        // Carregar dados salvos
+        function adicionarFoto() {
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.onchange = function(e) {
+                for (let file of e.target.files) {
+                    let reader = new FileReader();
+                    reader.onload = function(ev) {
+                        dados.fotos.push({
+                            url: ev.target.result,
+                            nome: file.name,
+                            data: new Date().toLocaleDateString('pt-BR')
+                        });
+                        salvarDados();
+                        renderizarAdmin();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        function excluirFoto(idx) {
+            dados.fotos.splice(idx, 1);
+            salvarDados();
+            renderizarAdmin();
+        }
+
+        // Inicialização
         carregarDados();
     </script>
 </body>
