@@ -430,23 +430,23 @@ let dados = {
             id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', 
             inicio: 0, duracao: 2, responsavel: 'Admin', 
             tarefas: [
-                { nome: 'Placa de Obra', duracao: 1, responsavel: 'Admin', progresso: 100 },
-                { nome: 'Administração da Obra', duracao: 5, responsavel: 'Engenheiro', progresso: 40 }
+                { nome: 'Placa de Obra',          inicio: 0, duracao: 1, responsavel: 'Admin',      progresso: 100 },
+                { nome: 'Administração da Obra',   inicio: 0, duracao: 5, responsavel: 'Engenheiro', progresso: 40  }
             ] 
         },
         { 
             id: 'g2', nome: '2. Demolições', cor: '#f43f5e', 
             inicio: 2, duracao: 2, responsavel: 'Equipe A', 
             tarefas: [
-                { nome: 'Demolição Alvenaria', duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
-                { nome: 'Remoção Entulho', duracao: 2, responsavel: 'Servente', progresso: 0 }
+                { nome: 'Demolição Alvenaria', inicio: 2, duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
+                { nome: 'Remoção Entulho',     inicio: 4, duracao: 2, responsavel: 'Servente', progresso: 0 }
             ] 
         },
         { 
             id: 'g3', nome: '3. Paredes', cor: '#e8a020', 
             inicio: 4, duracao: 2, responsavel: 'Pedreiro', 
             tarefas: [
-                { nome: 'Alvenaria Tijolo', duracao: 2, responsavel: 'Pedreiro', progresso: 0 }
+                { nome: 'Alvenaria Tijolo', inicio: 4, duracao: 2, responsavel: 'Pedreiro', progresso: 0 }
             ] 
         }
     ],
@@ -771,47 +771,74 @@ function renderizarCronogramaAdmin() {
     </div>`;
 }
 
+// ── Garante que tarefas antigas (sem campo inicio) recebam um valor padrão ──
+function normalizarTarefas() {
+    dados.grupos.forEach(g => {
+        let cursor = g.inicio; // acumula o início sequencial
+        g.tarefas.forEach(t => {
+            if (t.inicio === undefined || t.inicio === null) {
+                t.inicio = cursor;
+            }
+            cursor = t.inicio + (t.duracao || 1);
+        });
+    });
+}
+
+// ── Recalcula inicio e duracao do GRUPO com base nas tarefas filhas ──
+function recalcularGrupo(g) {
+    if (!g.tarefas || g.tarefas.length === 0) return;
+    const iMin = Math.min(...g.tarefas.map(t => t.inicio));
+    const iMax = Math.max(...g.tarefas.map(t => t.inicio + (t.duracao || 1)));
+    g.inicio   = iMin;
+    g.duracao  = iMax - iMin;
+}
+
 function renderizarGantt() {
+    normalizarTarefas(); // compatibilidade com dados antigos
     const body = document.getElementById('ganttBody');
     if (!body) return;
     body.innerHTML = '';
     const semanaAtual = getSemanaAtual();
 
     dados.grupos.forEach((g, gIndex) => {
+        recalcularGrupo(g); // grupo espelha suas tarefas
         const progGrupo = calcularProgressoGrupo(g);
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
 
-        // ── CABEÇALHO DO GRUPO ──
+        // ── CABEÇALHO DO GRUPO (barra engloba todas as tarefas) ──
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
             <div class="gc">
-                <div class="dot" style="background:${g.cor}; cursor:pointer" title="Alterar cor" onclick="alterarCorGrupo(${gIndex})"></div>
+                <div class="dot" style="background:${g.cor}; cursor:pointer" title="Alterar cor"
+                    onclick="alterarCorGrupo(${gIndex})"></div>
                 <input class="gc-edit" value="${g.nome}"
                     onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado();">
             </div>
             <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
             <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + g.duracao)}</div>
-            <div class="gc">
-                <input class="gc-edit" type="number" min="1" value="${g.duracao}"
-                    onchange="dados.grupos[${gIndex}].duracao=parseInt(this.value)||1; marcarAlterado(); renderizarGantt();">
-            </div>
+            <div class="gc" style="font-size:11px; color:var(--text3)">${g.duracao} sem.</div>
             <div class="gc">
                 <span style="color:var(--accent); font-weight:600">${progGrupo}%</span>
             </div>
             <div class="gc" style="padding:0; overflow:hidden">
                 <div class="bar-area">
                     <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                    <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${g.duracao*SEMANA_PX}px; background:${g.cor}33; border:1px solid ${g.cor}">
+                    <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${g.duracao*SEMANA_PX}px;
+                        background:${g.cor}33; border:1px solid ${g.cor}">
                         <div class="gantt-bar-fill" style="width:${progGrupo}%; background:${g.cor}"></div>
                     </div>
                 </div>
             </div>`;
         grupoDiv.appendChild(grupoHeader);
 
-        // ── TAREFAS ──
+        // ── TAREFAS — cada uma com seu próprio início e duração ──
         g.tarefas.forEach((t, tIndex) => {
+            // segurança: garante que t.inicio existe
+            if (t.inicio === undefined) t.inicio = g.inicio;
+            const tFim = t.inicio + (t.duracao || 1);
+
             const row = document.createElement('div');
             row.className = 'gantt-row';
             row.innerHTML = `
@@ -823,22 +850,26 @@ function renderizarGantt() {
                     <button class="btn-crud btn-crud-del" title="Excluir tarefa"
                         onclick="excluirTarefa(${gIndex},${tIndex})">Del</button>
                 </div>
-                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
-                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + t.duracao)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(t.inicio)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(tFim)}</div>
                 <div class="gc">
                     <input class="gc-edit" type="number" min="1" value="${t.duracao}"
-                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1; marcarAlterado(); renderizarGantt();">
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1;
+                                  marcarAlterado(); renderizarGantt();">
                 </div>
                 <div class="gc" style="gap:6px">
                     <input type="range" min="0" max="100" value="${t.progresso}"
                         style="width:70px; accent-color:${g.cor}"
-                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); this.nextElementSibling.textContent=this.value+'%';">
+                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value);
+                                 marcarAlterado(); this.nextElementSibling.textContent=this.value+'%';">
                     <span style="min-width:32px; font-size:11px">${t.progresso}%</span>
                 </div>
                 <div class="gc" style="padding:0; overflow:hidden">
                     <div class="bar-area">
                         <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                        <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${t.duracao*SEMANA_PX}px; background:${g.cor}22; border:1px solid ${g.cor}55">
+                        <div class="gantt-bar"
+                            style="left:${t.inicio*SEMANA_PX}px; width:${(t.duracao||1)*SEMANA_PX}px;
+                                   background:${g.cor}22; border:1px solid ${g.cor}55">
                             <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
                         </div>
                     </div>
@@ -946,10 +977,18 @@ function alterarCorGrupo(gIndex) {
 function abrirModalTarefa(gIndex, tIndex) {
     const novo = tIndex === null;
     const g = dados.grupos[gIndex];
-    const t = novo ? { nome: '', duracao: 2, responsavel: g.responsavel || 'Equipe', progresso: 0 }
-                   : g.tarefas[tIndex];
-    abrirModal(novo ? '➕ Nova Tarefa' : '✏️ Editar Tarefa', `
-        <div style="margin-bottom:6px; font-size:11px; color:var(--text2)">
+    // inicio sugerido = fim da ultima tarefa do grupo
+    let inicioSug = g.inicio || 0;
+    if (g.tarefas.length > 0) {
+        const ul = g.tarefas[g.tarefas.length - 1];
+        inicioSug = (ul.inicio !== undefined ? ul.inicio : g.inicio) + (ul.duracao || 1);
+    }
+    const t = novo
+        ? { nome: '', inicio: inicioSug, duracao: 2, responsavel: g.responsavel || 'Equipe', progresso: 0 }
+        : g.tarefas[tIndex];
+    const tIni = t.inicio !== undefined ? t.inicio : inicioSug;
+    abrirModal(novo ? 'Nova Tarefa' : 'Editar Tarefa', `
+        <div style="margin-bottom:8px; font-size:11px; color:var(--text2)">
             Grupo: <strong style="color:var(--accent)">${g.nome}</strong>
         </div>
         <div style="display:grid; gap:12px">
@@ -959,13 +998,25 @@ function abrirModalTarefa(gIndex, tIndex) {
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
                 <div>
-                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duração (semanas)</label>
-                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}">
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">
+                        Semana de Inicio &nbsp;<span style="color:var(--text3); font-size:10px">(S1=${fmtSemana(0)})</span>
+                    </label>
+                    <input id="mt-inicio" class="crud-input" type="number" min="0" value="${tIni}"
+                        oninput="atualizarPreviewTarefa()">
                 </div>
                 <div>
-                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsável</label>
-                    <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe">
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duracao (semanas)</label>
+                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}"
+                        oninput="atualizarPreviewTarefa()">
                 </div>
+            </div>
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                        padding:8px 12px; font-size:11px; color:var(--accent)" id="mt-preview">
+                Periodo: ${fmtSemana(tIni)} ate ${fmtSemana(tIni + t.duracao)}
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsavel</label>
+                <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe">
             </div>
             <div>
                 <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:6px">
@@ -984,14 +1035,22 @@ function abrirModalTarefa(gIndex, tIndex) {
         </div>`);
 }
 
+function atualizarPreviewTarefa() {
+    const ini = parseInt(document.getElementById('mt-inicio').value) || 0;
+    const dur = parseInt(document.getElementById('mt-dur').value)    || 1;
+    const el  = document.getElementById('mt-preview');
+    if (el) el.textContent = 'Periodo: ' + fmtSemana(ini) + ' ate ' + fmtSemana(ini + dur);
+}
+
 function salvarTarefa(gIndex, tIndex) {
     const nome = document.getElementById('mt-nome').value.trim();
     if (!nome) { mostrarNotificacao('Informe o nome da tarefa!', 'erro'); return; }
     const obj = {
         nome,
-        duracao:     parseInt(document.getElementById('mt-dur').value)  || 2,
-        responsavel: document.getElementById('mt-resp').value.trim()    || 'Equipe',
-        progresso:   parseInt(document.getElementById('mt-prog').value) || 0
+        inicio:      parseInt(document.getElementById('mt-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mt-dur').value)    || 2,
+        responsavel: document.getElementById('mt-resp').value.trim()      || 'Equipe',
+        progresso:   parseInt(document.getElementById('mt-prog').value)   || 0
     };
     if (tIndex === null) {
         dados.grupos[gIndex].tarefas.push(obj);
