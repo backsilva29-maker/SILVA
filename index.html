@@ -30,8 +30,6 @@ body {
     min-height: 100vh; 
     overflow-x: hidden; 
 }
-
-/* ===== LOGIN ===== */
 .login-modal { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); 
@@ -47,6 +45,7 @@ body {
     width: 100%; padding: 16px; margin: 15px 0; 
     background: var(--bg); border: 1px solid var(--border); 
     border-radius: 40px; color: var(--text); font-size: 16px; 
+    outline: none;
 }
 .login-btn { 
     width: 100%; padding: 16px; margin: 8px 0; border: none; 
@@ -54,8 +53,6 @@ body {
 }
 .btn-admin { background: var(--accent); color: #000; }
 .btn-client { background: var(--accent2); color: white; }
-
-/* ===== TOPBAR ===== */
 .topbar { 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 24px; height: 56px; background: var(--surface); 
@@ -81,8 +78,6 @@ body {
 .btn-primary:hover { background: #f5ae30; }
 .btn-danger { background: var(--accent4); color: white; }
 .btn-success { background: var(--accent3); color: white; }
-
-/* ===== LAYOUT ===== */
 .layout { display: flex; height: calc(100vh - 56px); }
 .sidebar { 
     width: 240px; min-width: 240px; background: var(--surface); 
@@ -104,8 +99,6 @@ body {
     color: var(--accent); border-left-color: var(--accent); 
     background: rgba(232,160,32,.06); 
 }
-
-/* ===== MAIN ===== */
 .main { flex: 1; overflow: auto; padding: 20px 24px; }
 .page-header { 
     display: flex; align-items: center; justify-content: space-between; 
@@ -113,8 +106,6 @@ body {
 }
 .page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .page-sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
-
-/* ===== SAVE BAR ===== */
 .save-bar { 
     background: var(--surface2); border: 1px solid var(--border); 
     border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; 
@@ -124,8 +115,6 @@ body {
 .save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
 .save-indicator.saved { background: var(--accent3); }
 .save-indicator.pending { background: var(--accent); animation: pulse 1s infinite; }
-
-/* ===== CLIENT DATA CARD ===== */
 .client-data-card { 
     background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); 
     border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
@@ -140,10 +129,65 @@ body {
 .client-data-input { 
     background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
     padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; 
+    outline: none;
 }
-.client-data-input:focus { outline: none; border-color: var(--accent); }
+.client-data-input:focus { border-color: var(--accent); }
 
-/* ===== GANTT ===== */
+/* DATA PICKER */
+.data-picker-box {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+.data-part {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+.data-part label {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+}
+.data-part input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border-color .15s;
+}
+.data-part input:focus { border-color: var(--accent); }
+.data-sep {
+    font-size: 24px;
+    color: var(--text3);
+    padding-bottom: 10px;
+    user-select: none;
+}
+.data-preview {
+    margin-left: 12px;
+    padding-bottom: 10px;
+    font-size: 12px;
+    color: var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
 .gantt-wrap { 
     border: 1px solid var(--border); border-radius: 10px; overflow: hidden; 
     background: var(--surface); margin-bottom: 20px; 
@@ -173,9 +217,10 @@ body {
 .gc-edit { 
     background: transparent; border: 1px solid var(--border); border-radius: 4px; 
     padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; 
+    outline: none;
 }
-.gc-edit:focus { outline: none; border-color: var(--accent); }
-.dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+.gc-edit:focus { border-color: var(--accent); }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink:0; }
 .bar-area { position: relative; height: var(--gantt-h); min-width: 100%; overflow-x: auto; }
 .gantt-bar { 
     position: absolute; top: 50%; transform: translateY(-50%); height: 20px; 
@@ -191,8 +236,6 @@ body {
     position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); 
     opacity: .7; z-index: 5; 
 }
-
-/* ===== ANIMAÇÕES ===== */
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes slideInLeft { 
     from { opacity: 0; transform: translateX(-20px); } 
@@ -205,8 +248,6 @@ body {
     animation: shimmer 2s infinite;
 }
 @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-/* ===== CRUD ===== */
 .crud-container { display: grid; gap: 12px; }
 .crud-card { 
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
@@ -220,10 +261,9 @@ body {
 .crud-input { 
     background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
     padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; 
+    outline: none;
 }
-.crud-input:focus { outline: none; border-color: var(--accent); }
-
-/* ===== FOTOS ===== */
+.crud-input:focus { border-color: var(--accent); }
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 .photo-card { 
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
@@ -234,8 +274,6 @@ body {
 .photo-card-info { padding: 12px; }
 .photo-card-ambiente { font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
 .photo-card-data { font-size: 10px; color: var(--text3); }
-
-/* ===== STATS ===== */
 .stats-row { 
     display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
     gap: 16px; margin-bottom: 20px; 
@@ -252,8 +290,6 @@ body {
 .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .stat-bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .stat-bar-fill { height: 100%; background: var(--accent3); border-radius: 2px; transition: width 0.5s ease-out; }
-
-/* ===== MODAL ===== */
 .modal { 
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; 
@@ -268,8 +304,6 @@ body {
 .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
 .modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
-
-/* ===== NOTIFICATION ===== */
 .notification { 
     position: fixed; bottom: 20px; right: 20px; background: var(--surface); 
     border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; 
@@ -278,16 +312,12 @@ body {
 }
 .notification.show { transform: translateY(0); opacity: 1; }
 .notification.success { border-color: var(--accent3); }
-
-/* ===== AMBIENTES TABS ===== */
 .ambientes-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 .ambiente-tab { 
     padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); 
     border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); 
 }
 .ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
-
-/* ===== CLIENT TIMELINE ===== */
 .client-timeline { 
     position: relative; padding-left: 30px; border-left: 3px solid var(--border); 
     margin: 30px 0; 
@@ -332,13 +362,14 @@ body {
     <div class="login-content">
         <h2 style="color: var(--accent); margin-bottom: 20px; font-family:'Syne'">🏗️ Torre L'iris</h2>
         <p style="color:var(--text2); margin-bottom:20px; font-size:12px">Aptos 1702 e 1704</p>
-        <input type="password" id="senhaInput" class="login-input" placeholder="Senha do administrador">
+        <input type="password" id="senhaInput" class="login-input" placeholder="Senha do administrador"
+               onkeydown="if(event.key==='Enter') verificarSenha()">
         <button class="login-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
         <button class="login-btn btn-client" onclick="entrarComoCliente()">Visualizar como Cliente</button>
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL GENÉRICO -->
 <div id="modalGenerico" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -362,14 +393,13 @@ body {
 const SENHA_ADMIN = "torre2026";
 let admin = false;
 let modoAtual = 'cronograma';
-let ambienteFotoSelecionado = 'todos';
 let dadosAlterados = false;
 
-// ==================== DADOS ====================
+// ==================== DADOS PADRÃO ====================
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
-    dataInicio: "2024-08-01", // ← ÚNICA DATA QUE IMPORTA
+    dataInicio: "2026-03-09",   // ← padrão 09/03/2026 conforme solicitado
     duracaoTotal: 20,
     valor: 234943.54,
     cliente: {
@@ -414,44 +444,43 @@ let dados = {
     ],
     ambientes: ['Sala', 'Cozinha', 'Quarto 1', 'Quarto 2', 'Banheiro 1', 'Banheiro 2', 'Área Serviço', 'Varanda'],
     fotos: [
-        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '01/08/2024' },
-        { url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '01/08/2024' }
+        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '09/03/2026' },
+        { url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '09/03/2026' }
     ]
 };
 
-// ==================== FUNÇÕES DE DATA ====================
 const SEMANA_PX = 40;
 
+// ==================== FUNÇÕES DE DATA ====================
+// ► CORREÇÃO PRINCIPAL: parse local para evitar bug de fuso UTC (problema que
+//   fazia a data aparecer 1 dia antes — ex: 09/03 virava 08/03)
 function getDataInicio() {
-    return new Date(dados.dataInicio);
+    const p = dados.dataInicio.split('-');
+    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+}
+
+function fmtData(d) {
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function fmtSemana(s) {
-    const start = getDataInicio();
-    if (isNaN(start.getTime())) return '??/??';
-    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
-    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-}
-
-function fmtSemanaCompleta(s) {
-    const start = getDataInicio();
-    if (isNaN(start.getTime())) return 'Data inválida';
-    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
-    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+    const d = new Date(getDataInicio().getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 }
 
 function calcularPrevisao() {
-    const start = getDataInicio();
-    if (isNaN(start.getTime())) return 'Data não definida';
-    const semanas = dados.duracaoTotal || 20;
-    const end = new Date(start.getTime() + semanas * 7 * 24 * 3600 * 1000);
-    return end.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+    const end = new Date(getDataInicio().getTime() + (dados.duracaoTotal || 20) * 7 * 24 * 3600 * 1000);
+    return end.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function getSemanaAtual() {
-    const start = getDataInicio();
-    if (isNaN(start.getTime())) return 0;
-    return Math.round((new Date() - start) / (7 * 24 * 3600 * 1000));
+    return Math.round((new Date() - getDataInicio()) / (7 * 24 * 3600 * 1000));
+}
+
+// ► Extrai partes da data armazenada (sem depender de Date para evitar bugs)
+function getPartes() {
+    const p = dados.dataInicio.split('-');
+    return { ano: p[0], mes: p[1], dia: p[2] };
 }
 
 // ==================== FUNÇÕES DE PROGRESSO ====================
@@ -459,17 +488,10 @@ function calcularProgressoGrupo(g) {
     if (!g.tarefas || g.tarefas.length === 0) return 0;
     return Math.round(g.tarefas.reduce((acc, t) => acc + (t.progresso || 0), 0) / g.tarefas.length);
 }
-
 function calcularProgressoGeral() {
-    let totalTarefas = 0;
-    let somaProgresso = 0;
-    dados.grupos.forEach(g => {
-        g.tarefas.forEach(t => {
-            totalTarefas++;
-            somaProgresso += t.progresso || 0;
-        });
-    });
-    return totalTarefas > 0 ? Math.round(somaProgresso / totalTarefas) : 0;
+    let total = 0, soma = 0;
+    dados.grupos.forEach(g => g.tarefas.forEach(t => { total++; soma += t.progresso || 0; }));
+    return total > 0 ? Math.round(soma / total) : 0;
 }
 
 // ==================== PERSISTÊNCIA ====================
@@ -479,30 +501,24 @@ function salvarDados() {
     atualizarIndicadorSave();
     mostrarNotificacao('Dados salvos com sucesso!', 'success');
 }
-
 function carregarDados() {
     const salvos = localStorage.getItem('obraLiris_v4');
     if (salvos) {
-        dados = JSON.parse(salvos);
+        try { dados = JSON.parse(salvos); } catch(e) { /* mantém padrão */ }
     }
 }
-
 function marcarAlterado() {
     dadosAlterados = true;
     atualizarIndicadorSave();
 }
-
 function atualizarIndicadorSave() {
-    const indicator = document.getElementById('saveIndicator');
-    if (indicator) {
-        indicator.className = 'save-indicator ' + (dadosAlterados ? 'pending' : 'saved');
-    }
+    const el = document.getElementById('saveIndicator');
+    if (el) el.className = 'save-indicator ' + (dadosAlterados ? 'pending' : 'saved');
 }
 
 // ==================== LOGIN ====================
 function verificarSenha() {
-    const senha = document.getElementById('senhaInput').value;
-    if (senha === SENHA_ADMIN) {
+    if (document.getElementById('senhaInput').value === SENHA_ADMIN) {
         admin = true;
         document.getElementById('loginModal').style.display = 'none';
         carregarDados();
@@ -511,7 +527,6 @@ function verificarSenha() {
         alert('Senha incorreta');
     }
 }
-
 function entrarComoCliente() {
     admin = false;
     document.getElementById('loginModal').style.display = 'none';
@@ -522,10 +537,8 @@ function entrarComoCliente() {
 // ==================== NOTIFICAÇÕES ====================
 function mostrarNotificacao(mensagem, tipo = 'success') {
     const notif = document.getElementById('notification');
-    const icon = document.getElementById('notifIcon');
-    const msg = document.getElementById('notifMsg');
-    icon.textContent = tipo === 'success' ? '✅' : '⚠️';
-    msg.textContent = mensagem;
+    document.getElementById('notifIcon').textContent = tipo === 'success' ? '✅' : '⚠️';
+    document.getElementById('notifMsg').textContent = mensagem;
     notif.className = 'notification show ' + tipo;
     setTimeout(() => { notif.className = 'notification'; }, 3000);
 }
@@ -540,29 +553,48 @@ function fecharModal() {
     document.getElementById('modalGenerico').classList.remove('open');
 }
 
-// ==================== FUNÇÃO ESPECÍFICA PARA DATA (AGORA NO CRONOGRAMA) ====================
-function atualizarDataInicio(novaData) {
-    dados.dataInicio = novaData;
+// ==================== ATUALIZAÇÃO DE DATA ====================
+// ► Esta é a função MANDANTE — chamada pelos campos DIA/MÊS/ANO em
+//   Dados do Cliente e propaga para Cronograma Admin + área do Cliente
+function atualizarDataPartes() {
+    const diaEl = document.getElementById('inputDia');
+    const mesEl = document.getElementById('inputMes');
+    const anoEl = document.getElementById('inputAno');
+    if (!diaEl || !mesEl || !anoEl) return;
+
+    let dia = parseInt(diaEl.value) || 9;
+    let mes = parseInt(mesEl.value) || 3;
+    let ano = parseInt(anoEl.value) || 2026;
+
+    // Validação básica
+    dia = Math.min(Math.max(dia, 1), 31);
+    mes = Math.min(Math.max(mes, 1), 12);
+    ano = Math.min(Math.max(ano, 2020), 2040);
+
+    dados.dataInicio = String(ano) + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
     marcarAlterado();
-    
-    // Atualiza a visualização atual
-    if (admin) {
-        renderizarAdmin();
-    } else {
-        renderizarCliente();
+
+    // Atualiza preview sem re-renderizar tudo
+    const prev = document.getElementById('dataPreview');
+    if (prev) {
+        prev.innerHTML =
+            '<span>📅 ' + fmtData(getDataInicio()) + '</span>' +
+            '<span style="color:var(--text2)">Término: ' + calcularPrevisao() + '</span>';
     }
-    
-    mostrarNotificacao('Data de início atualizada! Cronograma recalculado.', 'success');
+    // Atualiza legenda do cronograma se estiver visível
+    const cronSub = document.getElementById('cronSub');
+    if (cronSub) cronSub.textContent = dados.endereco + ' · Início: ' + fmtData(getDataInicio()) + ' · Término: ' + calcularPrevisao();
+
+    mostrarNotificacao('Data atualizada: ' + fmtData(getDataInicio()), 'success');
 }
 
 // ==================== RENDERIZAÇÃO ADMIN ====================
 function renderizarAdmin() {
-    const app = document.getElementById('app');
-    app.innerHTML = `
+    document.getElementById('app').innerHTML = `
     <div class="topbar">
-        <div class="logo"><div class="logo-badge">A</div> Admin - ${dados.titulo}</div>
+        <div class="logo"><div class="logo-badge">A</div> Admin — ${dados.titulo}</div>
         <div style="display:flex; gap:10px; align-items:center">
-            <span style="color: var(--accent); font-size:12px">👑 Modo Administrador</span>
+            <span style="color:var(--accent); font-size:12px">👑 Administrador</span>
             <button class="btn btn-ghost" onclick="renderizarCliente()">👁️ Ver como Cliente</button>
         </div>
     </div>
@@ -570,113 +602,145 @@ function renderizarAdmin() {
         <div class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-label">Módulos</div>
-                <div class="sidebar-item ${modoAtual === 'cronograma' ? 'active' : ''}" onclick="mudarModo('cronograma')">📅 Cronograma</div>
-                <div class="sidebar-item ${modoAtual === 'dadosCliente' ? 'active' : ''}" onclick="mudarModo('dadosCliente')">👤 Dados do Cliente</div>
-                <div class="sidebar-item ${modoAtual === 'orcamento' ? 'active' : ''}" onclick="mudarModo('orcamento')">💰 Orçamento</div>
-                <div class="sidebar-item ${modoAtual === 'fotos' ? 'active' : ''}" onclick="mudarModo('fotos')">📸 Fotos</div>
-                <div class="sidebar-item ${modoAtual === 'ambientes' ? 'active' : ''}" onclick="mudarModo('ambientes')">🏠 Ambientes</div>
+                <div class="sidebar-item ${modoAtual==='dadosCliente'?'active':''}" onclick="mudarModo('dadosCliente')">👤 Dados do Cliente</div>
+                <div class="sidebar-item ${modoAtual==='cronograma'?'active':''}" onclick="mudarModo('cronograma')">📅 Cronograma</div>
+                <div class="sidebar-item ${modoAtual==='orcamento'?'active':''}" onclick="mudarModo('orcamento')">💰 Orçamento</div>
+                <div class="sidebar-item ${modoAtual==='fotos'?'active':''}" onclick="mudarModo('fotos')">📸 Fotos</div>
+                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">🏠 Ambientes</div>
             </div>
         </div>
         <div class="main">
-            ${renderizarSaveBar()}
+            <div class="save-bar">
+                <div class="save-status">
+                    <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
+                    <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
+                </div>
+                <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
+            </div>
             ${renderizarConteudoAdmin()}
         </div>
     </div>`;
-    if (modoAtual === 'cronograma') {
-        setTimeout(() => renderizarGantt(), 100);
-    }
-}
-
-function renderizarSaveBar() {
-    return `
-    <div class="save-bar">
-        <div class="save-status">
-            <div id="saveIndicator" class="save-indicator saved"></div>
-            <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
-        </div>
-        <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
-    </div>`;
+    if (modoAtual === 'cronograma') setTimeout(() => renderizarGantt(), 80);
 }
 
 function mudarModo(modo) {
-    if (dadosAlterados) {
-        if (!confirm('Você tem alterações não salvas. Deseja salvar antes de mudar?')) { return; }
-        salvarDados();
-    }
+    if (dadosAlterados && !confirm('Alterações não salvas. Salvar antes de mudar?')) return;
+    if (dadosAlterados) salvarDados();
     modoAtual = modo;
     renderizarAdmin();
 }
 
 function renderizarConteudoAdmin() {
     switch(modoAtual) {
-        case 'cronograma': return renderizarCronogramaAdmin();
         case 'dadosCliente': return renderizarDadosClienteAdmin();
-        case 'orcamento': return renderizarOrcamentoAdmin();
-        case 'fotos': return renderizarFotosAdmin();
-        case 'ambientes': return renderizarAmbientesAdmin();
-        default: return renderizarCronogramaAdmin();
+        case 'cronograma':   return renderizarCronogramaAdmin();
+        case 'orcamento':    return renderizarOrcamentoAdmin();
+        case 'fotos':        return renderizarFotosAdmin();
+        case 'ambientes':    return renderizarAmbientesAdmin();
+        default:             return renderizarDadosClienteAdmin();
     }
 }
 
-// ==================== DADOS DO CLIENTE (ADMIN) - AGORA SEM DATA ====================
+// ==================== DADOS DO CLIENTE (MANDANTE DA DATA) ====================
 function renderizarDadosClienteAdmin() {
+    const p = getPartes();
     return `
     <div class="page-header">
         <div>
             <div class="page-title">👤 Dados do Cliente</div>
-            <div class="page-sub">Informações visíveis na área do cliente</div>
+            <div class="page-sub">⚠️ A data de início definida aqui é mandante — alimenta automaticamente o Cronograma e a área do Cliente</div>
         </div>
     </div>
+
+    <!-- BLOCO DE DATA — MANDANTE -->
+    <div class="client-data-card" style="border-color: var(--accent); margin-bottom:16px">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--accent); text-transform:uppercase; margin-bottom:12px">
+            📅 Data de Início da Obra — Mandante para todo o sistema
+        </div>
+        <div class="data-picker-box">
+            <div class="data-part">
+                <label>Dia</label>
+                <input id="inputDia" type="number" min="1" max="31" value="${parseInt(p.dia)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-sep">/</div>
+            <div class="data-part">
+                <label>Mês</label>
+                <input id="inputMes" type="number" min="1" max="12" value="${parseInt(p.mes)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-sep">/</div>
+            <div class="data-part">
+                <label>Ano</label>
+                <input id="inputAno" type="number" min="2020" max="2040" value="${parseInt(p.ano)}"
+                       style="width:90px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-preview" id="dataPreview">
+                <span>📅 ${fmtData(getDataInicio())}</span>
+                <span style="color:var(--text2)">Término: ${calcularPrevisao()}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEMAIS DADOS -->
     <div class="client-data-card">
         <div class="client-data-grid">
             <div class="client-data-item">
                 <label class="client-data-label">Nome do Cliente</label>
-                <input class="client-data-input" value="${dados.cliente.nome}" onchange="dados.cliente.nome=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.cliente.nome}"
+                       onchange="dados.cliente.nome=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Email</label>
-                <input class="client-data-input" value="${dados.cliente.email}" onchange="dados.cliente.email=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.cliente.email}"
+                       onchange="dados.cliente.email=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Telefone</label>
-                <input class="client-data-input" value="${dados.cliente.telefone}" onchange="dados.cliente.telefone=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.cliente.telefone}"
+                       onchange="dados.cliente.telefone=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Observações</label>
-                <input class="client-data-input" value="${dados.cliente.observacoes}" onchange="dados.cliente.observacoes=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.cliente.observacoes}"
+                       onchange="dados.cliente.observacoes=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Arquiteto</label>
-                <input class="client-data-input" value="${dados.obra.arquiteto}" onchange="dados.obra.arquiteto=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.obra.arquiteto}"
+                       onchange="dados.obra.arquiteto=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Área</label>
-                <input class="client-data-input" value="${dados.obra.area}" onchange="dados.obra.area=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.obra.area}"
+                       onchange="dados.obra.area=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Tipo</label>
-                <input class="client-data-input" value="${dados.obra.tipo}" onchange="dados.obra.tipo=this.value; marcarAlterado();">
+                <input class="client-data-input" value="${dados.obra.tipo}"
+                       onchange="dados.obra.tipo=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">⏱️ Duração (semanas)</label>
-                <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="dados.duracaoTotal=parseInt(this.value); marcarAlterado();">
+                <input class="client-data-input" type="number" value="${dados.duracaoTotal}"
+                       onchange="dados.duracaoTotal=parseInt(this.value)||20; marcarAlterado();">
             </div>
         </div>
     </div>`;
 }
 
-// ==================== CRONOGRAMA (COM DATA EDITÁVEL) ====================
+// ==================== CRONOGRAMA ADMIN ====================
 function renderizarCronogramaAdmin() {
     return `
     <div class="page-header">
         <div>
-            <div class="page-title">📅 Cronograma Inteligente</div>
-            <div class="page-sub">${dados.endereco} · Previsão: ${calcularPrevisao()}</div>
+            <div class="page-title">📅 Cronograma</div>
+            <div class="page-sub" id="cronSub">${dados.endereco} · Início: ${fmtData(getDataInicio())} · Término: ${calcularPrevisao()}</div>
         </div>
-        <div style="display:flex; gap:10px">
-            <div style="display:flex; align-items:center; gap:5px; background:var(--surface); padding:5px 10px; border-radius:8px">
-                <span style="color:var(--accent)">📅 Data de Início:</span>
-                <input type="date" value="${dados.dataInicio}" onchange="atualizarDataInicio(this.value)" style="background:var(--bg); border:1px solid var(--border); color:var(--text); padding:5px; border-radius:4px">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:11px; color:var(--text2)">
+                📅 Início: <strong style="color:var(--accent)">${fmtData(getDataInicio())}</strong>
+                &nbsp;·&nbsp; Altere em <strong style="color:var(--accent2)">Dados do Cliente</strong>
             </div>
             <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
             <button class="btn btn-primary" onclick="adicionarGrupo()">+ Novo Grupo</button>
@@ -684,12 +748,12 @@ function renderizarCronogramaAdmin() {
     </div>
     <div class="gantt-wrap">
         <div class="gantt-header">
-            <div class="gh-cell">Tarefa</div>
+            <div class="gh-cell">Tarefa / Grupo</div>
             <div class="gh-cell">Início</div>
             <div class="gh-cell">Fim</div>
-            <div class="gh-cell">Duração</div>
+            <div class="gh-cell">Dur. (sem)</div>
             <div class="gh-cell">Progresso</div>
-            <div class="gh-cell">Cronograma</div>
+            <div class="gh-cell">Cronograma Visual</div>
         </div>
         <div id="ganttBody"></div>
     </div>`;
@@ -699,85 +763,93 @@ function renderizarGantt() {
     const body = document.getElementById('ganttBody');
     if (!body) return;
     body.innerHTML = '';
-    
+    const semanaAtual = getSemanaAtual();
+
     dados.grupos.forEach((g, gIndex) => {
-        const progressoGrupo = calcularProgressoGrupo(g);
-        const semanaAtual = getSemanaAtual();
-        
+        const progGrupo = calcularProgressoGrupo(g);
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
-        
-        // Grupo
+
+        // Cabeçalho do grupo
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
             <div class="gc">
                 <div class="dot" style="background:${g.cor}"></div>
-                <input class="gc-edit" value="${g.nome}" onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado(); renderizarGantt();">
+                <input class="gc-edit" value="${g.nome}"
+                    onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado();">
             </div>
-            <div class="gc">${fmtSemana(g.inicio)}</div>
-            <div class="gc">${fmtSemana(g.inicio + g.duracao)}</div>
-            <div class="gc"><input class="gc-edit" type="number" value="${g.duracao}" onchange="dados.grupos[${gIndex}].duracao=parseInt(this.value); marcarAlterado(); renderizarGantt();"></div>
-            <div class="gc"><input class="gc-edit" value="${g.responsavel}" onchange="dados.grupos[${gIndex}].responsavel=this.value; marcarAlterado();"></div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + g.duracao)}</div>
             <div class="gc">
+                <input class="gc-edit" type="number" min="1" value="${g.duracao}"
+                    onchange="dados.grupos[${gIndex}].duracao=parseInt(this.value)||1; marcarAlterado(); renderizarGantt();">
+            </div>
+            <div class="gc">
+                <span style="color:var(--accent); font-weight:600">${progGrupo}%</span>
+            </div>
+            <div class="gc" style="padding:0; overflow:hidden">
                 <div class="bar-area">
                     <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                    <div class="gantt-bar" style="left:${g.inicio * SEMANA_PX}px; width:${g.duracao * SEMANA_PX}px; background:${g.cor}33; border:1px solid ${g.cor}">
-                        <div class="gantt-bar-fill" style="width:${progressoGrupo}%; background:${g.cor}"></div>
+                    <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${g.duracao*SEMANA_PX}px; background:${g.cor}33; border:1px solid ${g.cor}">
+                        <div class="gantt-bar-fill" style="width:${progGrupo}%; background:${g.cor}"></div>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
         grupoDiv.appendChild(grupoHeader);
-        
+
         // Tarefas
         g.tarefas.forEach((t, tIndex) => {
-            const tarefaRow = document.createElement('div');
-            tarefaRow.className = 'gantt-row';
-            tarefaRow.innerHTML = `
+            const row = document.createElement('div');
+            row.className = 'gantt-row';
+            row.innerHTML = `
                 <div class="gc" style="padding-left:36px">
-                    <input class="gc-edit" value="${t.nome}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
+                    <input class="gc-edit" value="${t.nome}"
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
                 </div>
-                <div class="gc">${fmtSemana(g.inicio)}</div>
-                <div class="gc">${fmtSemana(g.inicio + t.duracao)}</div>
-                <div class="gc"><input class="gc-edit" type="number" value="${t.duracao}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value); marcarAlterado(); renderizarGantt();"></div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + t.duracao)}</div>
                 <div class="gc">
-                    <input type="range" min="0" max="100" value="${t.progresso}" style="width:80px; accent-color:${g.cor}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); renderizarGantt();">
-                    <span style="margin-left:5px">${t.progresso}%</span>
+                    <input class="gc-edit" type="number" min="1" value="${t.duracao}"
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1; marcarAlterado(); renderizarGantt();">
                 </div>
-                <div class="gc">
+                <div class="gc" style="gap:6px">
+                    <input type="range" min="0" max="100" value="${t.progresso}"
+                        style="width:70px; accent-color:${g.cor}"
+                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); this.nextElementSibling.textContent=this.value+'%'; this.closest('.gantt-group').querySelector('.gantt-bar-fill').style.width=calcularProgressoGrupo(dados.grupos[${gIndex}])+'%';">
+                    <span style="min-width:32px; font-size:11px">${t.progresso}%</span>
+                </div>
+                <div class="gc" style="padding:0; overflow:hidden">
                     <div class="bar-area">
                         <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                        <div class="gantt-bar" style="left:${g.inicio * SEMANA_PX}px; width:${t.duracao * SEMANA_PX}px; background:${g.cor}22; border:1px solid ${g.cor}55">
+                        <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${t.duracao*SEMANA_PX}px; background:${g.cor}22; border:1px solid ${g.cor}55">
                             <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
                         </div>
                     </div>
-                </div>
-            `;
-            grupoDiv.appendChild(tarefaRow);
+                </div>`;
+            grupoDiv.appendChild(row);
         });
-        
-        // Botão adicionar tarefa
+
+        // Botões do grupo
         const addRow = document.createElement('div');
         addRow.className = 'gantt-row';
         addRow.innerHTML = `
-            <div class="gc" style="padding-left:12px">
-                <button class="btn btn-primary" onclick="adicionarTarefa(${gIndex})">+ Adicionar Tarefa</button>
+            <div class="gc" style="padding-left:12px; gap:8px">
+                <button class="btn btn-primary" onclick="adicionarTarefa(${gIndex})">+ Tarefa</button>
                 <button class="btn btn-danger" onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
             </div>
-            <div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div>
-        `;
+            <div class="gc"></div><div class="gc"></div>
+            <div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
         grupoDiv.appendChild(addRow);
-        
         body.appendChild(grupoDiv);
     });
 }
 
 function adicionarGrupo() {
     dados.grupos.push({
-        id: 'g' + (dados.grupos.length + 1),
+        id: 'g' + Date.now(),
         nome: 'Novo Grupo',
-        cor: '#' + Math.floor(Math.random()*16777215).toString(16),
+        cor: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6,'0'),
         inicio: dados.grupos.length * 2,
         duracao: 2,
         responsavel: 'Equipe',
@@ -788,18 +860,13 @@ function adicionarGrupo() {
 }
 
 function adicionarTarefa(gIndex) {
-    dados.grupos[gIndex].tarefas.push({
-        nome: 'Nova Tarefa',
-        duracao: 2,
-        responsavel: 'Equipe',
-        progresso: 0
-    });
+    dados.grupos[gIndex].tarefas.push({ nome: 'Nova Tarefa', duracao: 2, responsavel: 'Equipe', progresso: 0 });
     marcarAlterado();
     renderizarGantt();
 }
 
 function excluirGrupo(gIndex) {
-    if (confirm('Excluir este grupo?')) {
+    if (confirm('Excluir o grupo "' + dados.grupos[gIndex].nome + '"?')) {
         dados.grupos.splice(gIndex, 1);
         marcarAlterado();
         renderizarGantt();
@@ -808,7 +875,14 @@ function excluirGrupo(gIndex) {
 }
 
 function exportarCronograma() {
-    const ws = XLSX.utils.json_to_sheet(dados.grupos);
+    const linhas = [];
+    dados.grupos.forEach(g => {
+        linhas.push({ Grupo: g.nome, Tarefa: '', Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + g.duracao), Duracao: g.duracao, Progresso: calcularProgressoGrupo(g) + '%' });
+        g.tarefas.forEach(t => {
+            linhas.push({ Grupo: g.nome, Tarefa: t.nome, Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + t.duracao), Duracao: t.duracao, Progresso: t.progresso + '%' });
+        });
+    });
+    const ws = XLSX.utils.json_to_sheet(linhas);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
     XLSX.writeFile(wb, 'cronograma-torre-liris.xlsx');
@@ -817,40 +891,51 @@ function exportarCronograma() {
 
 // ==================== ORÇAMENTO ====================
 function renderizarOrcamentoAdmin() {
-    const total = dados.orcamento.reduce((acc, item) => acc + item.valor, 0);
+    const total = dados.orcamento.reduce((acc, item) => acc + (item.valor || 0), 0);
+    document.querySelector('.main') && (document.querySelector('.main').innerHTML = `
+        <div class="save-bar">
+            <div class="save-status">
+                <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
+                <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
+            </div>
+            <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
+        </div>
+        ${_htmlOrcamento(total)}`);
+    return _htmlOrcamento(total);
+}
+
+function _htmlOrcamento(total) {
     return `
     <div class="page-header">
         <div>
             <div class="page-title">💰 Orçamento</div>
-            <div class="page-sub">Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+            <div class="page-sub">Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
         </div>
         <button class="btn btn-primary" onclick="adicionarItemOrcamento()">+ Adicionar Item</button>
-    </div>
-    <div class="crud-card crud-card-header">
-        <div>Descrição</div><div>Valor (R$)</div><div>Ações</div>
     </div>
     <div class="crud-container">
         ${dados.orcamento.map((item, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${item.descricao}" onchange="dados.orcamento[${index}].descricao=this.value; marcarAlterado();">
-            <input class="crud-input" type="number" value="${item.valor}" onchange="dados.orcamento[${index}].valor=parseFloat(this.value); marcarAlterado();">
+            <input class="crud-input" value="${item.descricao}"
+                onchange="dados.orcamento[${index}].descricao=this.value; marcarAlterado();">
+            <input class="crud-input" type="number" value="${item.valor}"
+                onchange="dados.orcamento[${index}].valor=parseFloat(this.value)||0; marcarAlterado();">
             <button class="btn btn-danger" onclick="excluirOrcamento(${index})">🗑️</button>
-        </div>
-        `).join('')}
+        </div>`).join('')}
     </div>`;
 }
 
 function adicionarItemOrcamento() {
     dados.orcamento.push({ descricao: 'Novo Item', valor: 0 });
     marcarAlterado();
-    renderizarOrcamentoAdmin();
+    renderizarAdmin();
 }
 
 function excluirOrcamento(index) {
     if (confirm('Excluir este item?')) {
         dados.orcamento.splice(index, 1);
         marcarAlterado();
-        renderizarOrcamentoAdmin();
+        renderizarAdmin();
         mostrarNotificacao('Item excluído!');
     }
 }
@@ -861,7 +946,7 @@ function renderizarFotosAdmin() {
     <div class="page-header">
         <div>
             <div class="page-title">📸 Fotos da Obra</div>
-            <div class="page-sub">${dados.fotos.length} fotos</div>
+            <div class="page-sub">${dados.fotos.length} foto(s)</div>
         </div>
         <button class="btn btn-primary" onclick="adicionarFoto()">+ Adicionar Foto</button>
     </div>
@@ -872,56 +957,44 @@ function renderizarFotosAdmin() {
             <div class="photo-card-info">
                 <div class="photo-card-ambiente">${foto.ambiente}</div>
                 <div class="photo-card-data">${foto.data}</div>
-                <button class="btn btn-danger" onclick="excluirFoto(${index})">🗑️ Excluir</button>
+                <button class="btn btn-danger" style="margin-top:8px" onclick="excluirFoto(${index})">🗑️ Excluir</button>
             </div>
-        </div>
-        `).join('')}
+        </div>`).join('')}
     </div>`;
 }
 
 function adicionarFoto() {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+    input.type = 'file'; input.accept = 'image/*';
     input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                abrirModal('Adicionar Foto', `
-                    <div style="display:grid; gap:12px">
-                        <img src="${e.target.result}" style="width:100%; border-radius:10px">
-                        <select id="fotoAmbiente" class="crud-input">
-                            ${dados.ambientes.map(amb => `<option value="${amb}">${amb}</option>`).join('')}
-                        </select>
-                        <button class="btn btn-primary" onclick="confirmarFoto('${e.target.result}')">Salvar</button>
-                    </div>
-                `);
-            };
-            reader.readAsDataURL(file);
-        }
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            abrirModal('Adicionar Foto', `
+                <div style="display:grid; gap:12px">
+                    <img src="${ev.target.result}" style="width:100%; border-radius:10px; max-height:300px; object-fit:cover">
+                    <select id="fotoAmbiente" class="crud-input">
+                        ${dados.ambientes.map(a => `<option value="${a}">${a}</option>`).join('')}
+                    </select>
+                    <button class="btn btn-primary" onclick="confirmarFoto('${ev.target.result}')">💾 Salvar Foto</button>
+                </div>`);
+        };
+        reader.readAsDataURL(file);
     };
     input.click();
 }
 
 function confirmarFoto(url) {
     const ambiente = document.getElementById('fotoAmbiente').value;
-    dados.fotos.push({
-        url: url,
-        ambiente: ambiente,
-        data: new Date().toLocaleDateString('pt-BR')
-    });
-    marcarAlterado();
-    fecharModal();
-    renderizarFotosAdmin();
+    dados.fotos.push({ url, ambiente, data: fmtData(new Date()) });
+    marcarAlterado(); fecharModal(); renderizarAdmin();
     mostrarNotificacao('Foto adicionada!');
 }
 
 function excluirFoto(index) {
     if (confirm('Excluir esta foto?')) {
         dados.fotos.splice(index, 1);
-        marcarAlterado();
-        renderizarFotosAdmin();
+        marcarAlterado(); renderizarAdmin();
         mostrarNotificacao('Foto excluída!');
     }
 }
@@ -936,40 +1009,39 @@ function renderizarAmbientesAdmin() {
     <div class="crud-container">
         ${dados.ambientes.map((amb, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${amb}" onchange="dados.ambientes[${index}]=this.value; marcarAlterado();">
+            <input class="crud-input" value="${amb}"
+                onchange="dados.ambientes[${index}]=this.value; marcarAlterado();">
             <button class="btn btn-danger" onclick="excluirAmbiente(${index})">🗑️</button>
-        </div>
-        `).join('')}
+        </div>`).join('')}
     </div>`;
 }
 
 function adicionarAmbiente() {
     dados.ambientes.push('Novo Ambiente');
-    marcarAlterado();
-    renderizarAmbientesAdmin();
+    marcarAlterado(); renderizarAdmin();
     mostrarNotificacao('Ambiente adicionado!');
 }
 
 function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
-        marcarAlterado();
-        renderizarAmbientesAdmin();
+        marcarAlterado(); renderizarAdmin();
         mostrarNotificacao('Ambiente excluído!');
     }
 }
 
-// ==================== CLIENTE ====================
+// ==================== ÁREA DO CLIENTE ====================
+// ► A data exibida aqui vem diretamente de dados.dataInicio,
+//   que é atualizado pela função atualizarDataPartes() em Dados do Cliente
 function renderizarCliente() {
-    const progressoGeral = calcularProgressoGeral();
-    const semanaAtual = getSemanaAtual();
-    
-    let html = `
+    const progGeral = calcularProgressoGeral();
+    document.getElementById('app').innerHTML = `
     <div class="topbar">
         <div class="logo"><div class="logo-badge">C</div> ${dados.titulo}</div>
         <button class="btn btn-ghost" onclick="location.reload()">🔐 Sair</button>
     </div>
     <div class="main">
+        <!-- CARD INFORMAÇÕES -->
         <div class="client-data-card">
             <div class="client-data-grid">
                 <div class="client-data-item">
@@ -985,70 +1057,79 @@ function renderizarCliente() {
                     <div class="client-data-value">${dados.obra.arquiteto}</div>
                 </div>
                 <div class="client-data-item">
-                    <div class="client-data-label">Início</div>
-                    <div class="client-data-value">${new Date(dados.dataInicio).toLocaleDateString('pt-BR')}</div>
+                    <div class="client-data-label">Início da Obra</div>
+                    <div class="client-data-value" style="color:var(--accent3)">${fmtData(getDataInicio())}</div>
                 </div>
                 <div class="client-data-item">
-                    <div class="client-data-label">Previsão</div>
-                    <div class="client-data-value">${calcularPrevisao()}</div>
+                    <div class="client-data-label">Previsão de Término</div>
+                    <div class="client-data-value" style="color:var(--accent)">${calcularPrevisao()}</div>
+                </div>
+                <div class="client-data-item">
+                    <div class="client-data-label">Duração</div>
+                    <div class="client-data-value">${dados.duracaoTotal} semanas</div>
                 </div>
             </div>
         </div>
-        
-        <div class="stat-card">
-            <div class="stat-label">Progresso Geral</div>
+
+        <!-- PROGRESSO GERAL -->
+        <div class="stat-card" style="margin-bottom:20px">
+            <div class="stat-label">Progresso Geral da Obra</div>
             <div style="display:flex; justify-content:space-between; align-items:center">
-                <div class="stat-value" style="color:var(--accent3)">${progressoGeral}%</div>
-                <div style="font-size:12px">${dados.duracaoTotal} semanas</div>
+                <div class="stat-value" style="color:var(--accent3)">${progGeral}%</div>
+                <div style="font-size:12px; color:var(--text2)">${dados.grupos.reduce((s,g)=>s+g.tarefas.length,0)} tarefas</div>
             </div>
             <div class="stat-bar-bg">
-                <div class="stat-bar-fill animated-progress" style="width:${progressoGeral}%"></div>
+                <div class="stat-bar-fill animated-progress" style="width:${progGeral}%"></div>
             </div>
         </div>
-        
+
+        <!-- TIMELINE DAS ETAPAS -->
         <div class="client-timeline">
             ${dados.grupos.map((g, i) => {
                 const prog = calcularProgressoGrupo(g);
-                const status = prog >= 100 ? 'done' : (prog > 0 ? 'active' : '');
+                const cls = prog >= 100 ? 'done' : prog > 0 ? 'active' : '';
                 return `
-                <div class="client-item ${status}" style="animation-delay:${i*0.1}s">
+                <div class="client-item ${cls}" style="animation-delay:${i*0.1}s">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
-                        <div class="dot" style="background:${g.cor}"></div>
-                        <span style="font-weight:600">${g.nome}</span>
-                        <span style="color:${g.cor}">${prog}%</span>
+                        <div class="dot" style="background:${g.cor}; width:10px; height:10px"></div>
+                        <span style="font-weight:600; font-size:14px">${g.nome}</span>
+                        <span style="color:${g.cor}; font-weight:700">${prog}%</span>
+                        <span style="color:var(--text3); font-size:11px">
+                            ${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio + g.duracao)}
+                        </span>
                     </div>
                     ${g.tarefas.map(t => `
-                        <div style="margin-left:22px; margin-bottom:4px; font-size:11px; color:var(--text2)">
-                            • ${t.nome} (${t.progresso}%)
-                        </div>
-                    `).join('')}
-                    <div class="stat-bar-bg" style="margin-top:8px">
+                        <div style="margin-left:22px; margin-bottom:4px; font-size:11px; color:var(--text2); display:flex; align-items:center; gap:6px">
+                            <span style="color:var(--text3)">•</span>
+                            ${t.nome}
+                            <span style="color:${g.cor}">${t.progresso}%</span>
+                        </div>`).join('')}
+                    <div class="stat-bar-bg" style="margin-top:8px; margin-left:22px">
                         <div class="stat-bar-fill" style="width:${prog}%; background:${g.cor}"></div>
                     </div>
                 </div>`;
             }).join('')}
         </div>
-        
+
+        <!-- FOTOS -->
+        ${dados.fotos.length > 0 ? `
         <div class="page-header">
             <div class="page-title">📸 Fotos da Obra</div>
         </div>
         <div class="photo-grid">
             ${dados.fotos.map(foto => `
-            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}', '<img src=\\'${foto.url}\\' style=\\'width:100%\\'>')">
+            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}', '<img src=\\'${foto.url}\\' style=\\'width:100%; border-radius:12px\\'>')">
                 <img src="${foto.url}" alt="${foto.ambiente}">
                 <div class="photo-card-info">
                     <div class="photo-card-ambiente">${foto.ambiente}</div>
                     <div class="photo-card-data">${foto.data}</div>
                 </div>
-            </div>
-            `).join('')}
-        </div>
+            </div>`).join('')}
+        </div>` : ''}
     </div>`;
-    
-    document.getElementById('app').innerHTML = html;
 }
 
-// ==================== INICIALIZAÇÃO ====================
+// ==================== INIT ====================
 carregarDados();
 </script>
 </body>
