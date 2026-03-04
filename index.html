@@ -111,7 +111,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 
 /* PHOTOS */
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-.photo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: transform 0.2s; }
+.photo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: transform 0.2s; cursor: pointer; }
 .photo-card:hover { transform: translateY(-4px); }
 .photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
 .photo-card-info { padding: 12px; }
@@ -149,16 +149,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
 /* CLIENT TIMELINE ANIMATED */
-.client-timeline { position: relative; padding-left: 20px; border-left: 2px solid var(--border); margin: 20px 0; }
-.client-timeline::before {
-    content: ''; position: absolute; left: -2px; top: 0; width: 2px; height: 0;
-    background: linear-gradient(to bottom, var(--accent3), var(--accent));
-    animation: growLine 1.5s ease-out forwards;
-}
-.client-item { position: relative; padding-left: 20px; margin-bottom: 25px; opacity: 0; animation: slideInLeft 0.4s ease forwards; }
-.client-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
-.client-item.done::before { background: var(--accent3); box-shadow: 0 0 10px var(--accent3); }
-.client-item.active::before { background: var(--accent); box-shadow: 0 0 15px var(--accent); animation: pulse 1.5s infinite; }
+.client-timeline { position: relative; padding-left: 30px; border-left: 3px solid var(--border); margin: 30px 0; }
+.client-item { position: relative; padding-left: 20px; margin-bottom: 25px; opacity: 0; animation: slideInLeft 0.5s ease forwards; transition: all 0.3s ease; }
+.client-item:hover { transform: translateX(10px); background: var(--surface); border-radius: 12px; padding: 15px; margin-left: -15px; }
+.client-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); transition: all 0.3s; box-shadow: 0 0 10px currentColor; }
+.client-item.done::before { background: var(--accent3); }
+.client-item.active::before { background: var(--accent); animation: pulse 1.5s infinite; }
 .client-item:nth-child(1) { animation-delay: 0.1s; }
 .client-item:nth-child(2) { animation-delay: 0.2s; }
 .client-item:nth-child(3) { animation-delay: 0.3s; }
@@ -168,7 +164,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .client-item:nth-child(7) { animation-delay: 0.7s; }
 .client-item:nth-child(8) { animation-delay: 0.8s; }
 .client-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; }
-.status-pendente { background: rgba(136,146,164,0.1); color: var(--text2); }
+.status-pendente { background: rgba(74,84,104,0.1); color: var(--text2); }
 .status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
 .status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
 
@@ -177,7 +173,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes growLine { from { height: 0; } to { height: 100%; } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
@@ -329,6 +324,60 @@ let dados = {
     ]
 };
 
+// ==================== FUNÇÕES DE DATA GLOBAIS ====================
+const SEMANA_PX = 40;
+
+function getDataInicio() {
+    return new Date(dados.dataInicio);
+}
+
+function fmtSemana(s) {
+    const start = getDataInicio();
+    if (isNaN(start.getTime())) return '??/??';
+    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+}
+
+function fmtSemanaCompleta(s) {
+    const start = getDataInicio();
+    if (isNaN(start.getTime())) return 'Data inválida';
+    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+
+function calcularPrevisao() {
+    const start = getDataInicio();
+    if (isNaN(start.getTime())) return 'Data não definida';
+    const semanas = dados.duracaoTotal || 20;
+    const end = new Date(start.getTime() + semanas * 7 * 24 * 3600 * 1000);
+    return end.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+}
+
+function getSemanaAtual() {
+    const start = getDataInicio();
+    if (isNaN(start.getTime())) return 0;
+    return Math.round((new Date() - start) / (7 * 24 * 3600 * 1000));
+}
+const semanaAtual = getSemanaAtual();
+
+// ==================== FUNÇÕES DE PROGRESSO ====================
+function calcularProgressoGrupo(g) {
+    if (!g.tarefas || g.tarefas.length === 0) return 0;
+    return Math.round(g.tarefas.reduce((acc, t) => acc + (t.progresso || 0), 0) / g.tarefas.length);
+}
+
+function calcularProgressoGeral() {
+    let totalTarefas = 0;
+    let somaProgresso = 0;
+    dados.grupos.forEach(g => {
+        g.tarefas.forEach(t => {
+            totalTarefas++;
+            somaProgresso += t.progresso || 0;
+        });
+    });
+    return totalTarefas > 0 ? Math.round(somaProgresso / totalTarefas) : 0;
+}
+
 // ==================== PERSISTÊNCIA ====================
 function salvarDados() {
     localStorage.setItem('obraLiris_v4', JSON.stringify(dados));
@@ -375,29 +424,6 @@ function entrarComoCliente() {
     carregarDados();
     renderizarCliente();
 }
-
-// ==================== DATAS ====================
-const SEMANA_PX = 40;
-
-function fmtSemana(s) {
-    const start = new Date(dados.dataInicio);
-    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
-    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-}
-
-function fmtMesAno() {
-    const d = new Date(dados.dataInicio);
-    return d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-}
-
-function calcularPrevisao() {
-    const start = new Date(dados.dataInicio);
-    const semanas = dados.duracaoTotal || 20;
-    const end = new Date(start.getTime() + semanas * 7 * 24 * 3600 * 1000);
-    return end.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
-}
-
-const semanaAtual = Math.round((new Date() - new Date(dados.dataInicio)) / (7*24*3600*1000));
 
 // ==================== NOTIFICAÇÕES ====================
 function mostrarNotificacao(mensagem, tipo = 'success') {
@@ -544,7 +570,7 @@ function renderizarDadosClienteAdmin() {
 
 function editarDadosCliente(campo, valor) { dados.cliente[campo] = valor; marcarAlterado(); }
 function editarDadosObra(campo, valor) { dados.obra[campo] = valor; marcarAlterado(); }
-function editarDataInicio(valor) { dados.dataInicio = valor + '-01'; marcarAlterado(); }
+function editarDataInicio(valor) { dados.dataInicio = valor + '-01'; marcarAlterado(); mostrarNotificacao('Data de início alterada. Cronograma atualizado!', 'success'); }
 function editarDuracaoTotal(valor) { dados.duracaoTotal = parseInt(valor); marcarAlterado(); }
 
 // ==================== CRONOGRAMA ====================
@@ -553,7 +579,7 @@ function renderizarCronogramaAdmin() {
     <div class="page-header">
         <div>
             <div class="page-title">📅 Cronograma Inteligente</div>
-            <div class="page-sub">${dados.endereco} · Início: ${fmtMesAno()} · Previsão: ${calcularPrevisao()}</div>
+            <div class="page-sub">${dados.endereco} · Início: ${fmtSemanaCompleta(0)} · Previsão: ${calcularPrevisao()}</div>
         </div>
         <div style="display:flex; gap:10px">
             <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
@@ -577,9 +603,14 @@ function renderizarGantt() {
     const body = document.getElementById('ganttBody');
     if (!body) return;
     body.innerHTML = '';
+    
     dados.grupos.forEach((g, gIndex) => {
+        const progressoGrupo = calcularProgressoGrupo(g);
+        
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
+        
+        // HEADER DO GRUPO
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
@@ -595,12 +626,14 @@ function renderizarGantt() {
                 <div class="bar-area">
                     <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
                     <div class="gantt-bar" style="left:${g.inicio * SEMANA_PX}px; width:${g.duracao * SEMANA_PX}px; background:${g.cor}33; border:1px solid ${g.cor}">
-                        <div class="gantt-bar-fill" style="width:50%; background:${g.cor}"></div>
+                        <div class="gantt-bar-fill" style="width:${progressoGrupo}%; background:${g.cor}"></div>
                     </div>
                 </div>
             </div>
         `;
         grupoDiv.appendChild(grupoHeader);
+
+        // TAREFAS DO GRUPO
         g.tarefas.forEach((t, tIndex) => {
             const tarefaRow = document.createElement('div');
             tarefaRow.className = 'gantt-row';
@@ -617,13 +650,16 @@ function renderizarGantt() {
                 </div>
                 <div class="gc">
                     <div class="bar-area">
-                        <div class="gantt-bar">
+                        <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                        <div class="gantt-bar" style="left:${g.inicio * SEMANA_PX}px; width:${t.duracao * SEMANA_PX}px; background:${g.cor}22; border:1px solid ${g.cor}55">
                             <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
                         </div>
                     </div>
                 </div>
             `;
             grupoDiv.appendChild(tarefaRow);
+
+            // BOTÃO ADICIONAR SUBTAREFA
             const addSubtaskRow = document.createElement('div');
             addSubtaskRow.className = 'gantt-row gantt-subtask';
             addSubtaskRow.innerHTML = `
@@ -635,6 +671,8 @@ function renderizarGantt() {
             `;
             grupoDiv.appendChild(addSubtaskRow);
         });
+
+        // BOTÃO ADICIONAR TAREFA E EXCLUIR GRUPO
         const addTaskRow = document.createElement('div');
         addTaskRow.className = 'gantt-row';
         addTaskRow.innerHTML = `
@@ -645,6 +683,7 @@ function renderizarGantt() {
             <div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div>
         `;
         grupoDiv.appendChild(addTaskRow);
+        
         body.appendChild(grupoDiv);
     });
 }
@@ -655,7 +694,7 @@ function editarGrupoDuracao(index, valor) { dados.grupos[index].duracao = parseI
 function editarGrupoResp(index, valor) { dados.grupos[index].responsavel = valor; marcarAlterado(); }
 function editarTarefaNome(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].nome = valor; marcarAlterado(); }
 function editarTarefaDuracao(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].duracao = parseInt(valor); marcarAlterado(); renderizarGantt(); }
-function editarTarefaProgresso(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].progresso = parseInt(valor); marcarAlterado(); }
+function editarTarefaProgresso(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].progresso = parseInt(valor); marcarAlterado(); renderizarGantt(); }
 function adicionarGrupo() {
     dados.grupos.push({ id: 'g' + (dados.grupos.length + 1), nome: 'Novo Grupo', cor: '#' + Math.floor(Math.random()*16777215).toString(16), inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe', tarefas: [] });
     marcarAlterado(); renderizarGantt();
@@ -789,7 +828,7 @@ function excluirFoto(index) {
     }
 }
 
-// ==================== AMBIENTES (CORRIGIDO - EXCLUIR NA HORA) ====================
+// ==================== AMBIENTES ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -817,7 +856,7 @@ function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
         marcarAlterado();
-        renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza IMEDIATAMENTE
+        renderizarAmbientesAdmin();
         mostrarNotificacao('Ambiente excluído!', 'success');
     }
 }
@@ -832,7 +871,6 @@ function renderizarCliente() {
     </div>
     <div class="main">
         ${renderizarDadosClienteView()}
-        ${renderizarStatsCliente()}
         ${renderizarCronogramaAnimadoCliente()}
         ${renderizarFotosCliente()}
     </div>`;
@@ -862,55 +900,88 @@ function renderizarDadosClienteView() {
     </div>`;
 }
 
-function renderizarStatsCliente() {
-    let totalT = 0, totalP = 0;
-    dados.grupos.forEach(g => g.tarefas.forEach(t => { totalT++; totalP += t.progresso; }));
-    const media = totalT ? Math.round(totalP/totalT) : 0;
-    
-    return `
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-label">Progresso Geral</div>
-            <div class="stat-value" style="color: var(--accent3)">${media}%</div>
-            <div class="stat-bar-bg"><div class="stat-bar-fill animated-progress" style="width:${media}%"></div></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Previsão de Término</div>
-            <div class="stat-value" style="color:var(--accent)">${calcularPrevisao()}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Etapas</div>
-            <div class="stat-value">${dados.grupos.length} Grupos</div>
-        </div>
-    </div>`;
-}
-
 function renderizarCronogramaAnimadoCliente() {
+    const progressoGeral = calcularProgressoGeral();
+    
     return `
     <div class="page-header">
         <div class="page-title">📅 Cronograma da Obra</div>
+        <div style="color:var(--accent); font-size:14px">${fmtSemanaCompleta(0)} — ${calcularPrevisao()}</div>
     </div>
+    
+    <!-- BARRA DE PROGRESSO GERAL ANIMADA -->
+    <div class="stat-card" style="margin-bottom:20px; background:linear-gradient(135deg, var(--surface), var(--surface2))">
+        <div class="stat-label">Progresso Geral da Obra</div>
+        <div style="display:flex; align-items:center; justify-content:space-between">
+            <div class="stat-value" style="color:var(--accent3); font-size:32px">${progressoGeral}%</div>
+            <div style="font-size:12px; color:var(--text2)">${dados.duracaoTotal} semanas · Início: ${fmtSemanaCompleta(0)}</div>
+        </div>
+        <div class="stat-bar-bg" style="height:8px; margin-top:10px">
+            <div class="stat-bar-fill animated-progress" style="width:${progressoGeral}%; background:var(--accent3); height:8px; transition:width 1s ease-out"></div>
+        </div>
+    </div>
+    
+    <!-- TIMELINE ANIMADA -->
     <div class="client-timeline">
         ${dados.grupos.map((g, index) => {
-            const progressoMedio = g.tarefas.reduce((acc, t) => acc + t.progresso, 0) / g.tarefas.length;
-            const status = progressoMedio >= 100 ? 'Concluído' : (progressoMedio > 0 ? 'Em andamento' : 'Pendente');
-            const statusClass = progressoMedio >= 100 ? 'concluido' : (progressoMedio > 0 ? 'em-andamento' : 'pendente');
+            const progresso = calcularProgressoGrupo(g);
+            const status = progresso >= 100 ? 'concluido' : (progresso > 0 ? 'em-andamento' : 'pendente');
+            const statusText = progresso >= 100 ? '✅ Concluído' : (progresso > 0 ? '⏳ Em andamento' : '⏱️ Pendente');
+            
+            const dataInicio = fmtSemanaCompleta(g.inicio);
+            const dataFim = fmtSemanaCompleta(g.inicio + g.duracao);
+            
+            const totalTarefas = g.tarefas.length;
+            const tarefasConcluidas = g.tarefas.filter(t => t.progresso >= 100).length;
+            
             return `
-            <div class="client-item ${statusClass}" style="animation-delay: ${index * 0.15}s">
-                <div style="font-weight:600; color:var(--text); display:flex; justify-content:space-between; align-items:center">
-                    <span>${g.nome}</span>
-                    <span style="color:${g.cor}; font-weight:700">${Math.round(progressoMedio)}%</span>
+            <div class="client-item ${status}" style="animation-delay: ${index * 0.1}s">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+                    <div class="dot" style="background:${g.cor}; width:12px; height:12px; box-shadow:0 0 10px ${g.cor}"></div>
+                    <div style="font-weight:700; font-size:16px; color:var(--text); flex:1">${g.nome}</div>
+                    <div style="font-size:12px; color:var(--text2); background:var(--surface); padding:4px 10px; border-radius:20px">
+                        ${dataInicio} - ${dataFim}
+                    </div>
                 </div>
-                <div style="font-size:11px; color:var(--text2); margin-top:4px">
-                    ${g.tarefas.map(t => t.nome).join(' • ')}
+                
+                <div style="margin-left:22px; margin-bottom:12px">
+                    ${g.tarefas.map(t => {
+                        const tarefaStatus = t.progresso >= 100 ? '✅' : (t.progresso > 0 ? '⏳' : '⏱️');
+                        return `
+                        <div style="display:flex; align-items:center; gap:8px; margin:6px 0; font-size:12px">
+                            <span style="color:${t.progresso >= 100 ? 'var(--accent3)' : (t.progresso > 0 ? 'var(--accent)' : 'var(--text3)')}">${tarefaStatus}</span>
+                            <span style="color:var(--text2); flex:1">${t.nome}</span>
+                            <span style="color:var(--text); background:var(--surface); padding:2px 8px; border-radius:12px">${t.progresso}%</span>
+                        </div>`;
+                    }).join('')}
                 </div>
-                <div class="client-status status-${statusClass}">${status}</div>
-                <div class="stat-bar-bg" style="margin-top:8px">
-                    <div class="stat-bar-fill animated-progress progress-pulse" style="width:${progressoMedio}%; background:${g.cor}"></div>
+                
+                <div style="margin-left:22px; margin-top:10px">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-bottom:4px">
+                        <span>${tarefasConcluidas}/${totalTarefas} tarefas</span>
+                        <span style="color:${g.cor}">${progresso}%</span>
+                    </div>
+                    <div class="stat-bar-bg" style="height:8px; background:var(--surface2)">
+                        <div class="stat-bar-fill" style="width:${progresso}%; background:${g.cor}; height:8px; transition:width 1s ease-out"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-left:22px; margin-top:8px">
+                    <span class="client-status status-${status}" style="font-size:10px; padding:3px 10px; border-radius:12px; background:${status === 'concluido' ? 'rgba(16,185,129,0.1)' : (status === 'em-andamento' ? 'rgba(232,160,32,0.1)' : 'rgba(74,84,104,0.1)')}; color:${status === 'concluido' ? 'var(--accent3)' : (status === 'em-andamento' ? 'var(--accent)' : 'var(--text2)')}">
+                        ${statusText}
+                    </span>
                 </div>
             </div>`;
         }).join('')}
-    </div>`;
+    </div>
+    
+    <!-- LEGENDA -->
+    <div style="display:flex; gap:20px; justify-content:center; margin-top:30px; padding:15px; background:var(--surface); border-radius:10px">
+        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--accent3)"></div><span style="font-size:11px">Concluído</span></div>
+        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--accent)"></div><span style="font-size:11px">Em andamento</span></div>
+        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--text3)"></div><span style="font-size:11px">Pendente</span></div>
+    </div>
+    `;
 }
 
 function renderizarFotosCliente() {
@@ -923,7 +994,7 @@ function renderizarFotosCliente() {
     </div>
     <div class="photo-grid">
         ${dados.fotos.slice(0, 8).map((foto, index) => `
-        <div class="photo-card" style="animation: slideUp 0.4s ease ${index * 0.1}s forwards; opacity:0">
+        <div class="photo-card" style="animation: slideUp 0.4s ease ${index * 0.1}s forwards; opacity:0" onclick="abrirZoomFoto('${foto.url}')">
             <img src="${foto.url}" alt="${foto.ambiente}">
             <div class="photo-card-info">
                 <div class="photo-card-ambiente">${foto.ambiente}</div>
@@ -932,6 +1003,10 @@ function renderizarFotosCliente() {
         </div>
         `).join('')}
     </div>`;
+}
+
+function abrirZoomFoto(url) {
+    abrirModal('📸 Foto', `<img src="${url}" style="width:100%; border-radius:10px; cursor:pointer" onclick="window.open('${url}','_blank')">`);
 }
 
 // ==================== INICIALIZAÇÃO ====================
