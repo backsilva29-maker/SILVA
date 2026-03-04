@@ -410,7 +410,7 @@ let dadosAlterados = false;
 // ==================== GEMINI IA ====================
 // Cole sua chave aqui (so voce ve este arquivo):
 const GEMINI_KEY = "AIzaSyAWsj-jQp-xEa2A67q4lrr1oQHxMNqCCtA";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
 
 async function consultarGemini(prompt) {
     if (!GEMINI_KEY || GEMINI_KEY === "cole_sua_chave_aqui") {
@@ -1494,7 +1494,7 @@ async function enviarParaChat(prompt, tipo, textoUsuario) {
     } else {
         // Chama Gemini com a chave ativa
         try {
-            const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + chave;
+            const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + chave;
             const resp = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
