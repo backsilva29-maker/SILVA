@@ -90,10 +90,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .gantt-bar { position: absolute; top: 50%; transform: translateY(-50%); height: 20px; border-radius: 5px; display: flex; align-items: center; overflow: hidden; cursor: pointer; transition: all 0.3s; }
 .gantt-bar:hover { transform: translateY(-50%) scale(1.02); }
 .gantt-bar-fill { height: 100%; border-radius: 5px 0 0 5px; opacity: .95; transition: width 0.5s ease-out; }
-.gantt-bar-fill.animated { animation: growBar 1s ease-out forwards; }
 .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
 
-/* ANIMATED PROGRESS - CLIENT VIEW */
+/* ANIMATED PROGRESS */
 .animated-progress { position: relative; overflow: hidden; }
 .animated-progress::after {
     content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -178,7 +177,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes growBar { from { width: 0; } to { width: var(--target-width); } }
 @keyframes growLine { from { height: 0; } to { height: 100%; } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -237,6 +235,7 @@ let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
     dataInicio: "2024-08-01",
+    duracaoTotal: 20,
     valor: 234943.54,
     cliente: {
         nome: "Seu Aldebaner",
@@ -332,14 +331,14 @@ let dados = {
 
 // ==================== PERSISTÊNCIA ====================
 function salvarDados() {
-    localStorage.setItem('obraLiris_v3', JSON.stringify(dados));
+    localStorage.setItem('obraLiris_v4', JSON.stringify(dados));
     dadosAlterados = false;
     atualizarIndicadorSave();
     mostrarNotificacao('Dados salvos com sucesso!', 'success');
 }
 
 function carregarDados() {
-    const salvos = localStorage.getItem('obraLiris_v3');
+    const salvos = localStorage.getItem('obraLiris_v4');
     if (salvos) {
         dados = JSON.parse(salvos);
     }
@@ -379,15 +378,25 @@ function entrarComoCliente() {
 
 // ==================== DATAS ====================
 const SEMANA_PX = 40;
+
 function fmtSemana(s) {
     const start = new Date(dados.dataInicio);
     const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
     return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
 }
+
 function fmtMesAno() {
     const d = new Date(dados.dataInicio);
     return d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
 }
+
+function calcularPrevisao() {
+    const start = new Date(dados.dataInicio);
+    const semanas = dados.duracaoTotal || 20;
+    const end = new Date(start.getTime() + semanas * 7 * 24 * 3600 * 1000);
+    return end.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+}
+
 const semanaAtual = Math.round((new Date() - new Date(dados.dataInicio)) / (7*24*3600*1000));
 
 // ==================== NOTIFICAÇÕES ====================
@@ -518,8 +527,16 @@ function renderizarDadosClienteAdmin() {
                 <input class="client-data-input" value="${dados.obra.tipo}" onchange="editarDadosObra('tipo', this.value)">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">Data de Início (Mês/Ano)</label>
+                <label class="client-data-label">📅 Data de Início (EDITÁVEL)</label>
                 <input class="client-data-input" type="month" value="${dados.dataInicio.substring(0,7)}" onchange="editarDataInicio(this.value)">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">⏱️ Duração Total (semanas)</label>
+                <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="editarDuracaoTotal(this.value)">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">📆 Previsão de Término</label>
+                <div class="client-data-value" style="color:var(--accent); padding:8px 0">${calcularPrevisao()}</div>
             </div>
         </div>
     </div>`;
@@ -528,6 +545,7 @@ function renderizarDadosClienteAdmin() {
 function editarDadosCliente(campo, valor) { dados.cliente[campo] = valor; marcarAlterado(); }
 function editarDadosObra(campo, valor) { dados.obra[campo] = valor; marcarAlterado(); }
 function editarDataInicio(valor) { dados.dataInicio = valor + '-01'; marcarAlterado(); }
+function editarDuracaoTotal(valor) { dados.duracaoTotal = parseInt(valor); marcarAlterado(); }
 
 // ==================== CRONOGRAMA ====================
 function renderizarCronogramaAdmin() {
@@ -535,7 +553,7 @@ function renderizarCronogramaAdmin() {
     <div class="page-header">
         <div>
             <div class="page-title">📅 Cronograma Inteligente</div>
-            <div class="page-sub">${dados.endereco} · Início: ${fmtMesAno()} · ${dados.grupos.length} grupos</div>
+            <div class="page-sub">${dados.endereco} · Início: ${fmtMesAno()} · Previsão: ${calcularPrevisao()}</div>
         </div>
         <div style="display:flex; gap:10px">
             <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
@@ -771,7 +789,7 @@ function excluirFoto(index) {
     }
 }
 
-// ==================== AMBIENTES (CORRIGIDO) ====================
+// ==================== AMBIENTES (CORRIGIDO - EXCLUIR NA HORA) ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -791,7 +809,7 @@ function renderizarAmbientesAdmin() {
 function adicionarAmbiente() {
     dados.ambientes.push('Novo Ambiente');
     marcarAlterado();
-    renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza imediatamente
+    renderizarAmbientesAdmin();
     mostrarNotificacao('Ambiente criado!', 'success');
 }
 function editarAmbiente(index, valor) { dados.ambientes[index] = valor; marcarAlterado(); }
@@ -799,12 +817,12 @@ function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
         marcarAlterado();
-        renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza imediatamente
+        renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza IMEDIATAMENTE
         mostrarNotificacao('Ambiente excluído!', 'success');
     }
 }
 
-// ==================== RENDERIZAÇÃO CLIENTE (COM ANIMAÇÕES) ====================
+// ==================== RENDERIZAÇÃO CLIENTE (COM DATAS DINÂMICAS) ====================
 function renderizarCliente() {
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -848,6 +866,7 @@ function renderizarStatsCliente() {
     let totalT = 0, totalP = 0;
     dados.grupos.forEach(g => g.tarefas.forEach(t => { totalT++; totalP += t.progresso; }));
     const media = totalT ? Math.round(totalP/totalT) : 0;
+    
     return `
     <div class="stats-row">
         <div class="stat-card">
@@ -856,8 +875,8 @@ function renderizarStatsCliente() {
             <div class="stat-bar-bg"><div class="stat-bar-fill animated-progress" style="width:${media}%"></div></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Previsão</div>
-            <div class="stat-value">Jun/2026</div>
+            <div class="stat-label">Previsão de Término</div>
+            <div class="stat-value" style="color:var(--accent)">${calcularPrevisao()}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Etapas</div>
