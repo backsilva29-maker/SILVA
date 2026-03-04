@@ -7,152 +7,306 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+/* ===== RESET E VARIÁVEIS ===== */
 :root {
---bg: #0d0f14; --surface: #13161e; --surface2: #1a1e2a;
---border: #252a38; --accent: #e8a020; --accent2: #3b82f6;
---accent3: #10b981; --accent4: #f43f5e; --text: #e8eaf0;
---text2: #8892a4; --text3: #4a5468; --gantt-h: 44px;
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #e8a020;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #f43f5e;
+    --text: #e8eaf0;
+    --text2: #8892a4;
+    --text3: #4a5468;
+    --gantt-h: 44px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; min-height: 100vh; overflow-x: hidden; }
+body { 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: 'Inter', sans-serif; 
+    font-size: 13px; 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+}
 
-/* LOGIN */
-.login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
-.login-content { background: var(--surface); border: 1px solid var(--border); border-radius: 48px; padding: 40px; width: 90%; max-width: 380px; text-align: center; animation: slideUp 0.4s ease; }
-.login-input { width: 100%; padding: 16px; margin: 15px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 40px; color: var(--text); font-size: 16px; }
-.login-btn { width: 100%; padding: 16px; margin: 8px 0; border: none; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+/* ===== LOGIN ===== */
+.login-modal { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); 
+    display: flex; justify-content: center; align-items: center; 
+    z-index: 1000; 
+}
+.login-content { 
+    background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 48px; padding: 40px; width: 90%; max-width: 380px; 
+    text-align: center; 
+}
+.login-input { 
+    width: 100%; padding: 16px; margin: 15px 0; 
+    background: var(--bg); border: 1px solid var(--border); 
+    border-radius: 40px; color: var(--text); font-size: 16px; 
+}
+.login-btn { 
+    width: 100%; padding: 16px; margin: 8px 0; border: none; 
+    border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; 
+}
 .btn-admin { background: var(--accent); color: #000; }
-.btn-admin:hover { background: #f5ae30; transform: scale(1.02); }
 .btn-client { background: var(--accent2); color: white; }
-.btn-client:hover { background: #4a90f6; transform: scale(1.02); }
 
-/* TOPBAR */
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 10px; }
-.logo-badge { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #000; font-weight: 800; }
-.btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+/* ===== TOPBAR ===== */
+.topbar { 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 24px; height: 56px; background: var(--surface); 
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; 
+}
+.logo { 
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; 
+    display: flex; align-items: center; gap: 10px; 
+}
+.logo-badge { 
+    width: 28px; height: 28px; background: var(--accent); border-radius: 6px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 13px; color: #000; font-weight: 800; 
+}
+.btn { 
+    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; 
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; 
+    transition: all .15s; display: inline-flex; align-items: center; gap: 6px; 
+}
 .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-.btn-ghost:hover { border-color: var(--text2); color: var(--text); transform: translateY(-1px); }
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
 .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
-.btn-primary:hover { background: #f5ae30; transform: translateY(-1px); }
+.btn-primary:hover { background: #f5ae30; }
 .btn-danger { background: var(--accent4); color: white; }
-.btn-danger:hover { background: #f65a7a; }
 .btn-success { background: var(--accent3); color: white; }
-.btn-success:hover { background: #1dd796; }
 
-/* LAYOUT */
+/* ===== LAYOUT ===== */
 .layout { display: flex; height: calc(100vh - 56px); }
-.sidebar { width: 240px; min-width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; }
+.sidebar { 
+    width: 240px; min-width: 240px; background: var(--surface); 
+    border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; 
+}
 .sidebar-section { margin-bottom: 24px; }
-.sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; padding: 0 16px; margin-bottom: 6px; }
-.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; }
+.sidebar-label { 
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; 
+    letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; 
+    padding: 0 16px; margin-bottom: 6px; 
+}
+.sidebar-item { 
+    display: flex; align-items: center; gap: 10px; padding: 10px 16px; 
+    color: var(--text2); cursor: pointer; border-left: 2px solid transparent; 
+    transition: all 0.2s; 
+}
 .sidebar-item:hover { background: var(--surface2); color: var(--text); transform: translateX(4px); }
-.sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,160,32,.06); }
+.sidebar-item.active { 
+    color: var(--accent); border-left-color: var(--accent); 
+    background: rgba(232,160,32,.06); 
+}
 
-/* MAIN */
-.main { flex: 1; overflow: auto; padding: 20px 24px; animation: fadeIn 0.4s ease; }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+/* ===== MAIN ===== */
+.main { flex: 1; overflow: auto; padding: 20px 24px; }
+.page-header { 
+    display: flex; align-items: center; justify-content: space-between; 
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); 
+}
 .page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .page-sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
 
-/* SAVE BAR */
-.save-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; animation: slideDown 0.3s ease; }
+/* ===== SAVE BAR ===== */
+.save-bar { 
+    background: var(--surface2); border: 1px solid var(--border); 
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; 
+    display: flex; align-items: center; justify-content: space-between; 
+}
 .save-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
-.save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); transition: background 0.3s; }
+.save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
 .save-indicator.saved { background: var(--accent3); }
 .save-indicator.pending { background: var(--accent); animation: pulse 1s infinite; }
 
-/* DADOS DO CLIENTE CARD */
-.client-data-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; animation: slideUp 0.4s ease; }
+/* ===== CLIENT DATA CARD ===== */
+.client-data-card { 
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); 
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+}
 .client-data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
 .client-data-item { display: flex; flex-direction: column; gap: 6px; }
-.client-data-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+.client-data-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; 
+}
 .client-data-value { font-size: 14px; color: var(--text); font-weight: 500; }
-.client-data-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; }
+.client-data-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; 
+}
 .client-data-input:focus { outline: none; border-color: var(--accent); }
 
-/* GANTT */
-.gantt-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-bottom: 20px; }
-.gantt-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
+/* ===== GANTT ===== */
+.gantt-wrap { 
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; 
+    background: var(--surface); margin-bottom: 20px; 
+}
+.gantt-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: var(--surface2); border-bottom: 1px solid var(--border); 
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); 
+    text-transform: uppercase; 
+}
 .gh-cell { padding: 12px; border-right: 1px solid var(--border); }
 .gantt-group { border-bottom: 1px solid var(--border); }
-.gantt-group-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; transition: background 0.2s; }
-.gantt-group-header:hover { background: rgba(232,160,32,.12); }
-.gantt-row { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; transition: background 0.2s; }
+.gantt-group-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; 
+}
+.gantt-row { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; 
+}
 .gantt-row:hover { background: var(--surface2); }
-.gantt-subtask { background: rgba(59,130,246,.05); }
-.gc { padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 12px; }
+.gc { 
+    padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; 
+    border-right: 1px solid var(--border); font-size: 12px; 
+}
 .gc-name { font-weight: 500; }
-.gc-edit { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; transition: border-color 0.2s; }
+.gc-edit { 
+    background: transparent; border: 1px solid var(--border); border-radius: 4px; 
+    padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; 
+}
 .gc-edit:focus { outline: none; border-color: var(--accent); }
 .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
 .bar-area { position: relative; height: var(--gantt-h); min-width: 100%; overflow-x: auto; }
-.gantt-bar { position: absolute; top: 50%; transform: translateY(-50%); height: 20px; border-radius: 5px; display: flex; align-items: center; overflow: hidden; cursor: pointer; transition: all 0.3s; }
+.gantt-bar { 
+    position: absolute; top: 50%; transform: translateY(-50%); height: 20px; 
+    border-radius: 5px; display: flex; align-items: center; overflow: hidden; 
+    cursor: pointer; transition: all 0.3s; 
+}
 .gantt-bar:hover { transform: translateY(-50%) scale(1.02); }
-.gantt-bar-fill { height: 100%; border-radius: 5px 0 0 5px; opacity: .95; transition: width 0.5s ease-out; }
-.today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
+.gantt-bar-fill { 
+    height: 100%; border-radius: 5px 0 0 5px; opacity: .95; 
+    transition: width 0.5s ease-out; 
+}
+.today-line { 
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); 
+    opacity: .7; z-index: 5; 
+}
 
-/* ANIMATED PROGRESS */
+/* ===== ANIMAÇÕES ===== */
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes slideInLeft { 
+    from { opacity: 0; transform: translateX(-20px); } 
+    to { opacity: 1; transform: translateX(0); } 
+}
 .animated-progress { position: relative; overflow: hidden; }
 .animated-progress::after {
     content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
     animation: shimmer 2s infinite;
 }
-.progress-pulse { animation: pulse 2s infinite; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-/* CRUD */
+/* ===== CRUD ===== */
 .crud-container { display: grid; gap: 12px; }
-.crud-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: 1fr 100px 100px 120px; gap: 12px; align-items: center; animation: slideUp 0.3s ease; }
-.crud-card-header { background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text3); text-transform: uppercase; padding: 12px 16px; border-radius: 10px 10px 0 0; }
-.crud-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; transition: border-color 0.2s; }
+.crud-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; display: grid; grid-template-columns: 1fr 100px 100px 120px; 
+    gap: 12px; align-items: center; 
+}
+.crud-card-header { 
+    background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text3); 
+    text-transform: uppercase; padding: 12px 16px; border-radius: 10px 10px 0 0; 
+}
+.crud-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; 
+}
 .crud-input:focus { outline: none; border-color: var(--accent); }
-.crud-actions { display: flex; gap: 6px; }
 
-/* PHOTOS */
+/* ===== FOTOS ===== */
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-.photo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: transform 0.2s; cursor: pointer; }
+.photo-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    overflow: hidden; transition: transform 0.2s; cursor: pointer; 
+}
 .photo-card:hover { transform: translateY(-4px); }
 .photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
 .photo-card-info { padding: 12px; }
 .photo-card-ambiente { font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
 .photo-card-data { font-size: 10px; color: var(--text3); }
 
-/* STATS */
-.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; transition: transform 0.2s; animation: slideUp 0.4s ease; }
+/* ===== STATS ===== */
+.stats-row { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 16px; margin-bottom: 20px; 
+}
+.stat-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; transition: transform 0.2s; 
+}
 .stat-card:hover { transform: translateY(-4px); }
-.stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
+.stat-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; 
+}
 .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .stat-bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .stat-bar-fill { height: 100%; background: var(--accent3); border-radius: 2px; transition: width 0.5s ease-out; }
 
-/* MODAL */
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
-.modal.open { display: flex; animation: fadeIn 0.3s ease; }
-.modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; animation: slideUp 0.4s ease; }
+/* ===== MODAL ===== */
+.modal { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; 
+    align-items: center; justify-content: center; 
+}
+.modal.open { display: flex; }
+.modal-content { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px; 
+    padding: 30px; width: 90%; max-width: 500px; 
+}
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
-.modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; transition: color 0.2s; }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
 
-/* NOTIFICATION */
-.notification { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; z-index: 999; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+/* ===== NOTIFICATION ===== */
+.notification { 
+    position: fixed; bottom: 20px; right: 20px; background: var(--surface); 
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; 
+    display: flex; align-items: center; gap: 12px; z-index: 999; 
+    transform: translateY(100px); opacity: 0; transition: all 0.3s; 
+}
 .notification.show { transform: translateY(0); opacity: 1; }
 .notification.success { border-color: var(--accent3); }
-.notification.error { border-color: var(--accent4); }
 
-/* AMBIENTES TABS */
+/* ===== AMBIENTES TABS ===== */
 .ambientes-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.ambiente-tab { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); transition: all 0.2s; }
-.ambiente-tab:hover { transform: translateY(-2px); }
+.ambiente-tab { 
+    padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); 
+}
 .ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-/* CLIENT TIMELINE ANIMATED */
-.client-timeline { position: relative; padding-left: 30px; border-left: 3px solid var(--border); margin: 30px 0; }
-.client-item { position: relative; padding-left: 20px; margin-bottom: 25px; opacity: 0; animation: slideInLeft 0.5s ease forwards; transition: all 0.3s ease; }
-.client-item:hover { transform: translateX(10px); background: var(--surface); border-radius: 12px; padding: 15px; margin-left: -15px; }
-.client-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); transition: all 0.3s; box-shadow: 0 0 10px currentColor; }
+/* ===== CLIENT TIMELINE ===== */
+.client-timeline { 
+    position: relative; padding-left: 30px; border-left: 3px solid var(--border); 
+    margin: 30px 0; 
+}
+.client-item { 
+    position: relative; padding-left: 20px; margin-bottom: 25px; 
+    opacity: 0; animation: slideInLeft 0.5s ease forwards; 
+    transition: all 0.3s ease; 
+}
+.client-item:hover { 
+    transform: translateX(10px); background: var(--surface); 
+    border-radius: 12px; padding: 15px; margin-left: -15px; 
+}
+.client-item::before { 
+    content: ''; position: absolute; left: -26px; top: 5px; 
+    width: 12px; height: 12px; border-radius: 50%; background: var(--border); 
+    transition: all 0.3s; 
+}
 .client-item.done::before { background: var(--accent3); }
 .client-item.active::before { background: var(--accent); animation: pulse 1.5s infinite; }
 .client-item:nth-child(1) { animation-delay: 0.1s; }
@@ -163,26 +317,13 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .client-item:nth-child(6) { animation-delay: 0.6s; }
 .client-item:nth-child(7) { animation-delay: 0.7s; }
 .client-item:nth-child(8) { animation-delay: 0.8s; }
-.client-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; }
+.client-status { 
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; 
+    display: inline-block; margin-top: 5px; 
+}
 .status-pendente { background: rgba(74,84,104,0.1); color: var(--text2); }
 .status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
 .status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
-
-/* ANIMATIONS */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .sidebar { display: none; }
-    .gantt-header, .gantt-row { grid-template-columns: 150px 1fr; }
-    .gh-cell:nth-child(n+2), .gc:nth-child(n+2) { display: none; }
-    .crud-card { grid-template-columns: 1fr; }
-}
 </style>
 </head>
 <body>
@@ -198,7 +339,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
     </div>
 </div>
 
-<!-- MODAL GENÉRICO -->
+<!-- MODAL -->
 <div id="modalGenerico" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -244,87 +385,42 @@ let dados = {
         tipo: "Reforma Completa"
     },
     grupos: [
-        { id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', inicio: 0, duracao: 2, responsavel: 'Admin', tarefas: [
-            { id: 't1_1', nome: 'Placa de Obra', duracao: 1, responsavel: 'Admin', progresso: 100, subtasks: [] },
-            { id: 't1_2', nome: 'Administração da Obra', duracao: 5, responsavel: 'Engenheiro', progresso: 40, subtasks: [] }
-        ]},
-        { id: 'g2', nome: '2. Demolições', cor: '#f43f5e', inicio: 2, duracao: 2, responsavel: 'Equipe A', tarefas: [
-            { id: 't2_1', nome: 'Demolição Alvenaria', duracao: 2, responsavel: 'Pedreiro', progresso: 0, subtasks: [] },
-            { id: 't2_2', nome: 'Remoção Entulho', duracao: 2, responsavel: 'Servente', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g3', nome: '3. Paredes', cor: '#e8a020', inicio: 4, duracao: 2, responsavel: 'Pedreiro', tarefas: [
-            { id: 't3_1', nome: 'Alvenaria Tijolo', duracao: 2, responsavel: 'Pedreiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g4', nome: '4. Revestimentos', cor: '#10b981', inicio: 6, duracao: 4, responsavel: 'Pedreiro', tarefas: [
-            { id: 't4_1', nome: 'Chapisco', duracao: 2, responsavel: 'Pedreiro', progresso: 0, subtasks: [] },
-            { id: 't4_2', nome: 'Reboco Impermeabilizante', duracao: 4, responsavel: 'Pedreiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g5', nome: '5. Pavimentação', cor: '#8b5cf6', inicio: 10, duracao: 4, responsavel: 'Marmoreiro', tarefas: [
-            { id: 't5_1', nome: 'Camada Regularizadora', duracao: 2, responsavel: 'Pedreiro', progresso: 0, subtasks: [] },
-            { id: 't5_2', nome: 'Porcelanato Portinari/Portobello', duracao: 4, responsavel: 'Marmoreiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g6', nome: '6. Elétrica', cor: '#f59e0b', inicio: 8, duracao: 4, responsavel: 'Eletricista', tarefas: [
-            { id: 't6_1', nome: 'Pontos de Tomada (93 pts)', duracao: 3, responsavel: 'Eletricista', progresso: 0, subtasks: [] },
-            { id: 't6_2', nome: 'Iluminação LED', duracao: 2, responsavel: 'Eletricista', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g7', nome: '7. Hidráulica', cor: '#06b6d4', inicio: 8, duracao: 3, responsavel: 'Encanador', tarefas: [
-            { id: 't7_1', nome: 'Água Fria/Gás', duracao: 2, responsavel: 'Encanador', progresso: 0, subtasks: [] },
-            { id: 't7_2', nome: 'Esgoto PVC', duracao: 2, responsavel: 'Encanador', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g8', nome: '8. Refrigeração', cor: '#14b8a6', inicio: 10, duracao: 2, responsavel: 'Técnico', tarefas: [
-            { id: 't8_1', nome: 'Instalação AC (5 un)', duracao: 2, responsavel: 'Técnico', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g9', nome: '9. Rede Lógica', cor: '#6366f1', inicio: 10, duracao: 2, responsavel: 'Técnico', tarefas: [
-            { id: 't9_1', nome: 'Cabeamento', duracao: 2, responsavel: 'Técnico', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g10', nome: '10. Rodapés/Soleiras', cor: '#ec4899', inicio: 14, duracao: 2, responsavel: 'Marmoreiro', tarefas: [
-            { id: 't10_1', nome: 'Soleira Mármore', duracao: 1, responsavel: 'Marmoreiro', progresso: 0, subtasks: [] },
-            { id: 't10_2', nome: 'Rodapé Poliestireno', duracao: 2, responsavel: 'Pedreiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g11', nome: '11. Esquadrias', cor: '#84cc16', inicio: 14, duracao: 2, responsavel: 'Carpinteiro', tarefas: [
-            { id: 't11_1', nome: 'Portas Madeira (18 un)', duracao: 2, responsavel: 'Carpinteiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g12', nome: '12. Forro', cor: '#0ea5e9', inicio: 12, duracao: 3, responsavel: 'Gesseiro', tarefas: [
-            { id: 't12_1', nome: 'Gesso Acartonado (234m²)', duracao: 3, responsavel: 'Gesseiro', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g13', nome: '13. Pintura', cor: '#a855f7', inicio: 15, duracao: 4, responsavel: 'Pintor', tarefas: [
-            { id: 't13_1', nome: 'Fundo Selador', duracao: 1, responsavel: 'Pintor', progresso: 0, subtasks: [] },
-            { id: 't13_2', nome: 'Emassamento', duracao: 2, responsavel: 'Pintor', progresso: 0, subtasks: [] },
-            { id: 't13_3', nome: 'Tinta Acrílica Premium', duracao: 2, responsavel: 'Pintor', progresso: 0, subtasks: [] }
-        ]},
-        { id: 'g14', nome: '14. Limpeza Final', cor: '#22c55e', inicio: 19, duracao: 1, responsavel: 'Equipe', tarefas: [
-            { id: 't14_1', nome: 'Limpeza Geral', duracao: 1, responsavel: 'Equipe', progresso: 0, subtasks: [] }
-        ]}
+        { 
+            id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', 
+            inicio: 0, duracao: 2, responsavel: 'Admin', 
+            tarefas: [
+                { nome: 'Placa de Obra', duracao: 1, responsavel: 'Admin', progresso: 100 },
+                { nome: 'Administração da Obra', duracao: 5, responsavel: 'Engenheiro', progresso: 40 }
+            ] 
+        },
+        { 
+            id: 'g2', nome: '2. Demolições', cor: '#f43f5e', 
+            inicio: 2, duracao: 2, responsavel: 'Equipe A', 
+            tarefas: [
+                { nome: 'Demolição Alvenaria', duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
+                { nome: 'Remoção Entulho', duracao: 2, responsavel: 'Servente', progresso: 0 }
+            ] 
+        },
+        { 
+            id: 'g3', nome: '3. Paredes', cor: '#e8a020', 
+            inicio: 4, duracao: 2, responsavel: 'Pedreiro', 
+            tarefas: [
+                { nome: 'Alvenaria Tijolo', duracao: 2, responsavel: 'Pedreiro', progresso: 0 }
+            ] 
+        }
     ],
     orcamento: [
         { id: 'o1', grupo: 'Serviços Preliminares', descricao: 'Placa de Obra', valor: 1639.05 },
-        { id: 'o2', grupo: 'Serviços Preliminares', descricao: 'Administração da Obra', valor: 38139.75 },
-        { id: 'o3', grupo: 'Demolições', descricao: 'Demolição Alvenaria', valor: 764.84 },
-        { id: 'o4', grupo: 'Demolições', descricao: 'Remoção Entulho', valor: 2739.60 },
-        { id: 'o5', grupo: 'Paredes', descricao: 'Alvenaria Tijolo', valor: 5929.87 },
-        { id: 'o6', grupo: 'Revestimentos', descricao: 'Chapisco', valor: 3110.80 },
-        { id: 'o7', grupo: 'Revestimentos', descricao: 'Reboco Impermeabilizante', valor: 13260.00 },
-        { id: 'o8', grupo: 'Pavimentação', descricao: 'Camada Regularizadora', valor: 5602.62 },
-        { id: 'o9', grupo: 'Pavimentação', descricao: 'Porcelanatos', valor: 29938.42 },
-        { id: 'o10', grupo: 'Elétrica', descricao: 'Instalações Elétricas', valor: 38832.41 },
-        { id: 'o11', grupo: 'Hidráulica', descricao: 'Instalações Hidrossanitárias', valor: 4841.61 },
-        { id: 'o12', grupo: 'Refrigeração', descricao: 'Ar Condicionado', valor: 7218.55 },
-        { id: 'o13', grupo: 'Rede Lógica', descricao: 'Cabeamento', valor: 7194.29 },
-        { id: 'o14', grupo: 'Rodapés/Soleiras', descricao: 'Mármore e Poliestireno', valor: 1183.01 },
-        { id: 'o15', grupo: 'Esquadrias', descricao: 'Portas Madeira', valor: 7761.94 },
-        { id: 'o16', grupo: 'Forro', descricao: 'Gesso Acartonado', valor: 14627.35 },
-        { id: 'o17', grupo: 'Pintura', descricao: 'Pintura Completa', valor: 47353.35 },
-        { id: 'o18', grupo: 'Limpeza', descricao: 'Limpeza Final', valor: 4806.08 }
+        { id: 'o2', grupo: 'Serviços Preliminares', descricao: 'Administração da Obra', valor: 38139.75 }
     ],
     ambientes: ['Sala', 'Cozinha', 'Quarto 1', 'Quarto 2', 'Banheiro 1', 'Banheiro 2', 'Área Serviço', 'Varanda'],
     fotos: [
-        { id: 'f1', url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '01/08/2024' },
-        { id: 'f2', url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '01/08/2024' },
-        { id: 'f3', url: 'https://via.placeholder.com/400x300/f59e0b/ffffff?text=Quarto', ambiente: 'Quarto 1', data: '05/08/2024' }
+        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '01/08/2024' },
+        { url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '01/08/2024' }
     ]
 };
 
-// ==================== FUNÇÕES DE DATA GLOBAIS ====================
+// ==================== FUNÇÕES DE DATA ====================
 const SEMANA_PX = 40;
 
 function getDataInicio() {
@@ -509,7 +605,6 @@ function renderizarConteudoAdmin() {
     }
 }
 
-// ==================== DADOS DO CLIENTE (ADMIN) ====================
 function renderizarDadosClienteAdmin() {
     return `
     <div class="page-header">
@@ -522,58 +617,44 @@ function renderizarDadosClienteAdmin() {
         <div class="client-data-grid">
             <div class="client-data-item">
                 <label class="client-data-label">Nome do Cliente</label>
-                <input class="client-data-input" value="${dados.cliente.nome}" onchange="editarDadosCliente('nome', this.value)">
+                <input class="client-data-input" value="${dados.cliente.nome}" onchange="dados.cliente.nome=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Email</label>
-                <input class="client-data-input" value="${dados.cliente.email}" onchange="editarDadosCliente('email', this.value)">
+                <input class="client-data-input" value="${dados.cliente.email}" onchange="dados.cliente.email=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Telefone</label>
-                <input class="client-data-input" value="${dados.cliente.telefone}" onchange="editarDadosCliente('telefone', this.value)">
+                <input class="client-data-input" value="${dados.cliente.telefone}" onchange="dados.cliente.telefone=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">Observações</label>
-                <input class="client-data-input" value="${dados.cliente.observacoes}" onchange="editarDadosCliente('observacoes', this.value)">
-            </div>
-        </div>
-    </div>
-    <div class="client-data-card">
-        <div class="client-data-grid">
-            <div class="client-data-item">
-                <label class="client-data-label">Arquiteto Responsável</label>
-                <input class="client-data-input" value="${dados.obra.arquiteto}" onchange="editarDadosObra('arquiteto', this.value)">
+                <input class="client-data-input" value="${dados.cliente.observacoes}" onchange="dados.cliente.observacoes=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">Área Total</label>
-                <input class="client-data-input" value="${dados.obra.area}" onchange="editarDadosObra('area', this.value)">
+                <label class="client-data-label">Arquiteto</label>
+                <input class="client-data-input" value="${dados.obra.arquiteto}" onchange="dados.obra.arquiteto=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">Tipo de Obra</label>
-                <input class="client-data-input" value="${dados.obra.tipo}" onchange="editarDadosObra('tipo', this.value)">
+                <label class="client-data-label">Área</label>
+                <input class="client-data-input" value="${dados.obra.area}" onchange="dados.obra.area=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">📅 Data de Início (EDITÁVEL)</label>
-                <input class="client-data-input" type="month" value="${dados.dataInicio.substring(0,7)}" onchange="editarDataInicio(this.value)">
+                <label class="client-data-label">Tipo</label>
+                <input class="client-data-input" value="${dados.obra.tipo}" onchange="dados.obra.tipo=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">⏱️ Duração Total (semanas)</label>
-                <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="editarDuracaoTotal(this.value)">
+                <label class="client-data-label">📅 Data de Início</label>
+                <input class="client-data-input" type="month" value="${dados.dataInicio.substring(0,7)}" onchange="dados.dataInicio=this.value+'-01'; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">📆 Previsão de Término</label>
-                <div class="client-data-value" style="color:var(--accent); padding:8px 0">${calcularPrevisao()}</div>
+                <label class="client-data-label">⏱️ Duração (semanas)</label>
+                <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="dados.duracaoTotal=parseInt(this.value); marcarAlterado();">
             </div>
         </div>
     </div>`;
 }
 
-function editarDadosCliente(campo, valor) { dados.cliente[campo] = valor; marcarAlterado(); }
-function editarDadosObra(campo, valor) { dados.obra[campo] = valor; marcarAlterado(); }
-function editarDataInicio(valor) { dados.dataInicio = valor + '-01'; marcarAlterado(); mostrarNotificacao('Data de início alterada. Cronograma atualizado!', 'success'); }
-function editarDuracaoTotal(valor) { dados.duracaoTotal = parseInt(valor); marcarAlterado(); }
-
-// ==================== CRONOGRAMA ====================
 function renderizarCronogramaAdmin() {
     return `
     <div class="page-header">
@@ -610,18 +691,18 @@ function renderizarGantt() {
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
         
-        // HEADER DO GRUPO
+        // Grupo
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
-            <div class="gc gc-name">
+            <div class="gc">
                 <div class="dot" style="background:${g.cor}"></div>
-                <input class="gc-edit" value="${g.nome}" onchange="editarGrupoNome(${gIndex}, this.value)" style="background:transparent; border:none; color:var(--text); font-weight:600">
+                <input class="gc-edit" value="${g.nome}" onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado(); renderizarGantt();">
             </div>
             <div class="gc">${fmtSemana(g.inicio)}</div>
             <div class="gc">${fmtSemana(g.inicio + g.duracao)}</div>
-            <div class="gc"><input type="number" class="gc-edit" value="${g.duracao}" onchange="editarGrupoDuracao(${gIndex}, this.value)" style="width:50px"></div>
-            <div class="gc"><input class="gc-edit" value="${g.responsavel}" onchange="editarGrupoResp(${gIndex}, this.value)"></div>
+            <div class="gc"><input class="gc-edit" type="number" value="${g.duracao}" onchange="dados.grupos[${gIndex}].duracao=parseInt(this.value); marcarAlterado(); renderizarGantt();"></div>
+            <div class="gc"><input class="gc-edit" value="${g.responsavel}" onchange="dados.grupos[${gIndex}].responsavel=this.value; marcarAlterado();"></div>
             <div class="gc">
                 <div class="bar-area">
                     <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
@@ -632,21 +713,21 @@ function renderizarGantt() {
             </div>
         `;
         grupoDiv.appendChild(grupoHeader);
-
-        // TAREFAS DO GRUPO
+        
+        // Tarefas
         g.tarefas.forEach((t, tIndex) => {
             const tarefaRow = document.createElement('div');
             tarefaRow.className = 'gantt-row';
             tarefaRow.innerHTML = `
                 <div class="gc" style="padding-left:36px">
-                    <input class="gc-edit" value="${t.nome}" onchange="editarTarefaNome(${gIndex}, ${tIndex}, this.value)">
+                    <input class="gc-edit" value="${t.nome}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
                 </div>
                 <div class="gc">${fmtSemana(g.inicio)}</div>
                 <div class="gc">${fmtSemana(g.inicio + t.duracao)}</div>
-                <div class="gc"><input type="number" class="gc-edit" value="${t.duracao}" onchange="editarTarefaDuracao(${gIndex}, ${tIndex}, this.value)" style="width:50px"></div>
+                <div class="gc"><input class="gc-edit" type="number" value="${t.duracao}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value); marcarAlterado(); renderizarGantt();"></div>
                 <div class="gc">
-                    <input type="range" min="0" max="100" value="${t.progresso}" style="width:80px; accent-color:${g.cor}" onchange="editarTarefaProgresso(${gIndex}, ${tIndex}, this.value)">
-                    <span style="margin-left:5px; width:30px">${t.progresso}%</span>
+                    <input type="range" min="0" max="100" value="${t.progresso}" style="width:80px; accent-color:${g.cor}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); renderizarGantt();">
+                    <span style="margin-left:5px">${t.progresso}%</span>
                 </div>
                 <div class="gc">
                     <div class="bar-area">
@@ -658,69 +739,58 @@ function renderizarGantt() {
                 </div>
             `;
             grupoDiv.appendChild(tarefaRow);
-
-            // BOTÃO ADICIONAR SUBTAREFA
-            const addSubtaskRow = document.createElement('div');
-            addSubtaskRow.className = 'gantt-row gantt-subtask';
-            addSubtaskRow.innerHTML = `
-                <div class="gc" style="padding-left:56px">
-                    <button class="btn btn-ghost" style="padding:4px 8px" onclick="adicionarSubtask(${gIndex}, ${tIndex})">+ Sub-tarefa</button>
-                    <button class="btn btn-danger" style="padding:4px 8px; margin-left:8px" onclick="excluirTarefa(${gIndex}, ${tIndex})">🗑️ Tarefa</button>
-                </div>
-                <div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div>
-            `;
-            grupoDiv.appendChild(addSubtaskRow);
         });
-
-        // BOTÃO ADICIONAR TAREFA E EXCLUIR GRUPO
-        const addTaskRow = document.createElement('div');
-        addTaskRow.className = 'gantt-row';
-        addTaskRow.innerHTML = `
+        
+        // Botão adicionar tarefa
+        const addRow = document.createElement('div');
+        addRow.className = 'gantt-row';
+        addRow.innerHTML = `
             <div class="gc" style="padding-left:12px">
-                <button class="btn btn-primary" style="padding:6px 12px" onclick="adicionarTarefa(${gIndex})">+ Adicionar Tarefa</button>
-                <button class="btn btn-danger" style="padding:6px 12px; margin-left:8px" onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
+                <button class="btn btn-primary" onclick="adicionarTarefa(${gIndex})">+ Adicionar Tarefa</button>
+                <button class="btn btn-danger" onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
             </div>
             <div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div>
         `;
-        grupoDiv.appendChild(addTaskRow);
+        grupoDiv.appendChild(addRow);
         
         body.appendChild(grupoDiv);
     });
 }
 
-// ==================== FUNÇÕES CRONOGRAMA ====================
-function editarGrupoNome(index, valor) { dados.grupos[index].nome = valor; marcarAlterado(); }
-function editarGrupoDuracao(index, valor) { dados.grupos[index].duracao = parseInt(valor); marcarAlterado(); renderizarGantt(); }
-function editarGrupoResp(index, valor) { dados.grupos[index].responsavel = valor; marcarAlterado(); }
-function editarTarefaNome(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].nome = valor; marcarAlterado(); }
-function editarTarefaDuracao(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].duracao = parseInt(valor); marcarAlterado(); renderizarGantt(); }
-function editarTarefaProgresso(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].progresso = parseInt(valor); marcarAlterado(); renderizarGantt(); }
 function adicionarGrupo() {
-    dados.grupos.push({ id: 'g' + (dados.grupos.length + 1), nome: 'Novo Grupo', cor: '#' + Math.floor(Math.random()*16777215).toString(16), inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe', tarefas: [] });
-    marcarAlterado(); renderizarGantt();
+    dados.grupos.push({
+        id: 'g' + (dados.grupos.length + 1),
+        nome: 'Novo Grupo',
+        cor: '#' + Math.floor(Math.random()*16777215).toString(16),
+        inicio: dados.grupos.length * 2,
+        duracao: 2,
+        responsavel: 'Equipe',
+        tarefas: []
+    });
+    marcarAlterado();
+    renderizarGantt();
 }
+
 function adicionarTarefa(gIndex) {
-    dados.grupos[gIndex].tarefas.push({ id: 't' + Date.now(), nome: 'Nova Tarefa', duracao: 2, responsavel: 'Equipe', progresso: 0, subtasks: [] });
-    marcarAlterado(); renderizarGantt();
+    dados.grupos[gIndex].tarefas.push({
+        nome: 'Nova Tarefa',
+        duracao: 2,
+        responsavel: 'Equipe',
+        progresso: 0
+    });
+    marcarAlterado();
+    renderizarGantt();
 }
-function excluirTarefa(gIndex, tIndex) {
-    if (confirm('Excluir esta tarefa?')) {
-        dados.grupos[gIndex].tarefas.splice(tIndex, 1);
-        marcarAlterado(); renderizarGantt();
-        mostrarNotificacao('Tarefa excluída!', 'success');
-    }
-}
+
 function excluirGrupo(gIndex) {
     if (confirm('Excluir este grupo?')) {
         dados.grupos.splice(gIndex, 1);
-        marcarAlterado(); renderizarGantt();
-        mostrarNotificacao('Grupo excluído!', 'success');
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Grupo excluído!');
     }
 }
-function adicionarSubtask(gIndex, tIndex) {
-    dados.grupos[gIndex].tarefas[tIndex].subtasks.push({ nome: 'Nova Sub-tarefa', duracao: 1, progresso: 0 });
-    marcarAlterado(); renderizarGantt();
-}
+
 function exportarCronograma() {
     const ws = XLSX.utils.json_to_sheet(dados.grupos);
     const wb = XLSX.utils.book_new();
@@ -729,44 +799,46 @@ function exportarCronograma() {
     mostrarNotificacao('Cronograma exportado!');
 }
 
-// ==================== ORÇAMENTO ====================
 function renderizarOrcamentoAdmin() {
     const total = dados.orcamento.reduce((acc, item) => acc + item.valor, 0);
     return `
     <div class="page-header">
         <div>
             <div class="page-title">💰 Orçamento</div>
-            <div class="page-sub">${dados.orcamento.length} itens · Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+            <div class="page-sub">Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
         </div>
         <button class="btn btn-primary" onclick="adicionarItemOrcamento()">+ Adicionar Item</button>
     </div>
     <div class="crud-card crud-card-header">
-        <div>Descrição</div><div>Grupo</div><div>Valor (R$)</div><div>Ações</div>
+        <div>Descrição</div><div>Valor (R$)</div><div>Ações</div>
     </div>
     <div class="crud-container">
         ${dados.orcamento.map((item, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${item.descricao}" onchange="editarOrcamento(${index}, 'descricao', this.value)">
-            <input class="crud-input" value="${item.grupo}" onchange="editarOrcamento(${index}, 'grupo', this.value)">
-            <input class="crud-input" type="number" value="${item.valor}" onchange="editarOrcamento(${index}, 'valor', this.value)">
-            <div class="crud-actions"><button class="btn btn-danger" onclick="excluirOrcamento(${index})">🗑️</button></div>
+            <input class="crud-input" value="${item.descricao}" onchange="dados.orcamento[${index}].descricao=this.value; marcarAlterado();">
+            <input class="crud-input" type="number" value="${item.valor}" onchange="dados.orcamento[${index}].valor=parseFloat(this.value); marcarAlterado();">
+            <button class="btn btn-danger" onclick="excluirOrcamento(${index})">🗑️</button>
         </div>
         `).join('')}
     </div>`;
 }
-function adicionarItemOrcamento() { dados.orcamento.push({ id: 'o' + Date.now(), grupo: 'Geral', descricao: 'Novo Item', valor: 0 }); marcarAlterado(); renderizarOrcamentoAdmin(); }
-function editarOrcamento(index, campo, valor) { dados.orcamento[index][campo] = campo === 'valor' ? parseFloat(valor) : valor; marcarAlterado(); }
+
+function adicionarItemOrcamento() {
+    dados.orcamento.push({ descricao: 'Novo Item', valor: 0 });
+    marcarAlterado();
+    renderizarOrcamentoAdmin();
+}
+
 function excluirOrcamento(index) {
     if (confirm('Excluir este item?')) {
         dados.orcamento.splice(index, 1);
-        marcarAlterado(); renderizarOrcamentoAdmin();
-        mostrarNotificacao('Item excluído!', 'success');
+        marcarAlterado();
+        renderizarOrcamentoAdmin();
+        mostrarNotificacao('Item excluído!');
     }
 }
 
-// ==================== FOTOS ====================
 function renderizarFotosAdmin() {
-    const ambientes = ['todos', ...dados.ambientes];
     return `
     <div class="page-header">
         <div>
@@ -775,26 +847,24 @@ function renderizarFotosAdmin() {
         </div>
         <button class="btn btn-primary" onclick="adicionarFoto()">+ Adicionar Foto</button>
     </div>
-    <div class="ambientes-tabs">
-        ${ambientes.map(amb => `<div class="ambiente-tab ${ambienteFotoSelecionado === amb ? 'active' : ''}" onclick="filtrarFotos('${amb}')">${amb === 'todos' ? '📋 Todos' : '🏠 ' + amb}</div>`).join('')}
-    </div>
     <div class="photo-grid">
-        ${dados.fotos.filter(f => ambienteFotoSelecionado === 'todos' || f.ambiente === ambienteFotoSelecionado).map((foto, index) => `
+        ${dados.fotos.map((foto, index) => `
         <div class="photo-card">
             <img src="${foto.url}" alt="${foto.ambiente}">
             <div class="photo-card-info">
                 <div class="photo-card-ambiente">${foto.ambiente}</div>
                 <div class="photo-card-data">${foto.data}</div>
-                <button class="btn btn-danger" style="width:100%; margin-top:8px" onclick="excluirFoto(${index})">🗑️ Excluir</button>
+                <button class="btn btn-danger" onclick="excluirFoto(${index})">🗑️ Excluir</button>
             </div>
         </div>
         `).join('')}
     </div>`;
 }
-function filtrarFotos(ambiente) { ambienteFotoSelecionado = ambiente; renderizarFotosAdmin(); }
+
 function adicionarFoto() {
     const input = document.createElement('input');
-    input.type = 'file'; input.accept = 'image/*';
+    input.type = 'file';
+    input.accept = 'image/*';
     input.onchange = function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -803,9 +873,10 @@ function adicionarFoto() {
                 abrirModal('Adicionar Foto', `
                     <div style="display:grid; gap:12px">
                         <img src="${e.target.result}" style="width:100%; border-radius:10px">
-                        <label style="font-size:12px; color:var(--text2)">Ambiente</label>
-                        <select id="fotoAmbiente" class="crud-input">${dados.ambientes.map(amb => `<option value="${amb}">${amb}</option>`).join('')}</select>
-                        <button class="btn btn-primary" onclick="confirmarFoto('${e.target.result}')">Salvar Foto</button>
+                        <select id="fotoAmbiente" class="crud-input">
+                            ${dados.ambientes.map(amb => `<option value="${amb}">${amb}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-primary" onclick="confirmarFoto('${e.target.result}')">Salvar</button>
                     </div>
                 `);
             };
@@ -814,21 +885,29 @@ function adicionarFoto() {
     };
     input.click();
 }
+
 function confirmarFoto(url) {
     const ambiente = document.getElementById('fotoAmbiente').value;
-    dados.fotos.push({ id: 'f' + Date.now(), url: url, ambiente: ambiente, data: new Date().toLocaleDateString('pt-BR') });
-    marcarAlterado(); fecharModal(); renderizarFotosAdmin();
+    dados.fotos.push({
+        url: url,
+        ambiente: ambiente,
+        data: new Date().toLocaleDateString('pt-BR')
+    });
+    marcarAlterado();
+    fecharModal();
+    renderizarFotosAdmin();
     mostrarNotificacao('Foto adicionada!');
 }
+
 function excluirFoto(index) {
     if (confirm('Excluir esta foto?')) {
         dados.fotos.splice(index, 1);
-        marcarAlterado(); renderizarFotosAdmin();
-        mostrarNotificacao('Foto excluída!', 'success');
+        marcarAlterado();
+        renderizarFotosAdmin();
+        mostrarNotificacao('Foto excluída!');
     }
 }
 
-// ==================== AMBIENTES ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -838,175 +917,111 @@ function renderizarAmbientesAdmin() {
     <div class="crud-container">
         ${dados.ambientes.map((amb, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${amb}" onchange="editarAmbiente(${index}, this.value)">
-            <div></div><div></div>
-            <div class="crud-actions"><button class="btn btn-danger" onclick="excluirAmbiente(${index})">🗑️</button></div>
+            <input class="crud-input" value="${amb}" onchange="dados.ambientes[${index}]=this.value; marcarAlterado();">
+            <button class="btn btn-danger" onclick="excluirAmbiente(${index})">🗑️</button>
         </div>
         `).join('')}
     </div>`;
 }
+
 function adicionarAmbiente() {
     dados.ambientes.push('Novo Ambiente');
     marcarAlterado();
     renderizarAmbientesAdmin();
-    mostrarNotificacao('Ambiente criado!', 'success');
+    mostrarNotificacao('Ambiente adicionado!');
 }
-function editarAmbiente(index, valor) { dados.ambientes[index] = valor; marcarAlterado(); }
+
 function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
         marcarAlterado();
         renderizarAmbientesAdmin();
-        mostrarNotificacao('Ambiente excluído!', 'success');
+        mostrarNotificacao('Ambiente excluído!');
     }
 }
 
-// ==================== RENDERIZAÇÃO CLIENTE (COM DATAS DINÂMICAS) ====================
+// ==================== CLIENTE ====================
 function renderizarCliente() {
-    const app = document.getElementById('app');
-    app.innerHTML = `
-    <div class="topbar">
-        <div class="logo"><div class="logo-badge">C</div> ${dados.titulo} - Cliente</div>
-        <button class="btn btn-ghost" onclick="location.reload()">🔄 Sair</button>
-    </div>
-    <div class="main">
-        ${renderizarDadosClienteView()}
-        ${renderizarCronogramaAnimadoCliente()}
-        ${renderizarFotosCliente()}
-    </div>`;
-}
-
-function renderizarDadosClienteView() {
-    return `
-    <div class="client-data-card">
-        <div class="client-data-grid">
-            <div class="client-data-item">
-                <div class="client-data-label">Cliente</div>
-                <div class="client-data-value" style="font-size:16px; color:var(--accent)">👤 ${dados.cliente.nome}</div>
-            </div>
-            <div class="client-data-item">
-                <div class="client-data-label">Contato</div>
-                <div class="client-data-value">📞 ${dados.cliente.telefone}</div>
-            </div>
-            <div class="client-data-item">
-                <div class="client-data-label">Arquiteto</div>
-                <div class="client-data-value">📐 ${dados.obra.arquiteto}</div>
-            </div>
-            <div class="client-data-item">
-                <div class="client-data-label">Obra</div>
-                <div class="client-data-value">🏠 ${dados.obra.area} · ${dados.obra.tipo}</div>
-            </div>
-        </div>
-    </div>`;
-}
-
-function renderizarCronogramaAnimadoCliente() {
     const progressoGeral = calcularProgressoGeral();
     
-    return `
-    <div class="page-header">
-        <div class="page-title">📅 Cronograma da Obra</div>
-        <div style="color:var(--accent); font-size:14px">${fmtSemanaCompleta(0)} — ${calcularPrevisao()}</div>
+    let html = `
+    <div class="topbar">
+        <div class="logo"><div class="logo-badge">C</div> ${dados.titulo}</div>
+        <button class="btn btn-ghost" onclick="location.reload()">🔐 Sair</button>
     </div>
-    
-    <!-- BARRA DE PROGRESSO GERAL ANIMADA -->
-    <div class="stat-card" style="margin-bottom:20px; background:linear-gradient(135deg, var(--surface), var(--surface2))">
-        <div class="stat-label">Progresso Geral da Obra</div>
-        <div style="display:flex; align-items:center; justify-content:space-between">
-            <div class="stat-value" style="color:var(--accent3); font-size:32px">${progressoGeral}%</div>
-            <div style="font-size:12px; color:var(--text2)">${dados.duracaoTotal} semanas · Início: ${fmtSemanaCompleta(0)}</div>
-        </div>
-        <div class="stat-bar-bg" style="height:8px; margin-top:10px">
-            <div class="stat-bar-fill animated-progress" style="width:${progressoGeral}%; background:var(--accent3); height:8px; transition:width 1s ease-out"></div>
-        </div>
-    </div>
-    
-    <!-- TIMELINE ANIMADA -->
-    <div class="client-timeline">
-        ${dados.grupos.map((g, index) => {
-            const progresso = calcularProgressoGrupo(g);
-            const status = progresso >= 100 ? 'concluido' : (progresso > 0 ? 'em-andamento' : 'pendente');
-            const statusText = progresso >= 100 ? '✅ Concluído' : (progresso > 0 ? '⏳ Em andamento' : '⏱️ Pendente');
-            
-            const dataInicio = fmtSemanaCompleta(g.inicio);
-            const dataFim = fmtSemanaCompleta(g.inicio + g.duracao);
-            
-            const totalTarefas = g.tarefas.length;
-            const tarefasConcluidas = g.tarefas.filter(t => t.progresso >= 100).length;
-            
-            return `
-            <div class="client-item ${status}" style="animation-delay: ${index * 0.1}s">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
-                    <div class="dot" style="background:${g.cor}; width:12px; height:12px; box-shadow:0 0 10px ${g.cor}"></div>
-                    <div style="font-weight:700; font-size:16px; color:var(--text); flex:1">${g.nome}</div>
-                    <div style="font-size:12px; color:var(--text2); background:var(--surface); padding:4px 10px; border-radius:20px">
-                        ${dataInicio} - ${dataFim}
-                    </div>
+    <div class="main">
+        <div class="client-data-card">
+            <div class="client-data-grid">
+                <div class="client-data-item">
+                    <div class="client-data-label">Cliente</div>
+                    <div class="client-data-value" style="color:var(--accent)">${dados.cliente.nome}</div>
                 </div>
-                
-                <div style="margin-left:22px; margin-bottom:12px">
-                    ${g.tarefas.map(t => {
-                        const tarefaStatus = t.progresso >= 100 ? '✅' : (t.progresso > 0 ? '⏳' : '⏱️');
-                        return `
-                        <div style="display:flex; align-items:center; gap:8px; margin:6px 0; font-size:12px">
-                            <span style="color:${t.progresso >= 100 ? 'var(--accent3)' : (t.progresso > 0 ? 'var(--accent)' : 'var(--text3)')}">${tarefaStatus}</span>
-                            <span style="color:var(--text2); flex:1">${t.nome}</span>
-                            <span style="color:var(--text); background:var(--surface); padding:2px 8px; border-radius:12px">${t.progresso}%</span>
-                        </div>`;
-                    }).join('')}
+                <div class="client-data-item">
+                    <div class="client-data-label">Contato</div>
+                    <div class="client-data-value">${dados.cliente.telefone}</div>
                 </div>
-                
-                <div style="margin-left:22px; margin-top:10px">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-bottom:4px">
-                        <span>${tarefasConcluidas}/${totalTarefas} tarefas</span>
-                        <span style="color:${g.cor}">${progresso}%</span>
-                    </div>
-                    <div class="stat-bar-bg" style="height:8px; background:var(--surface2)">
-                        <div class="stat-bar-fill" style="width:${progresso}%; background:${g.cor}; height:8px; transition:width 1s ease-out"></div>
-                    </div>
+                <div class="client-data-item">
+                    <div class="client-data-label">Arquiteto</div>
+                    <div class="client-data-value">${dados.obra.arquiteto}</div>
                 </div>
-                
-                <div style="margin-left:22px; margin-top:8px">
-                    <span class="client-status status-${status}" style="font-size:10px; padding:3px 10px; border-radius:12px; background:${status === 'concluido' ? 'rgba(16,185,129,0.1)' : (status === 'em-andamento' ? 'rgba(232,160,32,0.1)' : 'rgba(74,84,104,0.1)')}; color:${status === 'concluido' ? 'var(--accent3)' : (status === 'em-andamento' ? 'var(--accent)' : 'var(--text2)')}">
-                        ${statusText}
-                    </span>
+                <div class="client-data-item">
+                    <div class="client-data-label">Início/Término</div>
+                    <div class="client-data-value">${fmtSemanaCompleta(0)} - ${calcularPrevisao()}</div>
                 </div>
-            </div>`;
-        }).join('')}
-    </div>
-    
-    <!-- LEGENDA -->
-    <div style="display:flex; gap:20px; justify-content:center; margin-top:30px; padding:15px; background:var(--surface); border-radius:10px">
-        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--accent3)"></div><span style="font-size:11px">Concluído</span></div>
-        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--accent)"></div><span style="font-size:11px">Em andamento</span></div>
-        <div style="display:flex; align-items:center; gap:5px"><div class="dot" style="background:var(--text3)"></div><span style="font-size:11px">Pendente</span></div>
-    </div>
-    `;
-}
-
-function renderizarFotosCliente() {
-    return `
-    <div class="page-header">
-        <div class="page-title">📸 Galeria da Obra</div>
-    </div>
-    <div class="ambientes-tabs">
-        ${dados.ambientes.map(amb => `<div class="ambiente-tab">${amb}</div>`).join('')}
-    </div>
-    <div class="photo-grid">
-        ${dados.fotos.slice(0, 8).map((foto, index) => `
-        <div class="photo-card" style="animation: slideUp 0.4s ease ${index * 0.1}s forwards; opacity:0" onclick="abrirZoomFoto('${foto.url}')">
-            <img src="${foto.url}" alt="${foto.ambiente}">
-            <div class="photo-card-info">
-                <div class="photo-card-ambiente">${foto.ambiente}</div>
-                <div class="photo-card-data">${foto.data}</div>
             </div>
         </div>
-        `).join('')}
+        
+        <div class="stat-card">
+            <div class="stat-label">Progresso Geral</div>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <div class="stat-value" style="color:var(--accent3)">${progressoGeral}%</div>
+                <div style="font-size:12px">${dados.duracaoTotal} semanas</div>
+            </div>
+            <div class="stat-bar-bg">
+                <div class="stat-bar-fill animated-progress" style="width:${progressoGeral}%"></div>
+            </div>
+        </div>
+        
+        <div class="client-timeline">
+            ${dados.grupos.map((g, i) => {
+                const prog = calcularProgressoGrupo(g);
+                const status = prog >= 100 ? 'done' : (prog > 0 ? 'active' : '');
+                return `
+                <div class="client-item ${status}" style="animation-delay:${i*0.1}s">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+                        <div class="dot" style="background:${g.cor}"></div>
+                        <span style="font-weight:600">${g.nome}</span>
+                        <span style="color:${g.cor}">${prog}%</span>
+                    </div>
+                    ${g.tarefas.map(t => `
+                        <div style="margin-left:22px; margin-bottom:4px; font-size:11px; color:var(--text2)">
+                            • ${t.nome} (${t.progresso}%)
+                        </div>
+                    `).join('')}
+                    <div class="stat-bar-bg" style="margin-top:8px">
+                        <div class="stat-bar-fill" style="width:${prog}%; background:${g.cor}"></div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+        
+        <div class="page-header">
+            <div class="page-title">📸 Fotos da Obra</div>
+        </div>
+        <div class="photo-grid">
+            ${dados.fotos.map(foto => `
+            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}', '<img src=\'${foto.url}\' style=\'width:100%\'>')">
+                <img src="${foto.url}" alt="${foto.ambiente}">
+                <div class="photo-card-info">
+                    <div class="photo-card-ambiente">${foto.ambiente}</div>
+                    <div class="photo-card-data">${foto.data}</div>
+                </div>
+            </div>
+            `).join('')}
+        </div>
     </div>`;
-}
-
-function abrirZoomFoto(url) {
-    abrirModal('📸 Foto', `<img src="${url}" style="width:100%; border-radius:10px; cursor:pointer" onclick="window.open('${url}','_blank')">`);
+    
+    document.getElementById('app').innerHTML = html;
 }
 
 // ==================== INICIALIZAÇÃO ====================
