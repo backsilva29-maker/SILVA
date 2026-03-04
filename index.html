@@ -72,11 +72,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 
 /* GANTT */
 .gantt-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-bottom: 16px; }
-.gantt-header { display: grid; grid-template-columns: 180px 70px 70px 60px 80px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); text-transform: uppercase; }
+.gantt-header { display: grid; grid-template-columns: 180px 90px 90px 60px 80px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); text-transform: uppercase; }
 .gh-cell { padding: 10px; border-right: 1px solid var(--border); }
 .gantt-group { border-bottom: 1px solid var(--border); }
-.gantt-group-header { display: grid; grid-template-columns: 180px 70px 70px 60px 80px 1fr; background: rgba(232,160,32,.08); padding: 10px; align-items: center; }
-.gantt-row { display: grid; grid-template-columns: 180px 70px 70px 60px 80px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; }
+.gantt-group-header { display: grid; grid-template-columns: 180px 90px 90px 60px 80px 1fr; background: rgba(232,160,32,.08); padding: 10px; align-items: center; }
+.gantt-row { display: grid; grid-template-columns: 180px 90px 90px 60px 80px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; }
 .gantt-row:hover { background: var(--surface2); }
 .gc { padding: 0 10px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 11px; }
 .gc-edit { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 6px; color: var(--text); font-size: 10px; width: 100%; }
@@ -88,7 +88,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
 
 /* ANIMATED WORKER */
-.worker-container { position: absolute; top: 50%; transform: translateY(-50%); height: 24px; width: 24px; z-index: 10; transition: left 1s ease-in-out; }
+.worker-container { position: absolute; top: 50%; transform: translateY(-50%); height: 24px; width: 24px; z-index: 10; }
 .worker-emoji { font-size: 18px; animation: walk 0.5s ease-in-out infinite alternate; }
 @keyframes walk { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
 
@@ -229,14 +229,13 @@ let modoAtual = 'cronograma';
 let ambienteFotoSelecionado = 'todos';
 let dadosAlterados = false;
 
-// ==================== DADOS CENTRALIZADOS (SINCRONIZADOS) ====================
+// ==================== DADOS CENTRALIZADOS (ÚNICA FONTE DA VERDADE) ====================
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
     dataInicio: "2024-03-01",
     duracaoTotal: 20,
     valor: 234943.54,
-    // DADOS DO CLIENTE (USADO EM TODAS AS TELAS)
     cliente: {
         nome: "Seu Aldebaner",
         email: "aldebaner@email.com",
@@ -248,7 +247,6 @@ let dados = {
         area: "180 m²",
         tipo: "Reforma Completa"
     },
-    // CRONOGRAMA (BASEADO NO PDF)
     grupos: [
         { id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', inicio: 0, duracao: 2, responsavel: 'Admin', tarefas: [
             { id: 't1_1', nome: 'Placa de Obra', duracao: 1, responsavel: 'Admin', progresso: 100 },
@@ -326,16 +324,16 @@ let dados = {
     fotos: []
 };
 
-// ==================== PERSISTÊNCIA ====================
+// ==================== PERSISTÊNCIA (ÚNICO LOCALSTORAGE) ====================
 function salvarDados() {
-    localStorage.setItem('obraLiris_v6', JSON.stringify(dados));
+    localStorage.setItem('obraLiris_FINAL', JSON.stringify(dados));
     dadosAlterados = false;
     atualizarIndicadorSave();
     mostrarNotificacao('Dados salvos!', 'success');
 }
 
 function carregarDados() {
-    const salvos = localStorage.getItem('obraLiris_v6');
+    const salvos = localStorage.getItem('obraLiris_FINAL');
     if (salvos) dados = JSON.parse(salvos);
 }
 
@@ -346,12 +344,12 @@ function atualizarIndicadorSave() {
     if (indicator) indicator.className = 'save-indicator ' + (dadosAlterados ? 'pending' : 'saved');
 }
 
-// ==================== LOGIN ====================
+// ==================== LOGIN (AMBOS CARREGAM MESMOS DADOS) ====================
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === SENHA_ADMIN) {
         admin = true;
         document.getElementById('loginModal').style.display = 'none';
-        carregarDados();
+        carregarDados(); // MESMOS DADOS
         renderizarAdmin();
     } else alert('Senha incorreta');
 }
@@ -363,7 +361,7 @@ function entrarComoCliente() {
     renderizarCliente();
 }
 
-// ==================== DATAS (CALCULADAS AUTOMATICAMENTE) ====================
+// ==================== DATAS (TODAS CALCULADAS DE dataInicio) ====================
 const SEMANA_PX = 35;
 
 function fmtDataCompleta(d) {
