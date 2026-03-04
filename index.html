@@ -353,6 +353,17 @@ body {
 .status-pendente { background: rgba(74,84,104,0.1); color: var(--text2); }
 .status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
 .status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
+/* botões inline do gantt */
+.btn-crud {
+    width: 20px; height: 20px; border-radius: 4px; border: none;
+    cursor: pointer; font-size: 10px; display: inline-flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .15s; padding: 0;
+}
+.btn-crud-del { background: rgba(244,63,94,.15); color: #fb7185; }
+.btn-crud-del:hover { background: rgba(244,63,94,.35); }
+.btn-crud-edit { background: rgba(59,130,246,.15); color: #60a5fa; }
+.btn-crud-edit:hover { background: rgba(59,130,246,.35); }
 </style>
 </head>
 <body>
@@ -770,12 +781,12 @@ function renderizarGantt() {
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
 
-        // Cabeçalho do grupo
+        // ── CABEÇALHO DO GRUPO ──
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
             <div class="gc">
-                <div class="dot" style="background:${g.cor}"></div>
+                <div class="dot" style="background:${g.cor}; cursor:pointer" title="Alterar cor" onclick="alterarCorGrupo(${gIndex})"></div>
                 <input class="gc-edit" value="${g.nome}"
                     onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado();">
             </div>
@@ -798,14 +809,18 @@ function renderizarGantt() {
             </div>`;
         grupoDiv.appendChild(grupoHeader);
 
-        // Tarefas
+        // ── TAREFAS ──
         g.tarefas.forEach((t, tIndex) => {
             const row = document.createElement('div');
             row.className = 'gantt-row';
             row.innerHTML = `
-                <div class="gc" style="padding-left:36px">
+                <div class="gc" style="padding-left:36px; gap:4px">
                     <input class="gc-edit" value="${t.nome}"
                         onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
+                    <button class="btn-crud btn-crud-edit" title="Editar tarefa"
+                        onclick="abrirModalTarefa(${gIndex}, ${tIndex})">✏️</button>
+                    <button class="btn-crud btn-crud-del" title="Excluir tarefa"
+                        onclick="excluirTarefa(${gIndex},${tIndex})">✕</button>
                 </div>
                 <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
                 <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + t.duracao)}</div>
@@ -816,7 +831,7 @@ function renderizarGantt() {
                 <div class="gc" style="gap:6px">
                     <input type="range" min="0" max="100" value="${t.progresso}"
                         style="width:70px; accent-color:${g.cor}"
-                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); this.nextElementSibling.textContent=this.value+'%'; this.closest('.gantt-group').querySelector('.gantt-bar-fill').style.width=calcularProgressoGrupo(dados.grupos[${gIndex}])+'%';">
+                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value); marcarAlterado(); this.nextElementSibling.textContent=this.value+'%';">
                     <span style="min-width:32px; font-size:11px">${t.progresso}%</span>
                 </div>
                 <div class="gc" style="padding:0; overflow:hidden">
@@ -830,43 +845,180 @@ function renderizarGantt() {
             grupoDiv.appendChild(row);
         });
 
-        // Botões do grupo
-        const addRow = document.createElement('div');
-        addRow.className = 'gantt-row';
-        addRow.innerHTML = `
-            <div class="gc" style="padding-left:12px; gap:8px">
-                <button class="btn btn-primary" onclick="adicionarTarefa(${gIndex})">+ Tarefa</button>
-                <button class="btn btn-danger" onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
+        // ── BARRA DE AÇÕES DO GRUPO ──
+        const actRow = document.createElement('div');
+        actRow.className = 'gantt-row';
+        actRow.innerHTML = `
+            <div class="gc" style="padding-left:12px; gap:6px; flex-wrap:wrap">
+                <button class="btn btn-primary" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalTarefa(${gIndex}, null)">＋ Tarefa</button>
+                <button class="btn btn-ghost" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalGrupo(${gIndex})">✏️ Grupo</button>
+                <button class="btn btn-danger" style="font-size:11px; padding:5px 10px"
+                    onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
             </div>
             <div class="gc"></div><div class="gc"></div>
             <div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
-        grupoDiv.appendChild(addRow);
+        grupoDiv.appendChild(actRow);
         body.appendChild(grupoDiv);
     });
 }
 
-function adicionarGrupo() {
-    dados.grupos.push({
-        id: 'g' + Date.now(),
-        nome: 'Novo Grupo',
-        cor: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6,'0'),
-        inicio: dados.grupos.length * 2,
-        duracao: 2,
-        responsavel: 'Equipe',
-        tarefas: []
-    });
+// ── MODAL GRUPO (criar / editar) ──────────────────────────────────────────
+function abrirModalGrupo(gIndex) {
+    // gIndex === null → novo grupo
+    const novo = gIndex === null;
+    const g = novo ? { nome: '', cor: '#3b82f6', inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe' }
+                   : dados.grupos[gIndex];
+    abrirModal(novo ? '➕ Novo Grupo' : '✏️ Editar Grupo', `
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome do Grupo *</label>
+                <input id="mg-nome" class="crud-input" value="${g.nome}" placeholder="Ex: 4. Revestimentos">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Semana de Início</label>
+                    <input id="mg-inicio" class="crud-input" type="number" min="0" value="${g.inicio}">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duração (semanas)</label>
+                    <input id="mg-dur" class="crud-input" type="number" min="1" value="${g.duracao}">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsável</label>
+                    <input id="mg-resp" class="crud-input" value="${g.responsavel}" placeholder="Equipe responsável">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Cor</label>
+                    <input id="mg-cor" type="color" value="${g.cor}"
+                        style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border); background:var(--bg); cursor:pointer; padding:2px">
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
+                <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarGrupo(${novo ? 'null' : gIndex})">
+                    ${novo ? '➕ Criar Grupo' : '💾 Salvar Alterações'}
+                </button>
+            </div>
+        </div>`);
+}
+
+function salvarGrupo(gIndex) {
+    const nome = document.getElementById('mg-nome').value.trim();
+    if (!nome) { mostrarNotificacao('Informe o nome do grupo!', 'erro'); return; }
+    const obj = {
+        nome,
+        inicio:      parseInt(document.getElementById('mg-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mg-dur').value)    || 2,
+        responsavel: document.getElementById('mg-resp').value.trim()      || 'Equipe',
+        cor:         document.getElementById('mg-cor').value
+    };
+    if (gIndex === null) {
+        dados.grupos.push({ id: 'g' + Date.now(), tarefas: [], ...obj });
+        mostrarNotificacao('Grupo "' + obj.nome + '" criado!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex], obj);
+        mostrarNotificacao('Grupo atualizado!', 'success');
+    }
     marcarAlterado();
+    fecharModal();
     renderizarGantt();
 }
 
-function adicionarTarefa(gIndex) {
-    dados.grupos[gIndex].tarefas.push({ nome: 'Nova Tarefa', duracao: 2, responsavel: 'Equipe', progresso: 0 });
+function alterarCorGrupo(gIndex) {
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = dados.grupos[gIndex].cor;
+    input.onchange = () => {
+        dados.grupos[gIndex].cor = input.value;
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Cor do grupo alterada!', 'success');
+    };
+    input.click();
+}
+
+// ── MODAL TAREFA (criar / editar) ─────────────────────────────────────────
+function abrirModalTarefa(gIndex, tIndex) {
+    const novo = tIndex === null;
+    const g = dados.grupos[gIndex];
+    const t = novo ? { nome: '', duracao: 2, responsavel: g.responsavel || 'Equipe', progresso: 0 }
+                   : g.tarefas[tIndex];
+    abrirModal(novo ? '➕ Nova Tarefa' : '✏️ Editar Tarefa', `
+        <div style="margin-bottom:6px; font-size:11px; color:var(--text2)">
+            Grupo: <strong style="color:var(--accent)">${g.nome}</strong>
+        </div>
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome da Tarefa *</label>
+                <input id="mt-nome" class="crud-input" value="${t.nome}" placeholder="Ex: Assentamento de piso">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duração (semanas)</label>
+                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsável</label>
+                    <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe">
+                </div>
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:6px">
+                    Progresso: <strong id="mt-pct-lbl" style="color:${g.cor}">${t.progresso}%</strong>
+                </label>
+                <input id="mt-prog" type="range" min="0" max="100" value="${t.progresso}"
+                    style="width:100%; accent-color:${g.cor}"
+                    oninput="document.getElementById('mt-pct-lbl').textContent=this.value+'%'">
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
+                <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarTarefa(${gIndex}, ${novo ? 'null' : tIndex})">
+                    ${novo ? '➕ Adicionar Tarefa' : '💾 Salvar Alterações'}
+                </button>
+            </div>
+        </div>`);
+}
+
+function salvarTarefa(gIndex, tIndex) {
+    const nome = document.getElementById('mt-nome').value.trim();
+    if (!nome) { mostrarNotificacao('Informe o nome da tarefa!', 'erro'); return; }
+    const obj = {
+        nome,
+        duracao:     parseInt(document.getElementById('mt-dur').value)  || 2,
+        responsavel: document.getElementById('mt-resp').value.trim()    || 'Equipe',
+        progresso:   parseInt(document.getElementById('mt-prog').value) || 0
+    };
+    if (tIndex === null) {
+        dados.grupos[gIndex].tarefas.push(obj);
+        mostrarNotificacao('Tarefa "' + obj.nome + '" adicionada!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex].tarefas[tIndex], obj);
+        mostrarNotificacao('Tarefa atualizada!', 'success');
+    }
     marcarAlterado();
+    fecharModal();
     renderizarGantt();
 }
+
+function excluirTarefa(gIndex, tIndex) {
+    const nome = dados.grupos[gIndex].tarefas[tIndex].nome;
+    if (confirm('Excluir a tarefa "' + nome + '"?')) {
+        dados.grupos[gIndex].tarefas.splice(tIndex, 1);
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Tarefa excluída!', 'success');
+    }
+}
+
+function adicionarGrupo() { abrirModalGrupo(null); }
+function adicionarTarefa(gIndex) { abrirModalTarefa(gIndex, null); }
 
 function excluirGrupo(gIndex) {
-    if (confirm('Excluir o grupo "' + dados.grupos[gIndex].nome + '"?')) {
+    if (confirm('Excluir o grupo "' + dados.grupos[gIndex].nome + '" e todas as suas tarefas?')) {
         dados.grupos.splice(gIndex, 1);
         marcarAlterado();
         renderizarGantt();
