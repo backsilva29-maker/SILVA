@@ -1,675 +1,366 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🏗️ Gestão de Obras</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-        
-        /* MODAL DE LOGIN */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white; padding: 40px 30px; border-radius: 48px;
-            width: 90%; max-width: 380px; text-align: center;
-        }
-        .modal-input {
-            width: 100%; padding: 16px; margin: 15px 0;
-            border: 2px solid #e2e8f0; border-radius: 40px;
-            font-size: 16px;
-        }
-        .modal-btn {
-            width: 100%; padding: 16px; margin: 8px 0;
-            border: none; border-radius: 40px; font-size: 16px;
-            font-weight: 600; cursor: pointer;
-        }
-        .btn-admin { background: #0f172a; color: white; }
-        .btn-client { background: #3b82f6; color: white; }
-        
-        /* ============================================ */
-        /* DASHBOARD DO CLIENTE (SÓ ISSO) */
-        /* ============================================ */
-        .cliente-container {
-            background: linear-gradient(145deg, #0f172a, #1e293b);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .cliente-header {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 30px 20px;
-            margin-bottom: 25px;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .cliente-titulo {
-            font-size: 28px; font-weight: 800; margin-bottom: 8px;
-        }
-        .cliente-info {
-            font-size: 15px; opacity: 0.9; margin: 4px 0;
-        }
-        
-        .cliente-cards {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 15px; margin-bottom: 25px;
-        }
-        
-        .cliente-card {
-            background: white; border-radius: 30px; padding: 20px 15px;
-            text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        
-        .card-icone {
-            width: 60px; height: 60px; background: #f1f5f9;
-            border-radius: 30px; display: flex; align-items: center;
-            justify-content: center; margin: 0 auto 12px;
-            font-size: 28px;
-        }
-        
-        .card-valor {
-            font-size: 36px; font-weight: 800; color: #0f172a;
-        }
-        .card-label {
-            font-size: 14px; color: #64748b; margin-top: 5px;
-        }
-        
-        .cliente-graficos {
-            background: white; border-radius: 40px; padding: 25px 20px;
-            margin: 20px 0;
-        }
-        
-        .grafico-item {
-            margin: 20px 0;
-        }
-        .grafico-header {
-            display: flex; justify-content: space-between;
-            margin-bottom: 8px; font-weight: 600;
-        }
-        .grafico-barra {
-            width: 100%; height: 12px; background: #e2e8f0;
-            border-radius: 30px; overflow: hidden;
-        }
-        .grafico-preenchimento {
-            height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            border-radius: 30px; transition: width 0.5s;
-        }
-        
-        /* ============================================ */
-        /* ADMIN (TUDO EDITÁVEL) */
-        /* ============================================ */
-        .admin-container {
-            background: #f8fafc; min-height: 100vh; padding: 20px;
-        }
-        
-        .admin-header {
-            background: white; border-radius: 30px; padding: 25px 20px;
-            margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        
-        .admin-tabs {
-            display: flex; background: white; padding: 6px;
-            border-radius: 40px; margin: 25px 0; gap: 4px;
-            flex-wrap: wrap;
-        }
-        
-        .admin-tab {
-            flex: 1; text-align: center; padding: 14px 0;
-            font-size: 14px; font-weight: 600; border-radius: 34px;
-            color: #64748b; cursor: pointer; min-width: 90px;
-        }
-        .admin-tab.active {
-            background: #0f172a; color: white;
-        }
-        
-        .admin-card {
-            background: white; border-radius: 28px; padding: 24px;
-            margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        
-        .admin-card-title {
-            font-size: 20px; font-weight: 700; color: #0f172a;
-            margin-bottom: 20px; border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 16px;
-        }
-        
-        .input-admin {
-            width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0;
-            border-radius: 30px; font-size: 14px; margin: 6px 0;
-        }
-        .input-admin:focus { outline: none; border-color: #3b82f6; }
-        
-        .btn {
-            padding: 12px 24px; border: none; border-radius: 30px;
-            font-weight: 600; font-size: 14px; cursor: pointer;
-            margin: 5px; transition: transform 0.2s;
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: #0f172a; color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-sm { padding: 8px 16px; font-size: 12px; }
-        
-        .foto-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 12px; margin: 20px 0;
-        }
-        .foto-item {
-            aspect-ratio: 1; background: #f1f5f9; border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px dashed #cbd5e1; color: #94a3b8;
-            cursor: pointer; overflow: hidden;
-        }
-        .foto-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .tabela-container { overflow-x: auto; border-radius: 20px; border: 1px solid #e2e8f0; }
-        .tabela { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px; }
-        .tabela th { background: #f8fafc; padding: 16px; text-align: left; }
-        .tabela td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>🏗️ Obra Torre L'iris - Gestão Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+--bg: #0d0f14; --surface: #13161e; --surface2: #1a1e2a;
+--border: #252a38; --accent: #e8a020; --accent2: #3b82f6;
+--accent3: #10b981; --accent4: #f43f5e; --text: #e8eaf0;
+--text2: #8892a4; --text3: #4a5468; --gantt-h: 44px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; min-height: 100vh; }
+
+/* MODAL DE LOGIN */
+.login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.login-content { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 90%; max-width: 380px; text-align: center; }
+.login-input { width: 100%; padding: 14px; margin: 15px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 15px; }
+.login-btn { width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-admin { background: var(--accent); color: #000; }
+.btn-client { background: var(--accent2); color: white; }
+
+/* TOP BAR */
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+.logo-badge { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #000; font-weight: 800; }
+.btn { padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; transition: all .15s; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+.btn-primary { background: var(--accent); color: #000; font-weight: 600; }
+
+/* LAYOUT */
+.layout { display: flex; height: calc(100vh - 60px); }
+.sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; display: flex; flex-direction: column; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--text2); cursor: pointer; border-left: 3px solid transparent; }
+.sidebar-item:hover { background: var(--surface2); color: var(--text); }
+.sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,160,32,.06); }
+.main { flex: 1; overflow: auto; padding: 20px; }
+
+/* GANTT */
+.gantt-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); margin-bottom: 20px; }
+.gantt-header { display: grid; grid-template-columns: 200px 80px 80px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
+.gh-cell { padding: 12px; border-right: 1px solid var(--border); }
+.gantt-row { display: grid; grid-template-columns: 200px 80px 80px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; }
+.gantt-row:hover { background: var(--surface2); }
+.gc { padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 12px; }
+.bar-area { position: relative; height: var(--gantt-h); min-width: 100%; overflow-x: auto; }
+.gantt-bar { position: absolute; top: 50%; transform: translateY(-50%); height: 20px; border-radius: 6px; display: flex; align-items: center; overflow: hidden; cursor: pointer; }
+.gantt-bar-fill { height: 100%; border-radius: 6px 0 0 6px; opacity: .9; transition: width 0.3s; }
+.today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
+
+/* CARDS */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
+.stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; }
+.progress-ring { width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--border); border-top-color: var(--accent3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+
+/* IMPORT MODAL */
+.import-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
+.import-modal.open { display: flex; }
+.import-content { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 90%; max-width: 500px; }
+.import-drop { border: 2px dashed var(--border); border-radius: 16px; padding: 30px; text-align: center; margin: 20px 0; cursor: pointer; }
+.import-drop:hover { border-color: var(--accent); }
+
+/* CLIENT VIEW */
+.client-timeline { position: relative; padding-left: 20px; border-left: 2px solid var(--border); margin: 20px 0; }
+.client-item { position: relative; padding-left: 20px; margin-bottom: 25px; }
+.client-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.client-item.done::before { background: var(--accent3); }
+.client-item.active::before { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.client-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; }
+.status-pendente { background: rgba(136,146,164,0.1); color: var(--text2); }
+.status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
+.status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .gantt-header, .gantt-row { grid-template-columns: 150px 1fr; }
+    .gh-cell:nth-child(n+2), .gc:nth-child(n+2) { display: none; }
+    .topbar { padding: 0 15px; }
+}
+</style>
 </head>
 <body>
-    <!-- MODAL DE LOGIN -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">🏗️ Acesso ao Sistema</h2>
-            <input type="password" id="senhaInput" class="modal-input" placeholder="Senha de administrador">
-            <button class="modal-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
-            <button class="modal-btn btn-client" onclick="entrarComoCliente()">Entrar como Cliente</button>
+
+<!-- LOGIN -->
+<div id="loginModal" class="login-modal">
+    <div class="login-content">
+        <h2 style="color: var(--accent); margin-bottom: 20px; font-family:'Syne'">🏗️ Torre L'iris</h2>
+        <p style="color:var(--text2); margin-bottom:20px; font-size:12px">Gestão de Obra Inteligente</p>
+        <input type="password" id="senhaInput" class="login-input" placeholder="Senha do administrador">
+        <button class="login-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
+        <button class="login-btn btn-client" onclick="entrarComoCliente()">Visualizar como Cliente</button>
+    </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div id="importModal" class="import-modal">
+    <div class="import-content">
+        <h3 style="margin-bottom: 15px;">📤 Importar Planilha</h3>
+        <p style="color: var(--text2); font-size: 12px; margin-bottom: 20px;">
+            Formate seu Excel com colunas: <strong>Nome, Inicio, Duracao, Responsavel</strong>
+        </p>
+        <div class="import-drop" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size: 30px; margin-bottom: 10px;">📂</div>
+            <p><strong>Clique para selecionar</strong></p>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="processarArquivo(this.files[0])">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="btn btn-ghost" onclick="fecharImportModal()">Cancelar</button>
         </div>
     </div>
+</div>
 
-    <div id="conteudo"></div>
+<div id="app"></div>
 
-    <script>
-        // ============================================
-        // CONFIGURAÇÕES E DADOS
-        // ============================================
-        const SENHA_ADMIN = "torre2026";
-        let admin = false;
-        let abaAdminAtual = 'ambientes';
+<script>
+// CONFIGURAÇÕES
+const SENHA_ADMIN = "torre2026";
+let admin = false;
+let modoAtual = 'cronograma';
 
-        let dados = {
-            // DADOS GERAIS (TUDO EDITÁVEL)
-            titulo: "",
-            endereco: "",
-            proprietario: "",
-            arquiteto: "",
-            dataInicio: "",
-            
-            // AMBIENTES
-            ambientes: [],
-            
-            // ORÇAMENTO
-            orcamento: [],
-            
-            // MATERIAIS
-            materiais: [],
-            
-            // MÃO DE OBRA
-            maoObra: { funcionarios: [] },
-            
-            // FOTOS
-            fotos: []
-        };
+// DADOS INICIAIS (BASEADO NO ORÇAMENTO REAL)
+let dados = {
+    titulo: "Torre L'iris Residence",
+    endereco: "Aptos 1702 e 1704",
+    valor: 234943.54,
+    inicio: "2024-08-01",
+    grupos: [
+        { id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', inicio: 0, duracao: 2, tarefas: [
+            { nome: 'Placa de Obra', duracao: 1, resp: 'Admin', progresso: 100 },
+            { nome: 'Administração', duracao: 2, resp: 'Engenheiro', progresso: 50 }
+        ]},
+        { id: 'g2', nome: '2. Demolições', cor: '#f43f5e', inicio: 2, duracao: 2, tarefas: [
+            { nome: 'Demolição Alvenaria', duracao: 2, resp: 'Equipe A', progresso: 0 },
+            { nome: 'Remoção Entulho', duracao: 2, resp: 'Equipe A', progresso: 0 }
+        ]},
+        { id: 'g3', nome: '3. Alvenaria', cor: '#e8a020', inicio: 4, duracao: 2, tarefas: [
+            { nome: 'Paredes Tijolo', duracao: 2, resp: 'Pedreiro', progresso: 0 }
+        ]},
+        { id: 'g4', nome: '4. Revestimentos', cor: '#10b981', inicio: 6, duracao: 4, tarefas: [
+            { nome: 'Chapisco', duracao: 2, resp: 'Pedreiro', progresso: 0 },
+            { nome: 'Reboco', duracao: 4, resp: 'Pedreiro', progresso: 0 }
+        ]},
+        { id: 'g5', nome: '5. Infraestrutura', cor: '#8b5cf6', inicio: 8, duracao: 4, tarefas: [
+            { nome: 'Elétrica', duracao: 4, resp: 'Eletricista', progresso: 0 },
+            { nome: 'Hidráulica', duracao: 3, resp: 'Encanador', progresso: 0 },
+            { nome: 'Ar Condicionado', duracao: 2, resp: 'Técnico', progresso: 0 }
+        ]},
+        { id: 'g6', nome: '6. Pavimentação', cor: '#06b6d4', inicio: 12, duracao: 4, tarefas: [
+            { nome: 'Regularização', duracao: 2, resp: 'Pedreiro', progresso: 0 },
+            { nome: 'Porcelanato', duracao: 4, resp: 'Marmoreiro', progresso: 0 }
+        ]},
+        { id: 'g7', nome: '7. Forro e Pintura', cor: '#f59e0b', inicio: 16, duracao: 4, tarefas: [
+            { nome: 'Forro Gesso', duracao: 2, resp: 'Gesseiro', progresso: 0 },
+            { nome: 'Pintura Geral', duracao: 4, resp: 'Pintor', progresso: 0 }
+        ]},
+        { id: 'g8', nome: '8. Finalização', cor: '#14b8a6', inicio: 20, duracao: 2, tarefas: [
+            { nome: 'Limpeza', duracao: 1, resp: 'Equipe', progresso: 0 },
+            { nome: 'Entrega', duracao: 1, resp: 'Admin', progresso: 0 }
+        ]}
+    ]
+};
 
-        // ============================================
-        // FUNÇÕES DE PERSISTÊNCIA
-        // ============================================
-        function salvarDados() {
-            localStorage.setItem('dadosObra', JSON.stringify(dados));
-        }
+// PERSISTÊNCIA
+function salvar() { localStorage.setItem('obraLiris', JSON.stringify(dados)); }
+function carregar() { 
+    const s = localStorage.getItem('obraLiris'); 
+    if(s) dados = JSON.parse(s); 
+}
 
-        function carregarDados() {
-            let salvos = localStorage.getItem('dadosObra');
-            if (salvos) {
-                try {
-                    dados = JSON.parse(salvos);
-                } catch (e) {}
+// LOGIN
+function verificarSenha() {
+    if (document.getElementById('senhaInput').value === SENHA_ADMIN) {
+        admin = true;
+        document.getElementById('loginModal').style.display = 'none';
+        carregar();
+        renderizar();
+    } else alert('Senha incorreta');
+}
+function entrarComoCliente() {
+    admin = false;
+    document.getElementById('loginModal').style.display = 'none';
+    carregar();
+    renderizar();
+}
+
+// DATA
+const START = new Date(2024, 7, 1);
+const SEMANA_PX = 40;
+function fmtSemana(s) {
+    const d = new Date(START.getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+}
+const semanaAtual = Math.round((new Date() - START) / (7*24*3600*1000));
+
+// IMPORTAÇÃO
+function abrirImport() { document.getElementById('importModal').classList.add('open'); }
+function fecharImport() { document.getElementById('importModal').classList.remove('open'); }
+function processarArquivo(file) {
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+        const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+        // Lógica simples de importação
+        rows.slice(1).forEach((row, i) => {
+            if(row[0]) {
+                dados.grupos[0].tarefas.push({
+                    nome: row[0], duracao: parseInt(row[2])||2, 
+                    resp: row[3]||'Equipe', progresso: 0
+                });
             }
-        }
+        });
+        salvar();
+        fecharImport();
+        renderizar();
+        alert('Importado com sucesso!');
+    };
+    r.readAsArrayBuffer(file);
+}
 
-        // ============================================
-        // FUNÇÕES DE LOGIN
-        // ============================================
-        function verificarSenha() {
-            let senha = document.getElementById('senhaInput').value;
-            if (senha === SENHA_ADMIN) {
-                admin = true;
-                document.getElementById('loginModal').style.display = 'none';
-                carregarDados();
-                renderizarAdmin();
-            } else {
-                alert('Senha incorreta!');
-            }
-        }
+// RENDERIZAÇÃO
+function renderizar() {
+    const app = document.getElementById('app');
+    if(admin) {
+        app.innerHTML = `
+        <div class="topbar">
+            <div class="logo"><div class="logo-badge">A</div> Admin</div>
+            <button class="btn btn-primary" onclick="abrirImport()">📤 Importar Excel</button>
+        </div>
+        <div class="layout">
+            <div class="sidebar">
+                <div class="sidebar-item active">📅 Cronograma</div>
+                <div class="sidebar-item">💰 Orçamento</div>
+                <div class="sidebar-item">📸 Fotos</div>
+            </div>
+            <div class="main">
+                ${renderStats()}
+                ${renderGanttAdmin()}
+            </div>
+        </div>`;
+    } else {
+        app.innerHTML = `
+        <div class="topbar">
+            <div class="logo"><div class="logo-badge">C</div> Cliente</div>
+            <div style="font-size:12px; color:var(--text2)">Acompanhamento</div>
+        </div>
+        <div class="main">
+            ${renderStatsCliente()}
+            ${renderTimelineCliente()}
+        </div>`;
+    }
+}
 
-        function entrarComoCliente() {
-            admin = false;
-            document.getElementById('loginModal').style.display = 'none';
-            carregarDados();
-            renderizarCliente();
-        }
+function renderStats() {
+    let totalT = 0, totalP = 0;
+    dados.grupos.forEach(g => g.tarefas.forEach(t => { totalT++; totalP += t.progresso; }));
+    const media = totalT ? Math.round(totalP/totalT) : 0;
+    return `
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Progresso Geral</div>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <div class="stat-value">${media}%</div>
+                <div class="progress-ring">${media}%</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Orçamento</div>
+            <div class="stat-value" style="color:var(--accent)">R$ ${(dados.valor/1000).toFixed(1)}k</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Previsão</div>
+            <div class="stat-value">Jun/2026</div>
+        </div>
+    </div>`;
+}
 
-        // ============================================
-        // FUNÇÕES DE CÁLCULO
-        // ============================================
-        function calcularProgressoGeral() {
-            let total = 0;
-            let concluidas = 0;
-            dados.ambientes.forEach(amb => {
-                amb.tarefas?.forEach(t => {
-                    total++;
-                    if (t.concluido) concluidas++;
-                });
-            });
-            return total > 0 ? Math.round((concluidas / total) * 100) : 0;
-        }
+function renderStatsCliente() {
+    let totalT = 0, totalP = 0;
+    dados.grupos.forEach(g => g.tarefas.forEach(t => { totalT++; totalP += t.progresso; }));
+    const media = totalT ? Math.round(totalP/totalT) : 0;
+    return `
+    <div class="stat-card" style="margin-bottom:20px; text-align:center">
+        <div class="stat-label">Andamento da Sua Obra</div>
+        <div class="progress-ring" style="width:80px; height:80px; font-size:20px; margin:10px auto">${media}%</div>
+        <div style="color:var(--text2); font-size:12px">Concluído até o momento</div>
+    </div>`;
+}
 
-        function calcularProgressoPorTipo(tipo) {
-            let total = 0;
-            let concluidas = 0;
-            dados.ambientes.forEach(amb => {
-                amb.tarefas?.forEach(t => {
-                    if (t.tipo === tipo) {
-                        total++;
-                        if (t.concluido) concluidas++;
-                    }
-                });
-            });
-            return total > 0 ? Math.round((concluidas / total) * 100) : 0;
-        }
-
-        function listarTipos() {
-            let tipos = [];
-            dados.ambientes.forEach(amb => {
-                amb.tarefas?.forEach(t => {
-                    if (!tipos.includes(t.tipo)) tipos.push(t.tipo);
-                });
-            });
-            return tipos;
-        }
-
-        // ============================================
-        // DASHBOARD DO CLIENTE (SÓ ISSO - SEM ABAS)
-        // ============================================
-        function renderizarCliente() {
-            let progresso = calcularProgressoGeral();
-            let tipos = listarTipos();
-            
-            const nomes = {
-                'revestimento': '🧱 Revestimento',
-                'pintura': '🎨 Pintura',
-                'instalacao': '🔧 Instalações',
-                'acabamento': '🪚 Acabamento',
-                'marcenaria': '🪑 Marcenaria'
-            };
-
-            let html = `
-            <div class="cliente-container">
-                <!-- CABEÇALHO -->
-                <div class="cliente-header">
-                    <div class="cliente-titulo">${dados.titulo || "Obra sem nome"}</div>
-                    <div class="cliente-info">${dados.endereco || "Endereço não informado"}</div>
-                    <div class="cliente-info">Proprietário: ${dados.proprietario || "Não informado"}</div>
-                    <div class="cliente-info" style="margin-top: 10px;">Início: ${dados.dataInicio || "Não definido"}</div>
+function renderGanttAdmin() {
+    let html = `<div class="gantt-wrap"><div class="gantt-header">
+        <div class="gh-cell">Tarefa</div><div class="gh-cell">Início</div><div class="gh-cell">Fim</div>
+        <div class="gh-cell">Resp.</div><div class="gh-cell">Progresso</div><div class="gh-cell">Cronograma</div>
+    </div>`;
+    
+    dados.grupos.forEach(g => {
+        g.tarefas.forEach((t, ti) => {
+            const fim = g.inicio + t.duracao;
+            html += `<div class="gantt-row">
+                <div class="gc"><div style="width:8px; height:8px; border-radius:50%; background:${g.cor}; margin-right:8px"></div>${t.nome}</div>
+                <div class="gc">${fmtSemana(g.inicio)}</div>
+                <div class="gc">${fmtSemana(fim)}</div>
+                <div class="gc">${t.resp}</div>
+                <div class="gc">
+                    <input type="range" min="0" max="100" value="${t.progresso}" 
+                    style="width:80px; accent-color:${g.cor}"
+                    onchange="atualizarProgresso('${g.id}', ${ti}, this.value)">
+                    <span style="margin-left:5px; width:30px">${t.progresso}%</span>
                 </div>
-
-                <!-- CARDS DE RESUMO -->
-                <div class="cliente-cards">
-                    <div class="cliente-card">
-                        <div class="card-icone">📊</div>
-                        <div class="card-valor">${progresso}%</div>
-                        <div class="card-label">Progresso</div>
+                <div class="gc" style="padding:0"><div class="bar-area">
+                    <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                    <div class="gantt-bar" style="left:${g.inicio * SEMANA_PX}px; width:${t.duracao * SEMANA_PX}px; background:${g.cor}33; border:1px solid ${g.cor}">
+                        <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
                     </div>
-                    <div class="cliente-card">
-                        <div class="card-icone">🏠</div>
-                        <div class="card-valor">${dados.ambientes.length}</div>
-                        <div class="card-label">Ambientes</div>
-                    </div>
-                    <div class="cliente-card">
-                        <div class="card-icone">📦</div>
-                        <div class="card-valor">${dados.materiais.length}</div>
-                        <div class="card-label">Materiais</div>
-                    </div>
-                    <div class="cliente-card">
-                        <div class="card-icone">👷</div>
-                        <div class="card-valor">${dados.maoObra.funcionarios.length}</div>
-                        <div class="card-label">Funcionários</div>
-                    </div>
-                </div>
+                </div></div>
+            </div>`;
+        });
+    });
+    html += `</div>`;
+    return html;
+}
 
-                <!-- GRÁFICOS DE PROGRESSO -->
-                <div class="cliente-graficos">
-                    <h3 style="margin-bottom: 20px; text-align: center;">📈 Andamento da Obra</h3>`;
+function renderTimelineCliente() {
+    let html = `<div class="client-timeline">`;
+    let globalProgress = 0, count = 0;
+    
+    dados.grupos.forEach(g => {
+        const grupoProgress = g.tarefas.reduce((acc, t) => acc + t.progresso, 0) / g.tarefas.length;
+        globalProgress += grupoProgress;
+        count++;
+        
+        let statusClass = grupoProgress >= 100 ? 'done' : (grupoProgress > 0 ? 'active' : '');
+        let statusText = grupoProgress >= 100 ? 'Concluído' : (grupoProgress > 0 ? 'Em andamento' : 'Pendente');
+        
+        html += `<div class="client-item ${statusClass}">
+            <div style="font-weight:600; color:var(--text)">${g.nome}</div>
+            <div style="font-size:11px; color:var(--text2); margin-top:4px">
+                ${g.tarefas.map(t => t.nome).join(' • ')}
+            </div>
+            <div class="client-status status-${statusText.toLowerCase().replace(' ', '-')}">${statusText}</div>
+        </div>`;
+    });
+    html += `</div>`;
+    return html;
+}
 
-            if (tipos.length === 0) {
-                html += `<p style="text-align: center; color: #94a3b8; padding: 20px;">Nenhuma tarefa cadastrada ainda</p>`;
-            } else {
-                tipos.forEach(tipo => {
-                    let prog = calcularProgressoPorTipo(tipo);
-                    html += `
-                    <div class="grafico-item">
-                        <div class="grafico-header">
-                            <span>${nomes[tipo] || tipo}</span>
-                            <span>${prog}%</span>
-                        </div>
-                        <div class="grafico-barra">
-                            <div class="grafico-preenchimento" style="width: ${prog}%;"></div>
-                        </div>
-                    </div>`;
-                });
-            }
+function atualizarProgresso(gid, ti, val) {
+    const g = dados.grupos.find(x => x.id === gid);
+    g.tarefas[ti].progresso = parseInt(val);
+    salvar();
+    renderizar();
+}
 
-            html += `</div></div>`;
-            document.getElementById('conteudo').innerHTML = html;
-        }
-
-        // ============================================
-        // ADMIN (TUDO EDITÁVEL + FOTOS)
-        // ============================================
-        function renderizarAdmin() {
-            let html = `
-            <div class="admin-container">
-                <!-- DADOS GERAIS -->
-                <div class="admin-header">
-                    <h2 style="margin-bottom: 15px;">📋 Dados da Obra</h2>
-                    <input class="input-admin" placeholder="Nome da obra" value="${dados.titulo}" onchange="dados.titulo=this.value; salvarDados();">
-                    <input class="input-admin" placeholder="Endereço completo" value="${dados.endereco}" onchange="dados.endereco=this.value; salvarDados();">
-                    <input class="input-admin" placeholder="Proprietário" value="${dados.proprietario}" onchange="dados.proprietario=this.value; salvarDados();">
-                    <input class="input-admin" placeholder="Arquiteto" value="${dados.arquiteto}" onchange="dados.arquiteto=this.value; salvarDados();">
-                    <input class="input-admin" placeholder="Data de início" value="${dados.dataInicio}" onchange="dados.dataInicio=this.value; salvarDados();">
-                </div>
-
-                <!-- TABS -->
-                <div class="admin-tabs">
-                    <div class="admin-tab ${abaAdminAtual === 'ambientes' ? 'active' : ''}" onclick="mudarAbaAdmin('ambientes')">🏠 Ambientes</div>
-                    <div class="admin-tab ${abaAdminAtual === 'orcamento' ? 'active' : ''}" onclick="mudarAbaAdmin('orcamento')">💰 Orçamento</div>
-                    <div class="admin-tab ${abaAdminAtual === 'materiais' ? 'active' : ''}" onclick="mudarAbaAdmin('materiais')">📦 Materiais</div>
-                    <div class="admin-tab ${abaAdminAtual === 'maoobra' ? 'active' : ''}" onclick="mudarAbaAdmin('maoobra')">👷 Mão de Obra</div>
-                    <div class="admin-tab ${abaAdminAtual === 'fotos' ? 'active' : ''}" onclick="mudarAbaAdmin('fotos')">📸 Fotos</div>
-                </div>`;
-
-            // AMBIENTES
-            if (abaAdminAtual === 'ambientes') {
-                html += `<div class="admin-card">
-                    <div class="admin-card-title">🏠 Ambientes</div>`;
-                
-                dados.ambientes.forEach((amb, idx) => {
-                    html += `
-                    <div style="background: #f8fafc; border-radius: 20px; padding: 20px; margin: 20px 0;">
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <input class="input-admin" style="flex:2;" placeholder="Nome" value="${amb.nome}" onchange="atualizarAmbiente(${amb.id}, 'nome', this.value)">
-                            <input class="input-admin" style="flex:1;" placeholder="Área" value="${amb.area}" onchange="atualizarAmbiente(${amb.id}, 'area', this.value)">
-                            <button class="btn btn-danger btn-sm" onclick="excluirAmbiente(${amb.id})">🗑️</button>
-                        </div>`;
-                    
-                    amb.tarefas?.forEach((tarefa, tIdx) => {
-                        html += `
-                        <div style="display: flex; gap: 8px; margin: 10px 0; align-items: center;">
-                            <input class="input-admin" style="flex:2;" value="${tarefa.nome}" onchange="atualizarTarefa(${amb.id}, ${tIdx}, 'nome', this.value)">
-                            <select class="input-admin" style="flex:1;" onchange="atualizarTarefa(${amb.id}, ${tIdx}, 'tipo', this.value)">
-                                <option value="revestimento" ${tarefa.tipo === 'revestimento' ? 'selected' : ''}>Revestimento</option>
-                                <option value="pintura" ${tarefa.tipo === 'pintura' ? 'selected' : ''}>Pintura</option>
-                                <option value="instalacao" ${tarefa.tipo === 'instalacao' ? 'selected' : ''}>Instalação</option>
-                                <option value="acabamento" ${tarefa.tipo === 'acabamento' ? 'selected' : ''}>Acabamento</option>
-                            </select>
-                            <input type="checkbox" ${tarefa.concluido ? 'checked' : ''} onchange="toggleTarefa(${amb.id}, ${tIdx})" style="width:24px;height:24px;">
-                            <button class="btn btn-danger btn-sm" onclick="excluirTarefa(${amb.id}, ${tIdx})">✕</button>
-                        </div>`;
-                    });
-                    
-                    html += `<button class="btn btn-success btn-sm" onclick="adicionarTarefa(${amb.id})">➕ Tarefa</button>`;
-                    html += `</div>`;
-                });
-                
-                html += `<button class="btn btn-primary" style="width:100%;" onclick="adicionarAmbiente()">➕ Adicionar Ambiente</button>`;
-                html += `</div>`;
-            }
-
-            // ORÇAMENTO
-            else if (abaAdminAtual === 'orcamento') {
-                html += `<div class="admin-card">
-                    <div class="admin-card-title">💰 Orçamento</div>
-                    <button class="btn btn-success" onclick="adicionarItemOrcamento()">➕ Adicionar Item</button>
-                    <div class="tabela-container">
-                        <table class="tabela">
-                            <thead><tr><th>Cód</th><th>Descrição</th><th>Un</th><th>Quant</th><th>R$ Unit</th><th>R$ Total</th><th>Ações</th></tr></thead>
-                            <tbody>`;
-                
-                dados.orcamento.forEach((item, idx) => {
-                    html += `<tr>
-                        <td><input class="input-admin" value="${item.codigo}" onchange="atualizarOrcamento(${idx}, 'codigo', this.value)"></td>
-                        <td><input class="input-admin" value="${item.descricao}" onchange="atualizarOrcamento(${idx}, 'descricao', this.value)"></td>
-                        <td><input class="input-admin" value="${item.un}" style="width:60px;" onchange="atualizarOrcamento(${idx}, 'un', this.value)"></td>
-                        <td><input class="input-admin" type="number" value="${item.quant}" style="width:80px;" onchange="atualizarOrcamento(${idx}, 'quant', this.value)"></td>
-                        <td><input class="input-admin" type="number" value="${item.unitario}" style="width:100px;" onchange="atualizarOrcamento(${idx}, 'unitario', this.value)"></td>
-                        <td>R$ ${(item.quant * item.unitario).toFixed(2)}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="excluirOrcamento(${idx})">🗑️</button></td>
-                    </tr>`;
-                });
-                
-                html += `</tbody></table></div></div>`;
-            }
-
-            // MATERIAIS
-            else if (abaAdminAtual === 'materiais') {
-                html += `<div class="admin-card">
-                    <div class="admin-card-title">📦 Materiais</div>
-                    <button class="btn btn-success" onclick="adicionarMaterial()">➕ Adicionar Material</button>
-                    <div class="tabela-container">
-                        <table class="tabela">
-                            <thead><tr><th>Cód</th><th>Material</th><th>Un</th><th>Quant</th><th>Fornecedor</th><th>Status</th><th>Ações</th></tr></thead>
-                            <tbody>`;
-                
-                dados.materiais.forEach((item, idx) => {
-                    html += `<tr>
-                        <td><input class="input-admin" value="${item.codigo}" onchange="atualizarMaterial(${idx}, 'codigo', this.value)"></td>
-                        <td><input class="input-admin" value="${item.descricao}" onchange="atualizarMaterial(${idx}, 'descricao', this.value)"></td>
-                        <td><input class="input-admin" value="${item.un}" style="width:60px;" onchange="atualizarMaterial(${idx}, 'un', this.value)"></td>
-                        <td><input class="input-admin" type="number" value="${item.quant}" style="width:80px;" onchange="atualizarMaterial(${idx}, 'quant', this.value)"></td>
-                        <td><input class="input-admin" value="${item.fornecedor}" onchange="atualizarMaterial(${idx}, 'fornecedor', this.value)"></td>
-                        <td>
-                            <select class="input-admin" onchange="atualizarMaterial(${idx}, 'status', this.value)">
-                                <option value="pendente" ${item.status === 'pendente' ? 'selected' : ''}>⏱️ Pendente</option>
-                                <option value="transporte" ${item.status === 'transporte' ? 'selected' : ''}>🚚 Transporte</option>
-                                <option value="entregue" ${item.status === 'entregue' ? 'selected' : ''}>✅ Entregue</option>
-                            </select>
-                        </td>
-                        <td><button class="btn btn-danger btn-sm" onclick="excluirMaterial(${idx})">🗑️</button></td>
-                    </tr>`;
-                });
-                
-                html += `</tbody></table></div></div>`;
-            }
-
-            // MÃO DE OBRA
-            else if (abaAdminAtual === 'maoobra') {
-                html += `<div class="admin-card">
-                    <div class="admin-card-title">👷 Mão de Obra</div>
-                    <button class="btn btn-success" onclick="adicionarFuncionario()">➕ Adicionar Funcionário</button>`;
-                
-                dados.maoObra.funcionarios.forEach((func, idx) => {
-                    html += `
-                    <div style="background: #f8fafc; border-radius: 20px; padding: 20px; margin: 20px 0;">
-                        <div style="display: flex; gap: 10px;">
-                            <input class="input-admin" style="flex:2;" value="${func.nome}" placeholder="Nome" onchange="atualizarFuncionario(${idx}, 'nome', this.value)">
-                            <input class="input-admin" style="flex:1;" value="${func.funcao}" placeholder="Função" onchange="atualizarFuncionario(${idx}, 'funcao', this.value)">
-                            <input class="input-admin" style="flex:1;" type="number" value="${func.valorHora}" placeholder="R$/hora" onchange="atualizarFuncionario(${idx}, 'valorHora', this.value)">
-                            <button class="btn btn-danger btn-sm" onclick="excluirFuncionario(${idx})">🗑️</button>
-                        </div>
-                    </div>`;
-                });
-                
-                html += `</div>`;
-            }
-
-            // FOTOS
-            else if (abaAdminAtual === 'fotos') {
-                html += `<div class="admin-card">
-                    <div class="admin-card-title">📸 Fotos da Obra</div>
-                    <button class="btn btn-success" onclick="adicionarFoto()">➕ Adicionar Fotos</button>
-                    <div class="foto-grid">`;
-                
-                if (dados.fotos.length === 0) {
-                    html += `<div style="grid-column: span 3; text-align: center; padding: 40px; color: #94a3b8;">Nenhuma foto adicionada</div>`;
-                } else {
-                    dados.fotos.forEach((foto, idx) => {
-                        html += `<div class="foto-item" onclick="verFoto(${idx})">
-                            <img src="${foto.url}" alt="Foto ${idx+1}">
-                        </div>`;
-                    });
-                }
-                
-                html += `</div></div>`;
-            }
-
-            html += `</div>`;
-            document.getElementById('conteudo').innerHTML = html;
-        }
-
-        // ============================================
-        // FUNÇÕES DE CRUD
-        // ============================================
-        function mudarAbaAdmin(aba) {
-            abaAdminAtual = aba;
-            renderizarAdmin();
-        }
-
-        // AMBIENTES
-        function adicionarAmbiente() {
-            let novoId = dados.ambientes.length > 0 ? Math.max(...dados.ambientes.map(a => a.id)) + 1 : 1;
-            dados.ambientes.push({ id: novoId, nome: "Novo Ambiente", area: "0m²", tarefas: [] });
-            salvarDados();
-            renderizarAdmin();
-        }
-
-        function atualizarAmbiente(id, campo, valor) {
-            let amb = dados.ambientes.find(a => a.id === id);
-            if (amb) { amb[campo] = valor; salvarDados(); }
-        }
-
-        function excluirAmbiente(id) {
-            if (confirm("Excluir ambiente?")) {
-                dados.ambientes = dados.ambientes.filter(a => a.id !== id);
-                salvarDados(); renderizarAdmin();
-            }
-        }
-
-        function adicionarTarefa(ambienteId) {
-            let amb = dados.ambientes.find(a => a.id === ambienteId);
-            if (amb) {
-                amb.tarefas = amb.tarefas || [];
-                amb.tarefas.push({ nome: "Nova tarefa", concluido: false, tipo: "revestimento" });
-                salvarDados(); renderizarAdmin();
-            }
-        }
-
-        function atualizarTarefa(ambienteId, tarefaIdx, campo, valor) {
-            let amb = dados.ambientes.find(a => a.id === ambienteId);
-            if (amb && amb.tarefas[tarefaIdx]) {
-                amb.tarefas[tarefaIdx][campo] = valor;
-                salvarDados();
-            }
-        }
-
-        function toggleTarefa(ambienteId, tarefaIdx) {
-            let amb = dados.ambientes.find(a => a.id === ambienteId);
-            if (amb && amb.tarefas[tarefaIdx]) {
-                amb.tarefas[tarefaIdx].concluido = !amb.tarefas[tarefaIdx].concluido;
-                salvarDados(); renderizarAdmin();
-            }
-        }
-
-        function excluirTarefa(ambienteId, tarefaIdx) {
-            let amb = dados.ambientes.find(a => a.id === ambienteId);
-            if (amb) {
-                amb.tarefas.splice(tarefaIdx, 1);
-                salvarDados(); renderizarAdmin();
-            }
-        }
-
-        // ORÇAMENTO
-        function adicionarItemOrcamento() {
-            dados.orcamento.push({ codigo: String(dados.orcamento.length + 1).padStart(3,'0'), descricao: "Novo item", un: "un", quant: 1, unitario: 0 });
-            salvarDados(); renderizarAdmin();
-        }
-
-        function atualizarOrcamento(idx, campo, valor) {
-            dados.orcamento[idx][campo] = campo === 'quant' || campo === 'unitario' ? parseFloat(valor) || 0 : valor;
-            salvarDados();
-        }
-
-        function excluirOrcamento(idx) {
-            dados.orcamento.splice(idx, 1);
-            salvarDados(); renderizarAdmin();
-        }
-
-        // MATERIAIS
-        function adicionarMaterial() {
-            dados.materiais.push({ codigo: "MAT"+String(dados.materiais.length+1).padStart(3,'0'), descricao: "Novo material", un: "un", quant: 1, fornecedor: "", status: "pendente" });
-            salvarDados(); renderizarAdmin();
-        }
-
-        function atualizarMaterial(idx, campo, valor) {
-            dados.materiais[idx][campo] = campo === 'quant' ? parseFloat(valor) || 0 : valor;
-            salvarDados();
-        }
-
-        function excluirMaterial(idx) {
-            dados.materiais.splice(idx, 1);
-            salvarDados(); renderizarAdmin();
-        }
-
-        // FUNCIONÁRIOS
-        function adicionarFuncionario() {
-            dados.maoObra.funcionarios.push({ id: dados.maoObra.funcionarios.length+1, nome: "Novo funcionário", funcao: "Servente", valorHora: 15, ponto: [], pagamentos: [] });
-            salvarDados(); renderizarAdmin();
-        }
-
-        function atualizarFuncionario(idx, campo, valor) {
-            dados.maoObra.funcionarios[idx][campo] = campo === 'valorHora' ? parseFloat(valor) || 0 : valor;
-            salvarDados();
-        }
-
-        function excluirFuncionario(idx) {
-            dados.maoObra.funcionarios.splice(idx, 1);
-            salvarDados(); renderizarAdmin();
-        }
-
-        // FOTOS
-        function adicionarFoto() {
-            let input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.onchange = function(e) {
-                for (let file of e.target.files) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        dados.fotos.push({ url: e.target.result, nome: file.name, data: new Date().toLocaleDateString('pt-BR') });
-                        salvarDados();
-                        renderizarAdmin();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }
-
-        function verFoto(idx) {
-            window.open(dados.fotos[idx].url, '_blank');
-        }
-
-        // INICIALIZAR
-        carregarDados();
-    </script>
+// INICIALIZAÇÃO
+carregar();
+</script>
 </body>
 </html>
