@@ -8,40 +8,70 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-    --bg: #0d0f14; --surface: #13161e; --surface2: #1a1e2a; --border: #252a38;
-    --accent: #e8a020; --accent2: #3b82f6; --accent3: #10b981; --accent4: #f43f5e;
-    --text: #e8eaf0; --text2: #8892a4; --text3: #4a5468; --gantt-h: 44px;
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #e8a020;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #f43f5e;
+    --text: #e8eaf0;
+    --text2: #8892a4;
+    --text3: #4a5468;
+    --gantt-h: 44px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; min-height: 100vh; overflow-x: hidden; }
-
-/* ── SETUP GITHUB ── */
-.setup-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.setup-card { background: var(--surface); border: 2px solid var(--accent); border-radius: 24px; padding: 36px; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 18px; }
-.setup-input { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 13px; outline: none; font-family: 'IBM Plex Mono', monospace; }
-.setup-input:focus { border-color: var(--accent); }
-.setup-input::placeholder { font-family: 'Inter', sans-serif; color: var(--text3); }
-.setup-btn { padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; background: var(--accent); color: #000; }
-.setup-btn:hover { background: #f5ae30; }
-.setup-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 11px; color: var(--text2); line-height: 1.8; }
-.setup-hint strong { color: var(--accent); }
-.setup-hint code { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent2); }
-.setup-skip { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 11px; text-decoration: underline; align-self: center; }
-.setup-skip:hover { color: var(--text2); }
-
-/* ── LOGIN ── */
-.login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.login-content { background: var(--surface); border: 1px solid var(--border); border-radius: 48px; padding: 40px; width: 90%; max-width: 380px; text-align: center; }
-.login-input { width: 100%; padding: 16px; margin: 15px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 40px; color: var(--text); font-size: 16px; outline: none; }
-.login-btn { width: 100%; padding: 16px; margin: 8px 0; border: none; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; }
+body { 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: 'Inter', sans-serif; 
+    font-size: 13px; 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+}
+.login-modal { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); 
+    display: flex; justify-content: center; align-items: center; 
+    z-index: 1000; 
+}
+.login-content { 
+    background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 48px; padding: 40px; width: 90%; max-width: 380px; 
+    text-align: center; 
+}
+.login-input { 
+    width: 100%; padding: 16px; margin: 15px 0; 
+    background: var(--bg); border: 1px solid var(--border); 
+    border-radius: 40px; color: var(--text); font-size: 16px; 
+    outline: none;
+}
+.login-btn { 
+    width: 100%; padding: 16px; margin: 8px 0; border: none; 
+    border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; 
+}
 .btn-admin { background: var(--accent); color: #000; }
 .btn-client { background: var(--accent2); color: white; }
-
-/* ── GERAL ── */
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 10px; }
-.logo-badge { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #000; font-weight: 800; }
-.btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.topbar { 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 24px; height: 56px; background: var(--surface); 
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; 
+}
+.logo { 
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; 
+    display: flex; align-items: center; gap: 10px; 
+}
+.logo-badge { 
+    width: 28px; height: 28px; background: var(--accent); border-radius: 6px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 13px; color: #000; font-weight: 800; 
+}
+.btn { 
+    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; 
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; 
+    transition: all .15s; display: inline-flex; align-items: center; gap: 6px; 
+}
 .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
 .btn-ghost:hover { border-color: var(--text2); color: var(--text); }
 .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
@@ -49,146 +79,318 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .btn-danger { background: var(--accent4); color: white; }
 .btn-success { background: var(--accent3); color: white; }
 .layout { display: flex; height: calc(100vh - 56px); }
-.sidebar { width: 240px; min-width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; }
+.sidebar { 
+    width: 240px; min-width: 240px; background: var(--surface); 
+    border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; 
+}
 .sidebar-section { margin-bottom: 24px; }
-.sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; padding: 0 16px; margin-bottom: 6px; }
-.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; }
+.sidebar-label { 
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; 
+    letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; 
+    padding: 0 16px; margin-bottom: 6px; 
+}
+.sidebar-item { 
+    display: flex; align-items: center; gap: 10px; padding: 10px 16px; 
+    color: var(--text2); cursor: pointer; border-left: 2px solid transparent; 
+    transition: all 0.2s; 
+}
 .sidebar-item:hover { background: var(--surface2); color: var(--text); transform: translateX(4px); }
-.sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,160,32,.06); }
+.sidebar-item.active { 
+    color: var(--accent); border-left-color: var(--accent); 
+    background: rgba(232,160,32,.06); 
+}
 .main { flex: 1; overflow: auto; padding: 20px 24px; }
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.page-header { 
+    display: flex; align-items: center; justify-content: space-between; 
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); 
+}
 .page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .page-sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
-.save-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.save-bar { 
+    background: var(--surface2); border: 1px solid var(--border); 
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; 
+    display: flex; align-items: center; justify-content: space-between; 
+}
 .save-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
 .save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
 .save-indicator.saved { background: var(--accent3); }
 .save-indicator.pending { background: var(--accent); animation: pulse 1s infinite; }
-.sync-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); color: var(--accent3); }
-.sync-badge.offline { background: rgba(74,84,104,.15); border-color: rgba(74,84,104,.3); color: var(--text3); }
-.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.sync-dot.pulsing { animation: pulse 1.2s infinite; }
-.client-data-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+.client-data-card { 
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); 
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+}
 .client-data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
 .client-data-item { display: flex; flex-direction: column; gap: 6px; }
-.client-data-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+.client-data-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; 
+}
 .client-data-value { font-size: 14px; color: var(--text); font-weight: 500; }
-.client-data-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; outline: none; }
+.client-data-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; 
+    outline: none;
+}
 .client-data-input:focus { border-color: var(--accent); }
-.data-picker-box { background: var(--bg); border: 1px solid var(--accent); border-radius: 12px; padding: 16px 20px; display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.data-part { display: flex; flex-direction: column; gap: 5px; align-items: center; }
-.data-part label { font-size: 9px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; }
-.data-part input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; color: var(--text); font-size: 22px; font-weight: 700; font-family: 'Syne', sans-serif; text-align: center; outline: none; transition: border-color .15s; }
+
+/* DATA PICKER */
+.data-picker-box {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+.data-part {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+.data-part label {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+}
+.data-part input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border-color .15s;
+}
 .data-part input:focus { border-color: var(--accent); }
-.data-sep { font-size: 24px; color: var(--text3); padding-bottom: 10px; user-select: none; }
-.data-preview { margin-left: 12px; padding-bottom: 10px; font-size: 12px; color: var(--accent); display: flex; flex-direction: column; gap: 3px; }
-.gantt-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-bottom: 20px; }
-.gantt-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
+.data-sep {
+    font-size: 24px;
+    color: var(--text3);
+    padding-bottom: 10px;
+    user-select: none;
+}
+.data-preview {
+    margin-left: 12px;
+    padding-bottom: 10px;
+    font-size: 12px;
+    color: var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.gantt-wrap { 
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; 
+    background: var(--surface); margin-bottom: 20px; 
+}
+.gantt-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: var(--surface2); border-bottom: 1px solid var(--border); 
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); 
+    text-transform: uppercase; 
+}
 .gh-cell { padding: 12px; border-right: 1px solid var(--border); }
 .gantt-group { border-bottom: 1px solid var(--border); }
-.gantt-group-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; }
-.gantt-row { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; }
+.gantt-group-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; 
+}
+.gantt-row { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; 
+}
 .gantt-row:hover { background: var(--surface2); }
-.gc { padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 12px; }
-.gc-edit { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; outline: none; }
+.gc { 
+    padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; 
+    border-right: 1px solid var(--border); font-size: 12px; 
+}
+.gc-name { font-weight: 500; }
+.gc-edit { 
+    background: transparent; border: 1px solid var(--border); border-radius: 4px; 
+    padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; 
+    outline: none;
+}
 .gc-edit:focus { border-color: var(--accent); }
-.dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink:0; }
 .bar-area { position: relative; height: var(--gantt-h); min-width: 100%; overflow-x: auto; }
-.gantt-bar { position: absolute; top: 50%; transform: translateY(-50%); height: 20px; border-radius: 5px; display: flex; align-items: center; overflow: hidden; cursor: pointer; transition: all 0.3s; }
+.gantt-bar { 
+    position: absolute; top: 50%; transform: translateY(-50%); height: 20px; 
+    border-radius: 5px; display: flex; align-items: center; overflow: hidden; 
+    cursor: pointer; transition: all 0.3s; 
+}
 .gantt-bar:hover { transform: translateY(-50%) scale(1.02); }
-.gantt-bar-fill { height: 100%; border-radius: 5px 0 0 5px; opacity: .95; transition: width 0.5s ease-out; }
-.today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
+.gantt-bar-fill { 
+    height: 100%; border-radius: 5px 0 0 5px; opacity: .95; 
+    transition: width 0.5s ease-out; 
+}
+.today-line { 
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); 
+    opacity: .7; z-index: 5; 
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes slideInLeft { 
+    from { opacity: 0; transform: translateX(-20px); } 
+    to { opacity: 1; transform: translateX(0); } 
+}
+.animated-progress { position: relative; overflow: hidden; }
+.animated-progress::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes fadeSlideDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+@keyframes bobbing {
+    0%,100% { transform:translateY(0); }
+    50%      { transform:translateY(-4px); }
+}
+@keyframes operarioCaminha {
+    0%   { content:'🦺'; transform:scaleX(1); }
+    50%  { transform:scaleX(-1); }
+    100% { transform:scaleX(1); }
+}
 .crud-container { display: grid; gap: 12px; }
-.crud-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: 1fr 120px 50px; gap: 12px; align-items: center; }
-.crud-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; outline: none; }
+.crud-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; display: grid; grid-template-columns: 1fr 100px 100px 120px; 
+    gap: 12px; align-items: center; 
+}
+.crud-card-header { 
+    background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text3); 
+    text-transform: uppercase; padding: 12px 16px; border-radius: 10px 10px 0 0; 
+}
+.crud-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; 
+    outline: none;
+}
 .crud-input:focus { border-color: var(--accent); }
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-.photo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: transform 0.2s; cursor: pointer; }
+.photo-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    overflow: hidden; transition: transform 0.2s; cursor: pointer; 
+}
 .photo-card:hover { transform: translateY(-4px); }
 .photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
 .photo-card-info { padding: 12px; }
 .photo-card-ambiente { font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
 .photo-card-data { font-size: 10px; color: var(--text3); }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; transition: transform 0.2s; }
+.stats-row { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 16px; margin-bottom: 20px; 
+}
+.stat-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; transition: transform 0.2s; 
+}
 .stat-card:hover { transform: translateY(-4px); }
-.stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
+.stat-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; 
+}
 .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .stat-bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .stat-bar-fill { height: 100%; background: var(--accent3); border-radius: 2px; transition: width 0.5s ease-out; }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
+.modal { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; 
+    align-items: center; justify-content: center; 
+}
 .modal.open { display: flex; }
-.modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal-content { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px; 
+    padding: 30px; width: 90%; max-width: 500px; 
+}
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
 .modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
 .modal-close:hover { color: var(--text); }
-.notification { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+.notification { 
+    position: fixed; bottom: 20px; right: 20px; background: var(--surface); 
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; 
+    display: flex; align-items: center; gap: 12px; z-index: 999; 
+    transform: translateY(100px); opacity: 0; transition: all 0.3s; 
+}
 .notification.show { transform: translateY(0); opacity: 1; }
 .notification.success { border-color: var(--accent3); }
-.client-timeline { position: relative; padding-left: 30px; border-left: 3px solid var(--border); margin: 30px 0; }
-.client-item { position: relative; padding-left: 20px; margin-bottom: 25px; opacity: 0; animation: slideInLeft 0.5s ease forwards; transition: all 0.3s ease; }
-.client-item:hover { transform: translateX(10px); background: var(--surface); border-radius: 12px; padding: 15px; margin-left: -15px; }
-.client-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
+.ambientes-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.ambiente-tab { 
+    padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); 
+}
+.ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.client-timeline { 
+    position: relative; padding-left: 30px; border-left: 3px solid var(--border); 
+    margin: 30px 0; 
+}
+.client-item { 
+    position: relative; padding-left: 20px; margin-bottom: 25px; 
+    opacity: 0; animation: slideInLeft 0.5s ease forwards; 
+    transition: all 0.3s ease; 
+}
+.client-item:hover { 
+    transform: translateX(10px); background: var(--surface); 
+    border-radius: 12px; padding: 15px; margin-left: -15px; 
+}
+.client-item::before { 
+    content: ''; position: absolute; left: -26px; top: 5px; 
+    width: 12px; height: 12px; border-radius: 50%; background: var(--border); 
+    transition: all 0.3s; 
+}
 .client-item.done::before { background: var(--accent3); }
 .client-item.active::before { background: var(--accent); animation: pulse 1.5s infinite; }
-.client-item:nth-child(1){animation-delay:.1s} .client-item:nth-child(2){animation-delay:.2s} .client-item:nth-child(3){animation-delay:.3s}
-.client-item:nth-child(4){animation-delay:.4s} .client-item:nth-child(5){animation-delay:.5s} .client-item:nth-child(6){animation-delay:.6s}
-.client-item:nth-child(7){animation-delay:.7s} .client-item:nth-child(8){animation-delay:.8s}
-.btn-crud { height: 22px; padding: 0 7px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; white-space: nowrap; }
+.client-item:nth-child(1) { animation-delay: 0.1s; }
+.client-item:nth-child(2) { animation-delay: 0.2s; }
+.client-item:nth-child(3) { animation-delay: 0.3s; }
+.client-item:nth-child(4) { animation-delay: 0.4s; }
+.client-item:nth-child(5) { animation-delay: 0.5s; }
+.client-item:nth-child(6) { animation-delay: 0.6s; }
+.client-item:nth-child(7) { animation-delay: 0.7s; }
+.client-item:nth-child(8) { animation-delay: 0.8s; }
+.client-status { 
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; 
+    display: inline-block; margin-top: 5px; 
+}
+.status-pendente { background: rgba(74,84,104,0.1); color: var(--text2); }
+.status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
+.status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
+/* botões inline do gantt */
+.btn-crud {
+    height: 22px; padding: 0 7px; border-radius: 4px; border: none;
+    cursor: pointer; font-size: 10px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .15s; white-space: nowrap;
+}
 .btn-crud-del { background: rgba(244,63,94,.2); color: #fb7185; border: 1px solid rgba(244,63,94,.3); }
 .btn-crud-del:hover { background: rgba(244,63,94,.4); }
 .btn-crud-edit { background: rgba(59,130,246,.2); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
 .btn-crud-edit:hover { background: rgba(59,130,246,.4); }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-@keyframes slideInLeft { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
-@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
-.animated-progress { position: relative; overflow: hidden; }
-.animated-progress::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent); animation:shimmer 2s infinite; }
 </style>
 </head>
 <body>
 
-<!-- ══ SETUP GITHUB (primeira vez) ══ -->
-<div id="setupOverlay" class="setup-overlay" style="display:none">
-    <div class="setup-card">
-        <div style="text-align:center">
-            <div style="font-size:40px;margin-bottom:8px">🔗</div>
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--accent)">Sincronizar com GitHub</div>
-            <div style="font-size:12px;color:var(--text2);margin-top:6px">Configure uma vez — notebook e celular ficam sincronizados</div>
-        </div>
-        <div class="setup-hint">
-            <strong>Passo 1</strong> — Crie um repositório <strong>público</strong> no github.com (ex: <code>torre-liris</code>)<br>
-            <strong>Passo 2</strong> — Vá em <code>Settings → Developer settings → Personal access tokens → Tokens (classic)</code>, clique <code>Generate new token</code>, marque <code>repo</code> e copie<br>
-            <strong>Passo 3</strong> — Preencha abaixo e clique em Conectar
-        </div>
-        <div>
-            <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:5px">Seu usuário GitHub</label>
-            <input id="gh-user" class="setup-input" placeholder="ex: seunome">
-        </div>
-        <div>
-            <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:5px">Nome do repositório</label>
-            <input id="gh-repo" class="setup-input" placeholder="ex: torre-liris">
-        </div>
-        <div>
-            <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:5px">Token de acesso (fica salvo só neste navegador)</label>
-            <input id="gh-token" class="setup-input" type="password" placeholder="ghp_...">
-        </div>
-        <div id="setup-error" style="display:none;color:#fb7185;font-size:12px;padding:8px 12px;background:rgba(244,63,94,.1);border-radius:8px;border:1px solid rgba(244,63,94,.2)"></div>
-        <button class="setup-btn" onclick="salvarConfigGH()">✅ Conectar e Sincronizar</button>
-        <button class="setup-skip" onclick="usarSoLocal()">Usar sem sincronização (somente neste aparelho)</button>
-    </div>
-</div>
-
 <!-- LOGIN -->
 <div id="loginModal" class="login-modal">
     <div class="login-content">
-        <h2 style="color:var(--accent);margin-bottom:20px;font-family:'Syne'">🏗️ Torre L'iris</h2>
-        <p style="color:var(--text2);margin-bottom:20px;font-size:12px">Aptos 1702 e 1704</p>
+        <h2 style="color: var(--accent); margin-bottom: 20px; font-family:'Syne'">🏗️ Torre L'iris</h2>
+        <p style="color:var(--text2); margin-bottom:20px; font-size:12px">Aptos 1702 e 1704</p>
         <input type="password" id="senhaInput" class="login-input" placeholder="Senha do administrador"
                onkeydown="if(event.key==='Enter') verificarSenha()">
         <button class="login-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
         <button class="login-btn btn-client" onclick="entrarComoCliente()">Visualizar como Cliente</button>
-        <div id="loginStatus" style="margin-top:14px;font-size:11px;color:var(--text3)"></div>
     </div>
 </div>
 
@@ -214,14 +416,30 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 <script>
 // ==================== CONFIG ====================
 const SENHA_ADMIN = "torre2026";
-const GH_CFG_KEY  = "ghcfg_liris_v2";
-let admin          = false;
-let modoAtual      = 'cronograma';
+let admin = false;
+let modoAtual = 'cronograma';
 let dadosAlterados = false;
 
-// ==================== GEMINI IA ====================
-const GEMINI_KEY = "AIzaSyAWsj-jQp-xEa2A67q4lrr1oQHxMNqCCtA";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-001:generateContent?key=";
+// ==================== CLAUDE IA (Anthropic) ====================
+// Sem chave necessaria — funciona automaticamente
+async function consultarClaude(prompt) {
+    try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-6",
+                max_tokens: 1024,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await resp.json();
+        if (data.error) return "Erro: " + (data.error.message || JSON.stringify(data.error));
+        return data.content?.[0]?.text || "Sem resposta.";
+    } catch(e) {
+        return "Erro de conexao: " + e.message;
+    }
+}
 
 function contextoObra() {
     const prog = calcularProgressoGeral();
@@ -232,137 +450,68 @@ function contextoObra() {
         ).join("\n");
         return "  " + g.nome + " (" + p + "% concluido, inicio S" + g.inicio + ", duracao " + g.duracao + " sem.):\n" + tarefas;
     }).join("\n");
-    return "Obra: " + dados.titulo + "\nEndereco: " + dados.endereco + "\nTipo: " + dados.obra.tipo +
-        " | Area: " + dados.obra.area + " | Arquiteto: " + dados.obra.arquiteto + "\nCliente: " + dados.cliente.nome +
-        "\nInicio: " + fmtData(getDataInicio()) + " | Termino previsto: " + calcularPrevisao() +
-        "\nDuracao total: " + dados.duracaoTotal + " semanas\nProgresso geral: " + prog + "%\nSemana atual: S" + getSemanaAtual() +
-        "\n\nCRONOGRAMA:\n" + grupos + "\n\nORCAMENTO TOTAL: R$ " +
-        dados.orcamento.reduce(function(s,i){return s+(i.valor||0);},0).toLocaleString("pt-BR",{minimumFractionDigits:2});
-}
-
-// ==================== GITHUB SYNC ====================
-function getCfg() {
-    try { return JSON.parse(localStorage.getItem(GH_CFG_KEY)) || null; } catch(e) { return null; }
-}
-function rawUrl() {
-    const c = getCfg();
-    return c ? "https://raw.githubusercontent.com/" + c.user + "/" + c.repo + "/main/dados.json" : null;
-}
-function apiUrl() {
-    const c = getCfg();
-    return c ? "https://api.github.com/repos/" + c.user + "/" + c.repo + "/contents/dados.json" : null;
-}
-function salvarConfigGH() {
-    const user  = document.getElementById('gh-user').value.trim();
-    const repo  = document.getElementById('gh-repo').value.trim();
-    const token = document.getElementById('gh-token').value.trim();
-    const errEl = document.getElementById('setup-error');
-    if (!user || !repo || !token) { errEl.style.display='block'; errEl.textContent='Preencha todos os campos!'; return; }
-    localStorage.setItem(GH_CFG_KEY, JSON.stringify({ user, repo, token }));
-    document.getElementById('setupOverlay').style.display = 'none';
-    document.getElementById('loginModal').style.display   = 'flex';
-    setLoginStatus('☁️ GitHub configurado — dados sincronizados em todos os dispositivos', 'var(--accent3)');
-    mostrarNotificacao('GitHub conectado! ☁️', 'success');
-}
-function usarSoLocal() {
-    localStorage.setItem(GH_CFG_KEY, JSON.stringify({ local: true }));
-    document.getElementById('setupOverlay').style.display = 'none';
-    document.getElementById('loginModal').style.display   = 'flex';
-}
-function setLoginStatus(msg, cor) {
-    const el = document.getElementById('loginStatus');
-    if (el) { el.textContent = msg; el.style.color = cor || 'var(--text3)'; }
-}
-
-async function carregarDados() {
-    const cfg = getCfg();
-    if (!cfg || cfg.local) {
-        const salvos = localStorage.getItem('obraLiris_v4');
-        if (salvos) { try { dados = JSON.parse(salvos); } catch(e){} }
-        return;
-    }
-    try {
-        const r = await fetch(rawUrl() + '?t=' + Date.now());
-        if (r.ok) {
-            const json = await r.json();
-            if (!json.grupos)    json.grupos    = [];
-            if (!json.orcamento) json.orcamento = [];
-            if (!json.ambientes) json.ambientes = [];
-            if (!json.fotos)     json.fotos     = [];
-            json.grupos.forEach(g => { if (!g.tarefas) g.tarefas = []; });
-            dados = json;
-        } else if (r.status === 404) {
-            await _commitGitHub(); // primeiro uso — sobe os dados padrão
-        }
-    } catch(e) {
-        console.warn('GitHub load error:', e);
-        const salvos = localStorage.getItem('obraLiris_v4');
-        if (salvos) { try { dados = JSON.parse(salvos); } catch(e2){} }
-    }
-}
-
-// ✅ CORRIGIDO: salvarDados agora salva no GitHub OU localStorage sem conflito
-async function salvarDados() {
-    dadosAlterados = false;
-    atualizarIndicadorSave();
-    // Sempre salva local como backup
-    localStorage.setItem('obraLiris_v4', JSON.stringify(dados));
-    const cfg = getCfg();
-    if (!cfg || cfg.local) {
-        mostrarNotificacao('💾 Dados salvos com sucesso!', 'success');
-        return;
-    }
-    mostrarNotificacao('Salvando na nuvem...', 'success');
-    const ok = await _commitGitHub();
-    mostrarNotificacao(ok ? '☁️ Salvo e sincronizado em todos os dispositivos!' : '⚠️ Erro no GitHub. Salvo localmente.', ok ? 'success' : 'erro');
-}
-
-async function _commitGitHub() {
-    const cfg = getCfg();
-    if (!cfg || cfg.local) return false;
-    try {
-        const headers = { 'Authorization': 'token ' + cfg.token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
-        let sha = null;
-        const get = await fetch(apiUrl(), { headers });
-        if (get.ok) { sha = (await get.json()).sha; }
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(dados, null, 2))));
-        const body = { message: 'atualiza dados da obra', content };
-        if (sha) body.sha = sha;
-        const put = await fetch(apiUrl(), { method: 'PUT', headers, body: JSON.stringify(body) });
-        return put.ok || put.status === 201;
-    } catch(e) { console.error('GitHub commit error:', e); return false; }
+    return "Obra: " + dados.titulo + "\n" +
+        "Endereco: " + dados.endereco + "\n" +
+        "Tipo: " + dados.obra.tipo + " | Area: " + dados.obra.area + " | Arquiteto: " + dados.obra.arquiteto + "\n" +
+        "Cliente: " + dados.cliente.nome + "\n" +
+        "Inicio: " + fmtData(getDataInicio()) + " | Termino previsto: " + calcularPrevisao() + "\n" +
+        "Duracao total: " + dados.duracaoTotal + " semanas\n" +
+        "Progresso geral: " + prog + "%\n" +
+        "Semana atual: S" + getSemanaAtual() + "\n\n" +
+        "CRONOGRAMA:\n" + grupos + "\n\n" +
+        "ORCAMENTO TOTAL: R$ " + dados.orcamento.reduce(function(s,i){return s+(i.valor||0);},0).toLocaleString("pt-BR",{minimumFractionDigits:2});
 }
 
 // ==================== DADOS PADRÃO ====================
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
-    dataInicio: "2026-03-09",
+    dataInicio: "2026-03-09",   // ← padrão 09/03/2026 conforme solicitado
     duracaoTotal: 20,
     valor: 234943.54,
-    cliente: { nome: "Seu Aldebaner", email: "aldebaner@email.com", telefone: "(91) 99999-9999", observacoes: "Cliente prefere contato por WhatsApp" },
-    obra: { arquiteto: "Isabela Kalume", area: "180 m²", tipo: "Reforma Completa" },
+    cliente: {
+        nome: "Seu Aldebaner",
+        email: "aldebaner@email.com",
+        telefone: "(91) 99999-9999",
+        observacoes: "Cliente prefere contato por WhatsApp"
+    },
+    obra: {
+        arquiteto: "Isabela Kalume",
+        area: "180 m²",
+        tipo: "Reforma Completa"
+    },
     grupos: [
-        { id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', inicio: 0, duracao: 2, responsavel: 'Admin',
-          tarefas: [
-              { nome: 'Placa de Obra',         inicio: 0, duracao: 1, responsavel: 'Admin',      progresso: 100 },
-              { nome: 'Administração da Obra',  inicio: 0, duracao: 5, responsavel: 'Engenheiro', progresso: 40  }
-          ]},
-        { id: 'g2', nome: '2. Demolições', cor: '#f43f5e', inicio: 2, duracao: 2, responsavel: 'Equipe A',
-          tarefas: [
-              { nome: 'Demolição Alvenaria', inicio: 2, duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
-              { nome: 'Remoção Entulho',     inicio: 4, duracao: 2, responsavel: 'Servente', progresso: 0 }
-          ]},
-        { id: 'g3', nome: '3. Paredes', cor: '#e8a020', inicio: 4, duracao: 2, responsavel: 'Pedreiro',
-          tarefas: [{ nome: 'Alvenaria Tijolo', inicio: 4, duracao: 2, responsavel: 'Pedreiro', progresso: 0 }]}
+        { 
+            id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', 
+            inicio: 0, duracao: 2, responsavel: 'Admin', 
+            tarefas: [
+                { nome: 'Placa de Obra',          inicio: 0, duracao: 1, responsavel: 'Admin',      progresso: 100 },
+                { nome: 'Administração da Obra',   inicio: 0, duracao: 5, responsavel: 'Engenheiro', progresso: 40  }
+            ] 
+        },
+        { 
+            id: 'g2', nome: '2. Demolições', cor: '#f43f5e', 
+            inicio: 2, duracao: 2, responsavel: 'Equipe A', 
+            tarefas: [
+                { nome: 'Demolição Alvenaria', inicio: 2, duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
+                { nome: 'Remoção Entulho',     inicio: 4, duracao: 2, responsavel: 'Servente', progresso: 0 }
+            ] 
+        },
+        { 
+            id: 'g3', nome: '3. Paredes', cor: '#e8a020', 
+            inicio: 4, duracao: 2, responsavel: 'Pedreiro', 
+            tarefas: [
+                { nome: 'Alvenaria Tijolo', inicio: 4, duracao: 2, responsavel: 'Pedreiro', progresso: 0 }
+            ] 
+        }
     ],
     orcamento: [
-        { id: 'o1', grupo: 'Serviços Preliminares', descricao: 'Placa de Obra',           valor: 1639.05  },
-        { id: 'o2', grupo: 'Serviços Preliminares', descricao: 'Administração da Obra',   valor: 38139.75 }
+        { id: 'o1', grupo: 'Serviços Preliminares', descricao: 'Placa de Obra', valor: 1639.05 },
+        { id: 'o2', grupo: 'Serviços Preliminares', descricao: 'Administração da Obra', valor: 38139.75 }
     ],
-    ambientes: ['Sala','Cozinha','Quarto 1','Quarto 2','Banheiro 1','Banheiro 2','Área Serviço','Varanda'],
+    ambientes: ['Sala', 'Cozinha', 'Quarto 1', 'Quarto 2', 'Banheiro 1', 'Banheiro 2', 'Área Serviço', 'Varanda'],
     fotos: [
-        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala',    ambiente: 'Sala',    data: '09/03/2026' },
+        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '09/03/2026' },
         { url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '09/03/2026' }
     ]
 };
@@ -370,31 +519,38 @@ let dados = {
 const SEMANA_PX = 40;
 
 // ==================== FUNÇÕES DE DATA ====================
+// ► CORREÇÃO PRINCIPAL: parse local para evitar bug de fuso UTC (problema que
+//   fazia a data aparecer 1 dia antes — ex: 09/03 virava 08/03)
 function getDataInicio() {
     const p = dados.dataInicio.split('-');
     return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
 }
-function fmtData(d) { return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }); }
-function fmtSemana(s) { return new Date(getDataInicio().getTime() + s * 7 * 24 * 3600 * 1000).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }); }
-function calcularPrevisao() { return new Date(getDataInicio().getTime() + (dados.duracaoTotal||20) * 7 * 24 * 3600 * 1000).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }); }
-function getSemanaAtual() { return Math.round((new Date() - getDataInicio()) / (7 * 24 * 3600 * 1000)); }
-function getPartes() { const p = dados.dataInicio.split('-'); return { ano: p[0], mes: p[1], dia: p[2] }; }
 
-function atualizarDataPartes() {
-    const diaEl = document.getElementById('inputDia'), mesEl = document.getElementById('inputMes'), anoEl = document.getElementById('inputAno');
-    if (!diaEl || !mesEl || !anoEl) return;
-    let dia = parseInt(diaEl.value)||9, mes = parseInt(mesEl.value)||3, ano = parseInt(anoEl.value)||2026;
-    dia = Math.min(Math.max(dia,1),31); mes = Math.min(Math.max(mes,1),12); ano = Math.min(Math.max(ano,2020),2040);
-    dados.dataInicio = String(ano) + '-' + String(mes).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
-    marcarAlterado();
-    const prev = document.getElementById('dataPreview');
-    if (prev) prev.innerHTML = '<span>📅 ' + fmtData(getDataInicio()) + '</span><span style="color:var(--text2)">Término: ' + calcularPrevisao() + '</span>';
-    const cronSub = document.getElementById('cronSub');
-    if (cronSub) cronSub.textContent = dados.endereco + ' · Início: ' + fmtData(getDataInicio()) + ' · Término: ' + calcularPrevisao();
-    mostrarNotificacao('Data atualizada: ' + fmtData(getDataInicio()), 'success');
+function fmtData(d) {
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-// ==================== PROGRESSO ====================
+function fmtSemana(s) {
+    const d = new Date(getDataInicio().getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+function calcularPrevisao() {
+    const end = new Date(getDataInicio().getTime() + (dados.duracaoTotal || 20) * 7 * 24 * 3600 * 1000);
+    return end.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function getSemanaAtual() {
+    return Math.round((new Date() - getDataInicio()) / (7 * 24 * 3600 * 1000));
+}
+
+// ► Extrai partes da data armazenada (sem depender de Date para evitar bugs)
+function getPartes() {
+    const p = dados.dataInicio.split('-');
+    return { ano: p[0], mes: p[1], dia: p[2] };
+}
+
+// ==================== FUNÇÕES DE PROGRESSO ====================
 function calcularProgressoGrupo(g) {
     if (!g.tarefas || g.tarefas.length === 0) return 0;
     return Math.round(g.tarefas.reduce((acc, t) => acc + (t.progresso || 0), 0) / g.tarefas.length);
@@ -404,7 +560,24 @@ function calcularProgressoGeral() {
     dados.grupos.forEach(g => g.tarefas.forEach(t => { total++; soma += t.progresso || 0; }));
     return total > 0 ? Math.round(soma / total) : 0;
 }
-function marcarAlterado() { dadosAlterados = true; atualizarIndicadorSave(); }
+
+// ==================== PERSISTÊNCIA ====================
+function salvarDados() {
+    localStorage.setItem('obraLiris_v4', JSON.stringify(dados));
+    dadosAlterados = false;
+    atualizarIndicadorSave();
+    mostrarNotificacao('Dados salvos com sucesso!', 'success');
+}
+function carregarDados() {
+    const salvos = localStorage.getItem('obraLiris_v4');
+    if (salvos) {
+        try { dados = JSON.parse(salvos); } catch(e) { /* mantém padrão */ }
+    }
+}
+function marcarAlterado() {
+    dadosAlterados = true;
+    atualizarIndicadorSave();
+}
 function atualizarIndicadorSave() {
     const el = document.getElementById('saveIndicator');
     if (el) el.className = 'save-indicator ' + (dadosAlterados ? 'pending' : 'saved');
@@ -415,16 +588,20 @@ function verificarSenha() {
     if (document.getElementById('senhaInput').value === SENHA_ADMIN) {
         admin = true;
         document.getElementById('loginModal').style.display = 'none';
+        carregarDados();
         renderizarAdmin();
-    } else { alert('Senha incorreta'); }
+    } else {
+        alert('Senha incorreta');
+    }
 }
 function entrarComoCliente() {
     admin = false;
     document.getElementById('loginModal').style.display = 'none';
+    carregarDados();
     renderizarCliente();
 }
 
-// ==================== NOTIFICAÇÕES / MODAL ====================
+// ==================== NOTIFICAÇÕES ====================
 function mostrarNotificacao(mensagem, tipo = 'success') {
     const notif = document.getElementById('notification');
     document.getElementById('notifIcon').textContent = tipo === 'success' ? '✅' : '⚠️';
@@ -432,26 +609,59 @@ function mostrarNotificacao(mensagem, tipo = 'success') {
     notif.className = 'notification show ' + tipo;
     setTimeout(() => { notif.className = 'notification'; }, 3000);
 }
+
+// ==================== MODAL ====================
 function abrirModal(titulo, conteudo) {
     document.getElementById('modalTitulo').textContent = titulo;
     document.getElementById('modalConteudo').innerHTML = conteudo;
     document.getElementById('modalGenerico').classList.add('open');
 }
-function fecharModal() { document.getElementById('modalGenerico').classList.remove('open'); }
+function fecharModal() {
+    document.getElementById('modalGenerico').classList.remove('open');
+}
+
+// ==================== ATUALIZAÇÃO DE DATA ====================
+// ► Esta é a função MANDANTE — chamada pelos campos DIA/MÊS/ANO em
+//   Dados do Cliente e propaga para Cronograma Admin + área do Cliente
+function atualizarDataPartes() {
+    const diaEl = document.getElementById('inputDia');
+    const mesEl = document.getElementById('inputMes');
+    const anoEl = document.getElementById('inputAno');
+    if (!diaEl || !mesEl || !anoEl) return;
+
+    let dia = parseInt(diaEl.value) || 9;
+    let mes = parseInt(mesEl.value) || 3;
+    let ano = parseInt(anoEl.value) || 2026;
+
+    // Validação básica
+    dia = Math.min(Math.max(dia, 1), 31);
+    mes = Math.min(Math.max(mes, 1), 12);
+    ano = Math.min(Math.max(ano, 2020), 2040);
+
+    dados.dataInicio = String(ano) + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
+    marcarAlterado();
+
+    // Atualiza preview sem re-renderizar tudo
+    const prev = document.getElementById('dataPreview');
+    if (prev) {
+        prev.innerHTML =
+            '<span>📅 ' + fmtData(getDataInicio()) + '</span>' +
+            '<span style="color:var(--text2)">Término: ' + calcularPrevisao() + '</span>';
+    }
+    // Atualiza legenda do cronograma se estiver visível
+    const cronSub = document.getElementById('cronSub');
+    if (cronSub) cronSub.textContent = dados.endereco + ' · Início: ' + fmtData(getDataInicio()) + ' · Término: ' + calcularPrevisao();
+
+    mostrarNotificacao('Data atualizada: ' + fmtData(getDataInicio()), 'success');
+}
 
 // ==================== RENDERIZAÇÃO ADMIN ====================
 function renderizarAdmin() {
-    const cfg = getCfg();
-    const temSync = cfg && !cfg.local;
     document.getElementById('app').innerHTML = `
     <div class="topbar">
         <div class="logo"><div class="logo-badge">A</div> Admin — ${dados.titulo}</div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <div class="sync-badge ${temSync ? '' : 'offline'}">
-                <div class="sync-dot ${temSync ? 'pulsing' : ''}"></div>
-                ${temSync ? '☁️ GitHub Sync' : '💾 Local'}
-            </div>
-            <span style="color:var(--accent);font-size:12px">👑 Administrador</span>
+        <div style="display:flex; gap:10px; align-items:center">
+            <span style="color:var(--accent); font-size:12px">👑 Administrador</span>
             <button class="btn btn-ghost" onclick="renderizarCliente()">👁️ Ver como Cliente</button>
         </div>
     </div>
@@ -463,9 +673,10 @@ function renderizarAdmin() {
                 <div class="sidebar-item ${modoAtual==='cronograma'?'active':''}" onclick="mudarModo('cronograma')">📅 Cronograma</div>
                 <div class="sidebar-item ${modoAtual==='orcamento'?'active':''}" onclick="mudarModo('orcamento')">💰 Orçamento</div>
                 <div class="sidebar-item ${modoAtual==='fotos'?'active':''}" onclick="mudarModo('fotos')">📸 Fotos</div>
-                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">🏠 Ambientes</div>
-                <div class="sidebar-item ${modoAtual==='ia'?'active':''}" onclick="mudarModo('ia')"><span style="color:#60a5fa">🤖 IA Assistente</span></div>
-                <div class="sidebar-item" onclick="configurarSync()" style="margin-top:8px"><span style="color:var(--text3);font-size:11px">⚙️ Config. Sync</span></div>
+                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">Ambientes</div>
+                <div class="sidebar-item ${modoAtual==='ia'?'active':''}" onclick="mudarModo('ia')" style="border-left:2px solid transparent">
+                    <span style="color:#60a5fa">IA Assistente</span>
+                </div>
             </div>
         </div>
         <div class="main">
@@ -473,9 +684,8 @@ function renderizarAdmin() {
                 <div class="save-status">
                     <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
                     <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
-                    ${temSync ? '<span style="font-size:10px;color:var(--accent3);margin-left:4px">☁️ sync ativo</span>' : ''}
                 </div>
-                <button class="btn btn-success" onclick="salvarDados()">💾 Salvar${temSync ? ' e Sincronizar' : ' Alterações'}</button>
+                <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
             </div>
             ${renderizarConteudoAdmin()}
         </div>
@@ -483,19 +693,13 @@ function renderizarAdmin() {
     if (modoAtual === 'cronograma') setTimeout(() => renderizarGantt(), 80);
 }
 
-function configurarSync() {
-    if (confirm('Reconfigurar sincronização com GitHub?')) {
-        localStorage.removeItem(GH_CFG_KEY); location.reload();
-    }
-}
-
 function mudarModo(modo) {
     if (dadosAlterados && !confirm('Alterações não salvas. Salvar antes de mudar?')) return;
     if (dadosAlterados) salvarDados();
-    modoAtual = modo; renderizarAdmin();
+    modoAtual = modo;
+    renderizarAdmin();
 }
 
-// ✅ CORRIGIDO: cada função só RETORNA HTML, sem manipular o DOM diretamente
 function renderizarConteudoAdmin() {
     switch(modoAtual) {
         case 'dadosCliente': return renderizarDadosClienteAdmin();
@@ -508,7 +712,7 @@ function renderizarConteudoAdmin() {
     }
 }
 
-// ==================== DADOS DO CLIENTE ====================
+// ==================== DADOS DO CLIENTE (MANDANTE DA DATA) ====================
 function renderizarDadosClienteAdmin() {
     const p = getPartes();
     return `
@@ -518,43 +722,85 @@ function renderizarDadosClienteAdmin() {
             <div class="page-sub">⚠️ A data de início definida aqui é mandante — alimenta automaticamente o Cronograma e a área do Cliente</div>
         </div>
     </div>
-    <div class="client-data-card" style="border-color:var(--accent);margin-bottom:16px">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:12px">📅 Data de Início da Obra — Mandante</div>
+
+    <!-- BLOCO DE DATA — MANDANTE -->
+    <div class="client-data-card" style="border-color: var(--accent); margin-bottom:16px">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--accent); text-transform:uppercase; margin-bottom:12px">
+            📅 Data de Início da Obra — Mandante para todo o sistema
+        </div>
         <div class="data-picker-box">
-            <div class="data-part"><label>Dia</label><input id="inputDia" type="number" min="1" max="31" value="${parseInt(p.dia)}" style="width:70px" oninput="atualizarDataPartes()"></div>
+            <div class="data-part">
+                <label>Dia</label>
+                <input id="inputDia" type="number" min="1" max="31" value="${parseInt(p.dia)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
             <div class="data-sep">/</div>
-            <div class="data-part"><label>Mês</label><input id="inputMes" type="number" min="1" max="12" value="${parseInt(p.mes)}" style="width:70px" oninput="atualizarDataPartes()"></div>
+            <div class="data-part">
+                <label>Mês</label>
+                <input id="inputMes" type="number" min="1" max="12" value="${parseInt(p.mes)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
             <div class="data-sep">/</div>
-            <div class="data-part"><label>Ano</label><input id="inputAno" type="number" min="2020" max="2040" value="${parseInt(p.ano)}" style="width:90px" oninput="atualizarDataPartes()"></div>
+            <div class="data-part">
+                <label>Ano</label>
+                <input id="inputAno" type="number" min="2020" max="2040" value="${parseInt(p.ano)}"
+                       style="width:90px" oninput="atualizarDataPartes()">
+            </div>
             <div class="data-preview" id="dataPreview">
                 <span>📅 ${fmtData(getDataInicio())}</span>
                 <span style="color:var(--text2)">Término: ${calcularPrevisao()}</span>
             </div>
         </div>
     </div>
+
+    <!-- DEMAIS DADOS -->
     <div class="client-data-card">
         <div class="client-data-grid">
-            <div class="client-data-item"><label class="client-data-label">Nome do Cliente</label>
-                <input class="client-data-input" value="${dados.cliente.nome}" onchange="dados.cliente.nome=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Email</label>
-                <input class="client-data-input" value="${dados.cliente.email}" onchange="dados.cliente.email=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Telefone</label>
-                <input class="client-data-input" value="${dados.cliente.telefone}" onchange="dados.cliente.telefone=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Observações</label>
-                <input class="client-data-input" value="${dados.cliente.observacoes}" onchange="dados.cliente.observacoes=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Arquiteto</label>
-                <input class="client-data-input" value="${dados.obra.arquiteto}" onchange="dados.obra.arquiteto=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Área</label>
-                <input class="client-data-input" value="${dados.obra.area}" onchange="dados.obra.area=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">Tipo</label>
-                <input class="client-data-input" value="${dados.obra.tipo}" onchange="dados.obra.tipo=this.value;marcarAlterado();"></div>
-            <div class="client-data-item"><label class="client-data-label">⏱️ Duração (semanas)</label>
-                <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="dados.duracaoTotal=parseInt(this.value)||20;marcarAlterado();"></div>
+            <div class="client-data-item">
+                <label class="client-data-label">Nome do Cliente</label>
+                <input class="client-data-input" value="${dados.cliente.nome}"
+                       onchange="dados.cliente.nome=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Email</label>
+                <input class="client-data-input" value="${dados.cliente.email}"
+                       onchange="dados.cliente.email=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Telefone</label>
+                <input class="client-data-input" value="${dados.cliente.telefone}"
+                       onchange="dados.cliente.telefone=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Observações</label>
+                <input class="client-data-input" value="${dados.cliente.observacoes}"
+                       onchange="dados.cliente.observacoes=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Arquiteto</label>
+                <input class="client-data-input" value="${dados.obra.arquiteto}"
+                       onchange="dados.obra.arquiteto=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Área</label>
+                <input class="client-data-input" value="${dados.obra.area}"
+                       onchange="dados.obra.area=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Tipo</label>
+                <input class="client-data-input" value="${dados.obra.tipo}"
+                       onchange="dados.obra.tipo=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">⏱️ Duração (semanas)</label>
+                <input class="client-data-input" type="number" value="${dados.duracaoTotal}"
+                       onchange="dados.duracaoTotal=parseInt(this.value)||20; marcarAlterado();">
+            </div>
         </div>
     </div>`;
 }
 
-// ==================== CRONOGRAMA ====================
+// ==================== CRONOGRAMA ADMIN ====================
 function renderizarCronogramaAdmin() {
     return `
     <div class="page-header">
@@ -562,8 +808,8 @@ function renderizarCronogramaAdmin() {
             <div class="page-title">📅 Cronograma</div>
             <div class="page-sub" id="cronSub">${dados.endereco} · Início: ${fmtData(getDataInicio())} · Término: ${calcularPrevisao()}</div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--text2)">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:11px; color:var(--text2)">
                 📅 Início: <strong style="color:var(--accent)">${fmtData(getDataInicio())}</strong>
                 &nbsp;·&nbsp; Altere em <strong style="color:var(--accent2)">Dados do Cliente</strong>
             </div>
@@ -584,120 +830,169 @@ function renderizarCronogramaAdmin() {
     </div>`;
 }
 
+// ── Garante que tarefas antigas (sem campo inicio) recebam um valor padrão ──
 function normalizarTarefas() {
     dados.grupos.forEach(g => {
-        let cursor = g.inicio;
+        let cursor = g.inicio; // acumula o início sequencial
         g.tarefas.forEach(t => {
-            if (t.inicio === undefined || t.inicio === null) { t.inicio = cursor; }
+            if (t.inicio === undefined || t.inicio === null) {
+                t.inicio = cursor;
+            }
             cursor = t.inicio + (t.duracao || 1);
         });
     });
 }
+
+// ── Recalcula inicio e duracao do GRUPO com base nas tarefas filhas ──
 function recalcularGrupo(g) {
     if (!g.tarefas || g.tarefas.length === 0) return;
-    g.inicio  = Math.min(...g.tarefas.map(t => t.inicio));
-    g.duracao = Math.max(...g.tarefas.map(t => t.inicio + (t.duracao || 1))) - g.inicio;
+    const iMin = Math.min(...g.tarefas.map(t => t.inicio));
+    const iMax = Math.max(...g.tarefas.map(t => t.inicio + (t.duracao || 1)));
+    g.inicio   = iMin;
+    g.duracao  = iMax - iMin;
 }
 
 function renderizarGantt() {
-    normalizarTarefas();
+    normalizarTarefas(); // compatibilidade com dados antigos
     const body = document.getElementById('ganttBody');
     if (!body) return;
     body.innerHTML = '';
     const semanaAtual = getSemanaAtual();
 
     dados.grupos.forEach((g, gIndex) => {
-        recalcularGrupo(g);
+        recalcularGrupo(g); // grupo espelha suas tarefas
         const progGrupo = calcularProgressoGrupo(g);
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
 
+        // ── CABEÇALHO DO GRUPO (barra engloba todas as tarefas) ──
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
             <div class="gc">
-                <div class="dot" style="background:${g.cor};cursor:pointer" title="Alterar cor" onclick="alterarCorGrupo(${gIndex})"></div>
-                <input class="gc-edit" value="${g.nome}" onchange="dados.grupos[${gIndex}].nome=this.value;marcarAlterado();">
+                <div class="dot" style="background:${g.cor}; cursor:pointer" title="Alterar cor"
+                    onclick="alterarCorGrupo(${gIndex})"></div>
+                <input class="gc-edit" value="${g.nome}"
+                    onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado();">
             </div>
-            <div class="gc" style="font-size:11px;color:var(--text2)">${fmtSemana(g.inicio)}</div>
-            <div class="gc" style="font-size:11px;color:var(--text2)">${fmtSemana(g.inicio + g.duracao)}</div>
-            <div class="gc" style="font-size:11px;color:var(--text3)">${g.duracao} sem.</div>
-            <div class="gc"><span style="color:var(--accent);font-weight:600">${progGrupo}%</span></div>
-            <div class="gc" style="padding:0;overflow:hidden"><div class="bar-area">
-                <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px;width:${g.duracao*SEMANA_PX}px;background:${g.cor}33;border:1px solid ${g.cor}">
-                    <div class="gantt-bar-fill" style="width:${progGrupo}%;background:${g.cor}"></div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + g.duracao)}</div>
+            <div class="gc" style="font-size:11px; color:var(--text3)">${g.duracao} sem.</div>
+            <div class="gc">
+                <span style="color:var(--accent); font-weight:600">${progGrupo}%</span>
+            </div>
+            <div class="gc" style="padding:0; overflow:hidden">
+                <div class="bar-area">
+                    <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                    <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${g.duracao*SEMANA_PX}px;
+                        background:${g.cor}33; border:1px solid ${g.cor}">
+                        <div class="gantt-bar-fill" style="width:${progGrupo}%; background:${g.cor}"></div>
+                    </div>
                 </div>
-            </div></div>`;
+            </div>`;
         grupoDiv.appendChild(grupoHeader);
 
+        // ── TAREFAS — cada uma com seu próprio início e duração ──
         g.tarefas.forEach((t, tIndex) => {
+            // segurança: garante que t.inicio existe
             if (t.inicio === undefined) t.inicio = g.inicio;
             const tFim = t.inicio + (t.duracao || 1);
+
             const row = document.createElement('div');
             row.className = 'gantt-row';
             row.innerHTML = `
-                <div class="gc" style="padding-left:36px;gap:4px">
-                    <input class="gc-edit" value="${t.nome}" onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value;marcarAlterado();">
-                    <button class="btn-crud btn-crud-edit" onclick="abrirModalTarefa(${gIndex},${tIndex})">Edit</button>
-                    <button class="btn-crud btn-crud-del" onclick="excluirTarefa(${gIndex},${tIndex})">Del</button>
+                <div class="gc" style="padding-left:36px; gap:4px">
+                    <input class="gc-edit" value="${t.nome}"
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
+                    <button class="btn-crud btn-crud-edit" title="Editar tarefa"
+                        onclick="abrirModalTarefa(${gIndex}, ${tIndex})">Edit</button>
+                    <button class="btn-crud btn-crud-del" title="Excluir tarefa"
+                        onclick="excluirTarefa(${gIndex},${tIndex})">Del</button>
                 </div>
-                <div class="gc" style="font-size:11px;color:var(--text2)">${fmtSemana(t.inicio)}</div>
-                <div class="gc" style="font-size:11px;color:var(--text2)">${fmtSemana(tFim)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(t.inicio)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(tFim)}</div>
                 <div class="gc">
                     <input class="gc-edit" type="number" min="1" value="${t.duracao}"
-                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1;marcarAlterado();renderizarGantt();">
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1;
+                                  marcarAlterado(); renderizarGantt();">
                 </div>
                 <div class="gc" style="gap:6px">
-                    <input type="range" min="0" max="100" value="${t.progresso}" style="width:70px;accent-color:${g.cor}"
-                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value);marcarAlterado();this.nextElementSibling.textContent=this.value+'%';">
-                    <span style="min-width:32px;font-size:11px">${t.progresso}%</span>
+                    <input type="range" min="0" max="100" value="${t.progresso}"
+                        style="width:70px; accent-color:${g.cor}"
+                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value);
+                                 marcarAlterado(); this.nextElementSibling.textContent=this.value+'%';">
+                    <span style="min-width:32px; font-size:11px">${t.progresso}%</span>
                 </div>
-                <div class="gc" style="padding:0;overflow:hidden"><div class="bar-area">
-                    <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
-                    <div class="gantt-bar" style="left:${t.inicio*SEMANA_PX}px;width:${(t.duracao||1)*SEMANA_PX}px;background:${g.cor}22;border:1px solid ${g.cor}55">
-                        <div class="gantt-bar-fill" style="width:${t.progresso}%;background:${g.cor}"></div>
+                <div class="gc" style="padding:0; overflow:hidden">
+                    <div class="bar-area">
+                        <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                        <div class="gantt-bar"
+                            style="left:${t.inicio*SEMANA_PX}px; width:${(t.duracao||1)*SEMANA_PX}px;
+                                   background:${g.cor}22; border:1px solid ${g.cor}55">
+                            <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
+                        </div>
                     </div>
-                </div></div>`;
+                </div>`;
             grupoDiv.appendChild(row);
         });
 
+        // ── BARRA DE AÇÕES DO GRUPO ──
         const actRow = document.createElement('div');
         actRow.className = 'gantt-row';
         actRow.innerHTML = `
-            <div class="gc" style="padding-left:12px;gap:6px;flex-wrap:wrap">
-                <button class="btn btn-primary" style="font-size:11px;padding:5px 10px" onclick="abrirModalTarefa(${gIndex},null)">+ Tarefa</button>
-                <button class="btn btn-ghost"   style="font-size:11px;padding:5px 10px" onclick="abrirModalGrupo(${gIndex})">Editar Grupo</button>
-                <button class="btn btn-danger"  style="font-size:11px;padding:5px 10px" onclick="excluirGrupo(${gIndex})">Excluir Grupo</button>
+            <div class="gc" style="padding-left:12px; gap:6px; flex-wrap:wrap">
+                <button class="btn btn-primary" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalTarefa(${gIndex}, null)">+ Tarefa</button>
+                <button class="btn btn-ghost" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalGrupo(${gIndex})">Editar Grupo</button>
+                <button class="btn btn-danger" style="font-size:11px; padding:5px 10px"
+                    onclick="excluirGrupo(${gIndex})">Excluir Grupo</button>
             </div>
-            <div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
+            <div class="gc"></div><div class="gc"></div>
+            <div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
         grupoDiv.appendChild(actRow);
         body.appendChild(grupoDiv);
     });
 }
 
+// ── MODAL GRUPO (criar / editar) ──────────────────────────────────────────
 function abrirModalGrupo(gIndex) {
+    // gIndex === null → novo grupo
     const novo = gIndex === null;
-    const g = novo ? { nome:'', cor:'#3b82f6', inicio: dados.grupos.length * 2, duracao: 2, responsavel:'Equipe' } : dados.grupos[gIndex];
+    const g = novo ? { nome: '', cor: '#3b82f6', inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe' }
+                   : dados.grupos[gIndex];
     abrirModal(novo ? '➕ Novo Grupo' : '✏️ Editar Grupo', `
-        <div style="display:grid;gap:12px">
-            <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Nome do Grupo *</label>
-                <input id="mg-nome" class="crud-input" value="${g.nome}" placeholder="Ex: 4. Revestimentos"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Semana de Início</label>
-                    <input id="mg-inicio" class="crud-input" type="number" min="0" value="${g.inicio}"></div>
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Duração (semanas)</label>
-                    <input id="mg-dur" class="crud-input" type="number" min="1" value="${g.duracao}"></div>
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome do Grupo *</label>
+                <input id="mg-nome" class="crud-input" value="${g.nome}" placeholder="Ex: 4. Revestimentos">
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Responsável</label>
-                    <input id="mg-resp" class="crud-input" value="${g.responsavel}" placeholder="Equipe responsável"></div>
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Cor</label>
-                    <input id="mg-cor" type="color" value="${g.cor}" style="width:100%;height:38px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;padding:2px"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Semana de Início</label>
+                    <input id="mg-inicio" class="crud-input" type="number" min="0" value="${g.inicio}">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duração (semanas)</label>
+                    <input id="mg-dur" class="crud-input" type="number" min="1" value="${g.duracao}">
+                </div>
             </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsável</label>
+                    <input id="mg-resp" class="crud-input" value="${g.responsavel}" placeholder="Equipe responsável">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Cor</label>
+                    <input id="mg-cor" type="color" value="${g.cor}"
+                        style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border); background:var(--bg); cursor:pointer; padding:2px">
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
                 <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarGrupo(${novo ? 'null' : gIndex})">${novo ? '+ Criar Grupo' : 'Salvar Alterações'}</button>
+                <button class="btn btn-primary" onclick="salvarGrupo(${novo ? 'null' : gIndex})">
+                    ${novo ? '+ Criar Grupo' : 'Salvar Alteracoes'}
+                </button>
             </div>
         </div>`);
 }
@@ -705,99 +1000,182 @@ function abrirModalGrupo(gIndex) {
 function salvarGrupo(gIndex) {
     const nome = document.getElementById('mg-nome').value.trim();
     if (!nome) { mostrarNotificacao('Informe o nome do grupo!', 'erro'); return; }
-    const obj = { nome, inicio: parseInt(document.getElementById('mg-inicio').value)||0, duracao: parseInt(document.getElementById('mg-dur').value)||2, responsavel: document.getElementById('mg-resp').value.trim()||'Equipe', cor: document.getElementById('mg-cor').value };
-    if (gIndex === null) { dados.grupos.push({ id: 'g' + Date.now(), tarefas: [], ...obj }); mostrarNotificacao('Grupo "' + obj.nome + '" criado!', 'success'); }
-    else { Object.assign(dados.grupos[gIndex], obj); mostrarNotificacao('Grupo atualizado!', 'success'); }
-    marcarAlterado(); fecharModal(); renderizarGantt();
+    const obj = {
+        nome,
+        inicio:      parseInt(document.getElementById('mg-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mg-dur').value)    || 2,
+        responsavel: document.getElementById('mg-resp').value.trim()      || 'Equipe',
+        cor:         document.getElementById('mg-cor').value
+    };
+    if (gIndex === null) {
+        dados.grupos.push({ id: 'g' + Date.now(), tarefas: [], ...obj });
+        mostrarNotificacao('Grupo "' + obj.nome + '" criado!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex], obj);
+        mostrarNotificacao('Grupo atualizado!', 'success');
+    }
+    marcarAlterado();
+    fecharModal();
+    renderizarGantt();
 }
 
 function alterarCorGrupo(gIndex) {
-    const input = document.createElement('input'); input.type = 'color'; input.value = dados.grupos[gIndex].cor;
-    input.onchange = () => { dados.grupos[gIndex].cor = input.value; marcarAlterado(); renderizarGantt(); };
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = dados.grupos[gIndex].cor;
+    input.onchange = () => {
+        dados.grupos[gIndex].cor = input.value;
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Cor do grupo alterada!', 'success');
+    };
     input.click();
 }
 
+// ── MODAL TAREFA (criar / editar) ─────────────────────────────────────────
 function abrirModalTarefa(gIndex, tIndex) {
     const novo = tIndex === null;
     const g = dados.grupos[gIndex];
+    // inicio sugerido = fim da ultima tarefa do grupo
     let inicioSug = g.inicio || 0;
-    if (g.tarefas.length > 0) { const ul = g.tarefas[g.tarefas.length - 1]; inicioSug = (ul.inicio !== undefined ? ul.inicio : g.inicio) + (ul.duracao || 1); }
-    const t = novo ? { nome:'', inicio: inicioSug, duracao: 2, responsavel: g.responsavel||'Equipe', progresso: 0 } : g.tarefas[tIndex];
+    if (g.tarefas.length > 0) {
+        const ul = g.tarefas[g.tarefas.length - 1];
+        inicioSug = (ul.inicio !== undefined ? ul.inicio : g.inicio) + (ul.duracao || 1);
+    }
+    const t = novo
+        ? { nome: '', inicio: inicioSug, duracao: 2, responsavel: g.responsavel || 'Equipe', progresso: 0 }
+        : g.tarefas[tIndex];
     const tIni = t.inicio !== undefined ? t.inicio : inicioSug;
     abrirModal(novo ? 'Nova Tarefa' : 'Editar Tarefa', `
-        <div style="margin-bottom:8px;font-size:11px;color:var(--text2)">Grupo: <strong style="color:var(--accent)">${g.nome}</strong></div>
-        <div style="display:grid;gap:12px">
-            <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Nome da Tarefa *</label>
-                <input id="mt-nome" class="crud-input" value="${t.nome}" placeholder="Ex: Assentamento de piso"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Semana de Início &nbsp;<span style="color:var(--text3);font-size:10px">(S1=${fmtSemana(0)})</span></label>
-                    <input id="mt-inicio" class="crud-input" type="number" min="0" value="${tIni}" oninput="atualizarPreviewTarefa()"></div>
-                <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Duração (semanas)</label>
-                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}" oninput="atualizarPreviewTarefa()"></div>
+        <div style="margin-bottom:8px; font-size:11px; color:var(--text2)">
+            Grupo: <strong style="color:var(--accent)">${g.nome}</strong>
+        </div>
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome da Tarefa *</label>
+                <input id="mt-nome" class="crud-input" value="${t.nome}" placeholder="Ex: Assentamento de piso">
             </div>
-            <div id="mt-preview" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--accent)">
-                Período: ${fmtSemana(tIni)} → ${fmtSemana(tIni + t.duracao)}</div>
-            <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Responsável</label>
-                <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe"></div>
-            <div><label style="font-size:11px;color:var(--text2);display:block;margin-bottom:6px">
-                Progresso: <strong id="mt-pct-lbl" style="color:${g.cor}">${t.progresso}%</strong></label>
-                <input id="mt-prog" type="range" min="0" max="100" value="${t.progresso}" style="width:100%;accent-color:${g.cor}"
-                    oninput="document.getElementById('mt-pct-lbl').textContent=this.value+'%'"></div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">
+                        Semana de Inicio &nbsp;<span style="color:var(--text3); font-size:10px">(S1=${fmtSemana(0)})</span>
+                    </label>
+                    <input id="mt-inicio" class="crud-input" type="number" min="0" value="${tIni}"
+                        oninput="atualizarPreviewTarefa()">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duracao (semanas)</label>
+                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}"
+                        oninput="atualizarPreviewTarefa()">
+                </div>
+            </div>
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                        padding:8px 12px; font-size:11px; color:var(--accent)" id="mt-preview">
+                Periodo: ${fmtSemana(tIni)} ate ${fmtSemana(tIni + t.duracao)}
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsavel</label>
+                <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe">
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:6px">
+                    Progresso: <strong id="mt-pct-lbl" style="color:${g.cor}">${t.progresso}%</strong>
+                </label>
+                <input id="mt-prog" type="range" min="0" max="100" value="${t.progresso}"
+                    style="width:100%; accent-color:${g.cor}"
+                    oninput="document.getElementById('mt-pct-lbl').textContent=this.value+'%'">
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
                 <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarTarefa(${gIndex},${novo ? 'null' : tIndex})">${novo ? '+ Adicionar Tarefa' : 'Salvar Alterações'}</button>
+                <button class="btn btn-primary" onclick="salvarTarefa(${gIndex}, ${novo ? 'null' : tIndex})">
+                    ${novo ? '+ Adicionar Tarefa' : 'Salvar Alteracoes'}
+                </button>
             </div>
         </div>`);
 }
 
 function atualizarPreviewTarefa() {
-    const ini = parseInt(document.getElementById('mt-inicio').value)||0, dur = parseInt(document.getElementById('mt-dur').value)||1;
-    const el = document.getElementById('mt-preview');
-    if (el) el.textContent = 'Período: ' + fmtSemana(ini) + ' → ' + fmtSemana(ini + dur);
+    const ini = parseInt(document.getElementById('mt-inicio').value) || 0;
+    const dur = parseInt(document.getElementById('mt-dur').value)    || 1;
+    const el  = document.getElementById('mt-preview');
+    if (el) el.textContent = 'Periodo: ' + fmtSemana(ini) + ' ate ' + fmtSemana(ini + dur);
 }
 
 function salvarTarefa(gIndex, tIndex) {
     const nome = document.getElementById('mt-nome').value.trim();
     if (!nome) { mostrarNotificacao('Informe o nome da tarefa!', 'erro'); return; }
-    const obj = { nome, inicio: parseInt(document.getElementById('mt-inicio').value)||0, duracao: parseInt(document.getElementById('mt-dur').value)||2, responsavel: document.getElementById('mt-resp').value.trim()||'Equipe', progresso: parseInt(document.getElementById('mt-prog').value)||0 };
-    if (tIndex === null) { dados.grupos[gIndex].tarefas.push(obj); mostrarNotificacao('Tarefa "' + obj.nome + '" adicionada!', 'success'); }
-    else { Object.assign(dados.grupos[gIndex].tarefas[tIndex], obj); mostrarNotificacao('Tarefa atualizada!', 'success'); }
-    marcarAlterado(); fecharModal(); renderizarGantt();
+    const obj = {
+        nome,
+        inicio:      parseInt(document.getElementById('mt-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mt-dur').value)    || 2,
+        responsavel: document.getElementById('mt-resp').value.trim()      || 'Equipe',
+        progresso:   parseInt(document.getElementById('mt-prog').value)   || 0
+    };
+    if (tIndex === null) {
+        dados.grupos[gIndex].tarefas.push(obj);
+        mostrarNotificacao('Tarefa "' + obj.nome + '" adicionada!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex].tarefas[tIndex], obj);
+        mostrarNotificacao('Tarefa atualizada!', 'success');
+    }
+    marcarAlterado();
+    fecharModal();
+    renderizarGantt();
 }
 
 function excluirTarefa(gIndex, tIndex) {
-    if (confirm('Excluir a tarefa "' + dados.grupos[gIndex].tarefas[tIndex].nome + '"?')) {
-        dados.grupos[gIndex].tarefas.splice(tIndex, 1); marcarAlterado(); renderizarGantt();
+    const nome = dados.grupos[gIndex].tarefas[tIndex].nome;
+    if (confirm('Excluir a tarefa "' + nome + '"?')) {
+        dados.grupos[gIndex].tarefas.splice(tIndex, 1);
+        marcarAlterado();
+        renderizarGantt();
         mostrarNotificacao('Tarefa excluída!', 'success');
     }
 }
+
 function adicionarGrupo() { abrirModalGrupo(null); }
+function adicionarTarefa(gIndex) { abrirModalTarefa(gIndex, null); }
+
 function excluirGrupo(gIndex) {
     if (confirm('Excluir o grupo "' + dados.grupos[gIndex].nome + '" e todas as suas tarefas?')) {
-        dados.grupos.splice(gIndex, 1); marcarAlterado(); renderizarGantt();
-        mostrarNotificacao('Grupo excluído!', 'success');
+        dados.grupos.splice(gIndex, 1);
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Grupo excluído!');
     }
 }
 
-// ✅ CORRIGIDO: exportar agora usa t.inicio (data real da tarefa) e não g.inicio
 function exportarCronograma() {
     const linhas = [];
     dados.grupos.forEach(g => {
         linhas.push({ Grupo: g.nome, Tarefa: '', Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + g.duracao), Duracao: g.duracao, Progresso: calcularProgressoGrupo(g) + '%' });
         g.tarefas.forEach(t => {
-            linhas.push({ Grupo: g.nome, Tarefa: t.nome, Inicio: fmtSemana(t.inicio), Fim: fmtSemana(t.inicio + (t.duracao||1)), Duracao: t.duracao, Progresso: t.progresso + '%' });
+            linhas.push({ Grupo: g.nome, Tarefa: t.nome, Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + t.duracao), Duracao: t.duracao, Progresso: t.progresso + '%' });
         });
     });
+    const ws = XLSX.utils.json_to_sheet(linhas);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(linhas), 'Cronograma');
+    XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
     XLSX.writeFile(wb, 'cronograma-torre-liris.xlsx');
-    mostrarNotificacao('Cronograma exportado!', 'success');
+    mostrarNotificacao('Cronograma exportado!');
 }
 
 // ==================== ORÇAMENTO ====================
-// ✅ CORRIGIDO: função agora APENAS retorna HTML (sem manipular DOM diretamente)
 function renderizarOrcamentoAdmin() {
     const total = dados.orcamento.reduce((acc, item) => acc + (item.valor || 0), 0);
+    document.querySelector('.main') && (document.querySelector('.main').innerHTML = `
+        <div class="save-bar">
+            <div class="save-status">
+                <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
+                <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
+            </div>
+            <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
+        </div>
+        ${_htmlOrcamento(total)}`);
+    return _htmlOrcamento(total);
+}
+
+function _htmlOrcamento(total) {
     return `
     <div class="page-header">
         <div>
@@ -809,34 +1187,44 @@ function renderizarOrcamentoAdmin() {
     <div class="crud-container">
         ${dados.orcamento.map((item, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${item.descricao}" placeholder="Descrição"
-                onchange="dados.orcamento[${index}].descricao=this.value;marcarAlterado();">
-            <input class="crud-input" type="number" value="${item.valor}" placeholder="Valor (R$)"
-                onchange="dados.orcamento[${index}].valor=parseFloat(this.value)||0;marcarAlterado();">
+            <input class="crud-input" value="${item.descricao}"
+                onchange="dados.orcamento[${index}].descricao=this.value; marcarAlterado();">
+            <input class="crud-input" type="number" value="${item.valor}"
+                onchange="dados.orcamento[${index}].valor=parseFloat(this.value)||0; marcarAlterado();">
             <button class="btn btn-danger" onclick="excluirOrcamento(${index})">🗑️</button>
         </div>`).join('')}
     </div>`;
 }
 
 function adicionarItemOrcamento() {
-    dados.orcamento.push({ id: 'o' + Date.now(), descricao: 'Novo Item', valor: 0 });
-    marcarAlterado(); renderizarAdmin();
+    dados.orcamento.push({ descricao: 'Novo Item', valor: 0 });
+    marcarAlterado();
+    renderizarAdmin();
 }
+
 function excluirOrcamento(index) {
-    if (confirm('Excluir este item?')) { dados.orcamento.splice(index, 1); marcarAlterado(); renderizarAdmin(); mostrarNotificacao('Item excluído!', 'success'); }
+    if (confirm('Excluir este item?')) {
+        dados.orcamento.splice(index, 1);
+        marcarAlterado();
+        renderizarAdmin();
+        mostrarNotificacao('Item excluído!');
+    }
 }
 
 // ==================== FOTOS ====================
 function renderizarFotosAdmin() {
     return `
     <div class="page-header">
-        <div><div class="page-title">📸 Fotos da Obra</div><div class="page-sub">${dados.fotos.length} foto(s)</div></div>
+        <div>
+            <div class="page-title">📸 Fotos da Obra</div>
+            <div class="page-sub">${dados.fotos.length} foto(s)</div>
+        </div>
         <button class="btn btn-primary" onclick="adicionarFoto()">+ Adicionar Foto</button>
     </div>
     <div class="photo-grid">
         ${dados.fotos.map((foto, index) => `
         <div class="photo-card">
-            <img src="${foto.url}" alt="${foto.ambiente}" loading="lazy">
+            <img src="${foto.url}" alt="${foto.ambiente}">
             <div class="photo-card-info">
                 <div class="photo-card-ambiente">${foto.ambiente}</div>
                 <div class="photo-card-data">${foto.data}</div>
@@ -845,16 +1233,20 @@ function renderizarFotosAdmin() {
         </div>`).join('')}
     </div>`;
 }
+
 function adicionarFoto() {
-    const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
     input.onchange = function(e) {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(ev) {
             abrirModal('Adicionar Foto', `
-                <div style="display:grid;gap:12px">
-                    <img src="${ev.target.result}" style="width:100%;border-radius:10px;max-height:300px;object-fit:cover">
-                    <select id="fotoAmbiente" class="crud-input">${dados.ambientes.map(a => '<option value="' + a + '">' + a + '</option>').join('')}</select>
+                <div style="display:grid; gap:12px">
+                    <img src="${ev.target.result}" style="width:100%; border-radius:10px; max-height:300px; object-fit:cover">
+                    <select id="fotoAmbiente" class="crud-input">
+                        ${dados.ambientes.map(a => `<option value="${a}">${a}</option>`).join('')}
+                    </select>
                     <button class="btn btn-primary" onclick="confirmarFoto('${ev.target.result}')">💾 Salvar Foto</button>
                 </div>`);
         };
@@ -862,212 +1254,548 @@ function adicionarFoto() {
     };
     input.click();
 }
+
 function confirmarFoto(url) {
-    dados.fotos.push({ url, ambiente: document.getElementById('fotoAmbiente').value, data: fmtData(new Date()) });
-    marcarAlterado(); fecharModal(); renderizarAdmin(); mostrarNotificacao('Foto adicionada!', 'success');
+    const ambiente = document.getElementById('fotoAmbiente').value;
+    dados.fotos.push({ url, ambiente, data: fmtData(new Date()) });
+    marcarAlterado(); fecharModal(); renderizarAdmin();
+    mostrarNotificacao('Foto adicionada!');
 }
+
 function excluirFoto(index) {
-    if (confirm('Excluir esta foto?')) { dados.fotos.splice(index, 1); marcarAlterado(); renderizarAdmin(); mostrarNotificacao('Foto excluída!', 'success'); }
+    if (confirm('Excluir esta foto?')) {
+        dados.fotos.splice(index, 1);
+        marcarAlterado(); renderizarAdmin();
+        mostrarNotificacao('Foto excluída!');
+    }
 }
 
 // ==================== AMBIENTES ====================
 function renderizarAmbientesAdmin() {
     return `
-    <div class="page-header"><div class="page-title">🏠 Ambientes</div>
-        <button class="btn btn-primary" onclick="adicionarAmbiente()">+ Adicionar Ambiente</button></div>
+    <div class="page-header">
+        <div class="page-title">🏠 Ambientes</div>
+        <button class="btn btn-primary" onclick="adicionarAmbiente()">+ Adicionar Ambiente</button>
+    </div>
     <div class="crud-container">
         ${dados.ambientes.map((amb, index) => `
         <div class="crud-card">
-            <input class="crud-input" value="${amb}" onchange="dados.ambientes[${index}]=this.value;marcarAlterado();">
-            <div></div>
+            <input class="crud-input" value="${amb}"
+                onchange="dados.ambientes[${index}]=this.value; marcarAlterado();">
             <button class="btn btn-danger" onclick="excluirAmbiente(${index})">🗑️</button>
         </div>`).join('')}
     </div>`;
 }
-function adicionarAmbiente() { dados.ambientes.push('Novo Ambiente'); marcarAlterado(); renderizarAdmin(); mostrarNotificacao('Ambiente adicionado!', 'success'); }
+
+function adicionarAmbiente() {
+    dados.ambientes.push('Novo Ambiente');
+    marcarAlterado(); renderizarAdmin();
+    mostrarNotificacao('Ambiente adicionado!');
+}
+
 function excluirAmbiente(index) {
-    if (confirm('Excluir este ambiente?')) { dados.ambientes.splice(index, 1); marcarAlterado(); renderizarAdmin(); mostrarNotificacao('Ambiente excluído!', 'success'); }
+    if (confirm('Excluir este ambiente?')) {
+        dados.ambientes.splice(index, 1);
+        marcarAlterado(); renderizarAdmin();
+        mostrarNotificacao('Ambiente excluído!');
+    }
 }
 
 // ==================== IA ASSISTENTE ====================
-function getChaveAtiva() {
-    if (GEMINI_KEY && GEMINI_KEY !== "cole_sua_chave_aqui") return GEMINI_KEY;
-    return localStorage.getItem('gemini_key') || "";
-}
-
 function renderizarIAAdmin() {
-    const chaveOk = !!getChaveAtiva();
     return `
     <div class="page-header">
-        <div><div class="page-title">🤖 IA Assistente</div>
-        <div class="page-sub">Gemini integrado — análise, relatórios e sugestões em tempo real</div></div>
-    </div>
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div style="font-size:12px;color:var(--text2)">Status da chave: <span style="color:${chaveOk?'var(--accent3)':'var(--accent4)'}">${chaveOk ? '✅ Configurada no arquivo' : '❌ Não configurada'}</span></div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input id="ia-key-input" type="password" placeholder="Cole sua chave Gemini aqui"
-                style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;width:280px;outline:none">
-            <button class="btn btn-primary" onclick="salvarChaveIA()" style="font-size:11px;padding:6px 12px">Salvar Chave</button>
+        <div>
+            <div class="page-title">IA Assistente</div>
+            <div class="page-sub">Gemini integrado — analise, relatorios e sugestoes em tempo real</div>
         </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
-        <div class="stat-card" style="cursor:pointer;border-color:rgba(59,130,246,.3)" onclick="acaoIA('relatorio')">
-            <div class="stat-label">Relatório Semanal</div><div style="font-size:12px;color:var(--text2);margin-top:4px">Texto pronto para enviar ao cliente</div>
-            <button class="btn btn-ghost" style="margin-top:12px;font-size:11px;width:100%">Gerar Relatório</button></div>
-        <div class="stat-card" style="cursor:pointer;border-color:rgba(244,63,94,.3)" onclick="acaoIA('alertas')">
-            <div class="stat-label">Análise de Alertas</div><div style="font-size:12px;color:var(--text2);margin-top:4px">Tarefas atrasadas e riscos</div>
-            <button class="btn btn-ghost" style="margin-top:12px;font-size:11px;width:100%">Analisar Cronograma</button></div>
-        <div class="stat-card" style="cursor:pointer;border-color:rgba(16,185,129,.3)" onclick="acaoIA('materiais')">
-            <div class="stat-label">Lista de Materiais</div><div style="font-size:12px;color:var(--text2);margin-top:4px">Sugestão por etapa</div>
-            <button class="btn btn-ghost" style="margin-top:12px;font-size:11px;width:100%">Sugerir Materiais</button></div>
-        <div class="stat-card" style="cursor:pointer;border-color:rgba(232,160,32,.3)" onclick="acaoIA('prazo')">
-            <div class="stat-label">Análise de Prazo</div><div style="font-size:12px;color:var(--text2);margin-top:4px">Prazo realista vs progresso</div>
-            <button class="btn btn-ghost" style="margin-top:12px;font-size:11px;width:100%">Avaliar Prazo</button></div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-        <div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text2)">Pergunte qualquer coisa sobre a obra</div>
-        <div id="ia-chat" style="height:280px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
-            <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);border-left:3px solid var(--accent2)">
-                Olá! Sou o assistente de IA da Torre L'iris. Como posso ajudar?</div>
+
+    <!-- STATUS DA CHAVE -->
+    <div id="ia-status-bar" style="background:var(--surface2); border:1px solid var(--border);
+        border-radius:10px; padding:12px 16px; margin-bottom:16px;
+        display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px">
+        <div style="font-size:12px; color:var(--text2)">
+            Status da chave: <span id="ia-key-status" style="color:var(--accent)">verificando...</span>
         </div>
-        <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px">
-            <input id="ia-pergunta" class="crud-input" placeholder="Ex: Quais tarefas estão atrasadas?" style="flex:1" onkeydown="if(event.key==='Enter') enviarPerguntaIA()">
-            <button class="btn btn-primary" onclick="enviarPerguntaIA()" style="white-space:nowrap">Enviar</button>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+            <input id="ia-key-input" type="password" placeholder="Cole sua chave Gemini aqui para testar"
+                style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                       padding:6px 10px; color:var(--text); font-size:12px; width:280px; outline:none">
+            <button class="btn btn-primary" onclick="salvarChaveIA()" style="font-size:11px; padding:6px 12px">
+                Salvar Chave
+            </button>
+        </div>
+    </div>
+
+    <!-- ACOES RAPIDAS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:20px">
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(59,130,246,.3)"
+            onclick="acaoIA('relatorio')">
+            <div class="stat-label">Relatorio Semanal</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Gera texto de atualizacao para enviar ao cliente baseado no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Gerar Relatorio
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(244,63,94,.3)"
+            onclick="acaoIA('alertas')">
+            <div class="stat-label">Analise de Alertas</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Detecta tarefas atrasadas, conflitos de sequencia e riscos no cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Analisar Cronograma
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(16,185,129,.3)"
+            onclick="acaoIA('materiais')">
+            <div class="stat-label">Lista de Materiais</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Sugere lista de materiais e mao de obra com base nas etapas do cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Sugerir Materiais
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(232,160,32,.3)"
+            onclick="acaoIA('prazo')">
+            <div class="stat-label">Analise de Prazo</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Avalia se o prazo e realista e sugere ajustes com base no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Avaliar Prazo
+            </button>
+        </div>
+
+    </div>
+
+    <!-- CHAT LIVRE -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden">
+        <div style="padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+                    font-size:12px; font-weight:600; color:var(--text2)">
+            Pergunte qualquer coisa sobre a obra
+        </div>
+        <div id="ia-chat" style="height:280px; overflow-y:auto; padding:16px;
+                                  display:flex; flex-direction:column; gap:12px">
+            <div style="background:var(--surface2); border-radius:8px; padding:12px;
+                        font-size:12px; color:var(--text2); border-left:3px solid var(--accent2)">
+                Ola! Sou o assistente de IA da Torre L'iris. Posso analisar o cronograma,
+                gerar relatorios para o cliente, sugerir materiais ou responder qualquer
+                pergunta sobre a obra. Como posso ajudar?
+            </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px">
+            <input id="ia-pergunta" class="crud-input" placeholder="Ex: Quais tarefas estao atrasadas? Gere um resumo da obra..."
+                style="flex:1" onkeydown="if(event.key==='Enter') enviarPerguntaIA()">
+            <button class="btn btn-primary" onclick="enviarPerguntaIA()" style="font-size:12px; white-space:nowrap">
+                Enviar
+            </button>
         </div>
     </div>`;
 }
 
-function salvarChaveIA() {
-    const val = document.getElementById('ia-key-input').value.trim();
-    if (!val) { mostrarNotificacao('Cole a chave antes de salvar', 'erro'); return; }
-    localStorage.setItem('gemini_key', val);
-    mostrarNotificacao('Chave Gemini salva!', 'success');
-    renderizarAdmin();
-}
+// Status IA — sem chave necessaria
+setTimeout(() => {
+    const el = document.getElementById('ia-key-status');
+    if (el) { el.textContent = "Claude ativo — sem chave necessaria"; el.style.color = "var(--accent3)"; }
+}, 200);
 
 async function acaoIA(tipo) {
-    const prompts = {
-        relatorio: "Voce e um assistente de gestao de obra. Escreva um relatorio semanal profissional e cordial para enviar ao cliente via WhatsApp. Maximo 200 palavras.\n\n" + contextoObra(),
-        alertas:   "Voce e especialista em obras. Identifique tarefas atrasadas, conflitos e riscos no cronograma. Seja objetivo.\n\n" + contextoObra(),
-        materiais: "Voce e mestre de obras. Liste materiais necessarios por etapa com unidade de medida.\n\n" + contextoObra(),
-        prazo:     "O prazo e realista dado o progresso atual? Calcule o desvio acumulado. Seja direto.\n\n" + contextoObra()
-    };
-    await enviarParaChat(prompts[tipo]);
+    let prompt = "";
+    if (tipo === "relatorio") {
+        prompt = "Voce e um assistente de gestao de obra. Com base nos dados abaixo, escreva um relatorio semanal " +
+            "profissional e cordial para enviar ao cliente via WhatsApp. Use linguagem simples, destaque o que foi " +
+            "concluido, o que esta em andamento e a previsao proxima. Maximo 200 palavras. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "alertas") {
+        prompt = "Voce e um especialista em gestao de obras. Analise o cronograma abaixo e identifique: " +
+            "1) Tarefas que parecem atrasadas (progresso baixo vs semana atual), " +
+            "2) Possiveis conflitos de sequencia entre tarefas, " +
+            "3) Grupos com risco de nao cumprir o prazo. Seja objetivo e pratico. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "materiais") {
+        prompt = "Voce e um mestre de obras experiente. Com base nas etapas e tarefas do cronograma abaixo, " +
+            "gere uma lista resumida de materiais e servicos de mao de obra necessarios, agrupados por etapa. " +
+            "Inclua unidade de medida sugerida (m2, m, un, kg, etc). Seja pratico. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "prazo") {
+        prompt = "Voce e um consultor de obras. Analise o progresso atual vs a semana em que estamos e diga: " +
+            "1) O prazo final e realista? " +
+            "2) Qual o percentual esperado de conclusao para esta semana? " +
+            "3) Se houver desvio, quanto tempo de atraso esta acumulando? " +
+            "Seja direto e use os dados reais. Responda em portugues.\n\n" + contextoObra();
+    }
+    await enviarParaChat(prompt, tipo);
 }
 
 async function enviarPerguntaIA() {
-    const input = document.getElementById('ia-pergunta'); const q = input.value.trim(); if (!q) return; input.value = '';
-    await enviarParaChat("Assistente de gestao de obras. Responda em portugues.\n\nDADOS:\n" + contextoObra() + "\n\nPERGUNTA: " + q, q);
+    const input = document.getElementById('ia-pergunta');
+    const pergunta = input.value.trim();
+    if (!pergunta) return;
+    input.value = '';
+    const prompt = "Voce e um assistente especialista em gestao de obras. Responda a pergunta abaixo com base " +
+        "nos dados da obra. Seja objetivo e pratico. Responda em portugues.\n\nDADOS DA OBRA:\n" + contextoObra() +
+        "\n\nPERGUNTA DO USUARIO:\n" + pergunta;
+    await enviarParaChat(prompt, 'usuario', pergunta);
 }
 
-async function enviarParaChat(prompt, textoUsuario) {
-    const chat = document.getElementById('ia-chat'); if (!chat) return;
+async function enviarParaChat(prompt, tipo, textoUsuario) {
+    const chat = document.getElementById('ia-chat');
+    if (!chat) return;
+
+    // Mensagem do usuario (chat livre)
     if (textoUsuario) {
-        const mu = document.createElement('div');
-        mu.style.cssText = "background:rgba(232,160,32,.1);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text);border-left:3px solid var(--accent)";
-        mu.textContent = textoUsuario; chat.appendChild(mu);
+        const msgUser = document.createElement('div');
+        msgUser.style.cssText = "background:rgba(232,160,32,.1); border-radius:8px; padding:10px 12px;" +
+            "font-size:12px; color:var(--text); border-left:3px solid var(--accent);";
+        msgUser.textContent = textoUsuario;
+        chat.appendChild(msgUser);
     }
-    const ld = document.createElement('div');
-    ld.style.cssText = "background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);border-left:3px solid var(--accent2)";
-    ld.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block">Analisando com IA...</span>';
-    chat.appendChild(ld); chat.scrollTop = chat.scrollHeight;
 
-    const chave = getChaveAtiva();
+    // Loader
+    const loader = document.createElement('div');
+    loader.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px;" +
+        "font-size:12px; color:var(--text2); border-left:3px solid var(--accent2);";
+    loader.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block">Analisando com IA...</span>';
+    chat.appendChild(loader);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Chama Claude (Anthropic) — sem chave necessaria quando aberto no claude.ai
     let resposta;
-    if (!chave) { resposta = "Chave não configurada. Cole sua chave Gemini no campo acima e clique em Salvar Chave."; }
-    else {
-        try {
-            const r = await fetch(GEMINI_URL + chave, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }) });
-            const d = await r.json();
-            resposta = d.error ? "Erro: " + d.error.message : (d.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.");
-        } catch(e) { resposta = "Erro de conexão: " + e.message; }
+    try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-6",
+                max_tokens: 1024,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await resp.json();
+        if (data.error) resposta = "Erro: " + (data.error.message || JSON.stringify(data.error));
+        else resposta = data.content?.[0]?.text || "Sem resposta.";
+    } catch(e) {
+        resposta = "Erro de conexao: " + e.message;
     }
-    chat.removeChild(ld);
-    const mi = document.createElement('div');
-    mi.style.cssText = "background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text);border-left:3px solid var(--accent2);white-space:pre-wrap;line-height:1.6";
-    mi.textContent = resposta; chat.appendChild(mi); chat.scrollTop = chat.scrollHeight;
+
+    // Remove loader e mostra resposta
+    chat.removeChild(loader);
+    const msgIA = document.createElement('div');
+    msgIA.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px;" +
+        "font-size:12px; color:var(--text); border-left:3px solid var(--accent2); white-space:pre-wrap; line-height:1.6";
+    msgIA.textContent = resposta;
+    chat.appendChild(msgIA);
+    chat.scrollTop = chat.scrollHeight;
 }
 
-// ==================== ÁREA DO CLIENTE ====================
+// ==================== ÁREA DO CLIENTE (VERSÃO ANIMADA) ====================
 function renderizarCliente() {
     const progGeral = calcularProgressoGeral();
+    const totalTarefas = dados.grupos.reduce((s,g)=>s+g.tarefas.length,0);
+    const concluidas  = dados.grupos.reduce((s,g)=>s+g.tarefas.filter(t=>t.progresso>=100).length,0);
+    const semAtual    = getSemanaAtual();
+
+    // Mensagem dinâmica de saudação baseada no progresso
+    let msgBoas, emojiBoas;
+    if (progGeral === 0)        { msgBoas = "Sua obra está prestes a começar!";    emojiBoas = "🚀"; }
+    else if (progGeral < 25)    { msgBoas = "Os trabalhos já começaram!";           emojiBoas = "⛏️"; }
+    else if (progGeral < 50)    { msgBoas = "Estamos avançando muito bem!";         emojiBoas = "💪"; }
+    else if (progGeral < 75)    { msgBoas = "Já passamos da metade, quase lá!";     emojiBoas = "🏗️"; }
+    else if (progGeral < 100)   { msgBoas = "Reta final, falta pouco!";             emojiBoas = "🎯"; }
+    else                         { msgBoas = "Obra concluída, parabéns!";            emojiBoas = "🎉"; }
+
     document.getElementById('app').innerHTML = `
-    <div class="topbar">
-        <div class="logo"><div class="logo-badge">C</div> ${dados.titulo}</div>
-        <button class="btn btn-ghost" onclick="location.reload()">🔐 Sair</button>
+    <!-- TOPBAR CLIENTE -->
+    <div style="background:linear-gradient(135deg,#0d0f14 0%,#13161e 100%);
+                border-bottom:1px solid var(--border); padding:0 24px; height:60px;
+                display:flex; align-items:center; justify-content:space-between;
+                position:sticky; top:0; z-index:100">
+        <div style="display:flex; align-items:center; gap:12px">
+            <div style="width:36px; height:36px; background:var(--accent); border-radius:10px;
+                        display:flex; align-items:center; justify-content:center;
+                        font-size:18px; animation: bobbing 2s ease-in-out infinite">🏠</div>
+            <div>
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:16px">${dados.titulo}</div>
+                <div style="font-size:10px; color:var(--text3)">${dados.endereco}</div>
+            </div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:11px" onclick="location.reload()">Sair</button>
     </div>
-    <div class="main">
-        <div class="client-data-card">
-            <div class="client-data-grid">
-                <div class="client-data-item"><div class="client-data-label">Cliente</div><div class="client-data-value" style="color:var(--accent)">${dados.cliente.nome}</div></div>
-                <div class="client-data-item"><div class="client-data-label">Contato</div><div class="client-data-value">${dados.cliente.telefone}</div></div>
-                <div class="client-data-item"><div class="client-data-label">Arquiteto</div><div class="client-data-value">${dados.obra.arquiteto}</div></div>
-                <div class="client-data-item"><div class="client-data-label">Início da Obra</div><div class="client-data-value" style="color:var(--accent3)">${fmtData(getDataInicio())}</div></div>
-                <div class="client-data-item"><div class="client-data-label">Previsão de Término</div><div class="client-data-value" style="color:var(--accent)">${calcularPrevisao()}</div></div>
-                <div class="client-data-item"><div class="client-data-label">Duração</div><div class="client-data-value">${dados.duracaoTotal} semanas</div></div>
+
+    <div style="max-width:780px; margin:0 auto; padding:24px 20px; display:flex; flex-direction:column; gap:20px">
+
+        <!-- BOAS VINDAS ANIMADO -->
+        <div style="background:linear-gradient(135deg,rgba(232,160,32,.12),rgba(59,130,246,.08));
+                    border:1px solid rgba(232,160,32,.25); border-radius:20px; padding:24px;
+                    animation:fadeSlideDown .6s ease forwards; opacity:0">
+            <div style="font-size:32px; margin-bottom:8px">${emojiBoas}</div>
+            <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:22px; margin-bottom:4px">
+                Olá, ${dados.cliente.nome.split(' ')[0]}!
+            </div>
+            <div style="font-size:14px; color:var(--text2); margin-bottom:16px">${msgBoas}</div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap">
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Arquiteto</div>
+                    <div style="font-size:13px; font-weight:500">${dados.obra.arquiteto}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Início</div>
+                    <div style="font-size:13px; font-weight:500; color:var(--accent3)">${fmtData(getDataInicio())}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Término Previsto</div>
+                    <div style="font-size:13px; font-weight:500; color:var(--accent)">${calcularPrevisao()}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Área</div>
+                    <div style="font-size:13px; font-weight:500">${dados.obra.area}</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card" style="margin-bottom:20px">
-            <div class="stat-label">Progresso Geral da Obra</div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-                <div class="stat-value" style="color:var(--accent3)">${progGeral}%</div>
-                <div style="font-size:12px;color:var(--text2)">${dados.grupos.reduce((s,g)=>s+g.tarefas.length,0)} etapas</div>
+
+        <!-- BARRA DE PROGRESSO GERAL COM OPERÁRIO -->
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:24px;
+                    animation:fadeSlideDown .7s ease forwards; opacity:0; animation-delay:.1s">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px">
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:16px">
+                    Andamento Geral da Obra
+                </div>
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:28px; color:var(--accent3)">
+                    ${progGeral}%
+                </div>
             </div>
-            <div class="stat-bar-bg"><div class="stat-bar-fill animated-progress" style="width:${progGeral}%"></div></div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:16px">
+                ${concluidas} de ${totalTarefas} etapas concluídas · Semana ${semAtual > 0 ? semAtual : 0} de ${dados.duracaoTotal}
+            </div>
+
+            <!-- BARRA COM OPERÁRIO ANIMADO -->
+            <div style="position:relative; height:48px; background:var(--surface2);
+                        border-radius:24px; overflow:visible; border:1px solid var(--border)">
+
+                <!-- Preenchimento da barra -->
+                <div id="barra-prog" style="position:absolute; top:0; left:0; bottom:0;
+                    width:0%; background:linear-gradient(90deg,var(--accent3),var(--accent));
+                    border-radius:24px; transition:width 1.5s cubic-bezier(.4,0,.2,1);
+                    box-shadow:0 0 20px rgba(232,160,32,.3)">
+                    <!-- Brilho animado -->
+                    <div style="position:absolute; top:0; right:0; bottom:0; width:60px;
+                                background:linear-gradient(90deg,transparent,rgba(255,255,255,.15));
+                                border-radius:0 24px 24px 0"></div>
+                </div>
+
+                <!-- OPERÁRIO NA PONTA DA BARRA -->
+                <div id="operario-wrap" style="position:absolute; top:50%; transform:translateY(-60%);
+                    left:0%; transition:left 1.5s cubic-bezier(.4,0,.2,1); z-index:10">
+                    <div id="operario" style="font-size:28px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+                        animation: operarioCaminha 0.4s steps(1) infinite">🦺</div>
+                </div>
+
+                <!-- Marcadores de 25%, 50%, 75% -->
+                <div style="position:absolute; top:0; bottom:0; left:25%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+                <div style="position:absolute; top:0; bottom:0; left:50%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+                <div style="position:absolute; top:0; bottom:0; left:75%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+            </div>
+
+            <!-- Labels abaixo da barra -->
+            <div style="display:flex; justify-content:space-between; margin-top:6px;
+                        font-size:10px; color:var(--text3); font-family:'IBM Plex Mono',monospace">
+                <span>Início</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>Conclusão</span>
+            </div>
         </div>
-        <div class="client-timeline">
+
+        <!-- CARDS DE STATUS RÁPIDO -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;
+                    animation:fadeSlideDown .8s ease forwards; opacity:0; animation-delay:.2s">
+            <div style="background:var(--surface); border:1px solid rgba(16,185,129,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">✅</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent3)">${concluidas}</div>
+                <div style="font-size:11px; color:var(--text2)">Etapas Concluídas</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(232,160,32,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">⚙️</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent)">
+                    ${dados.grupos.reduce((s,g)=>s+g.tarefas.filter(t=>t.progresso>0&&t.progresso<100).length,0)}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Em Andamento</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(59,130,246,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">📅</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent2)">
+                    ${Math.max(0, dados.duracaoTotal - Math.max(0, semAtual))}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Semanas Restantes</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(244,63,94,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">🏗️</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:#fb7185">
+                    ${totalTarefas - concluidas}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Etapas Pendentes</div>
+            </div>
+        </div>
+
+        <!-- TÍTULO CRONOGRAMA -->
+        <div style="animation:fadeSlideDown .9s ease forwards; opacity:0; animation-delay:.3s">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px">
+                <div style="width:4px; height:28px; background:var(--accent); border-radius:2px"></div>
+                <div>
+                    <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:18px">
+                        Cronograma da Sua Obra
+                    </div>
+                    <div style="font-size:12px; color:var(--text2)">
+                        Acompanhe abaixo o andamento de cada etapa
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPAS ANIMADAS -->
+        <div style="display:flex; flex-direction:column; gap:12px">
             ${dados.grupos.map((g, i) => {
                 const prog = calcularProgressoGrupo(g);
-                const cls = prog >= 100 ? 'done' : prog > 0 ? 'active' : '';
-                return `<div class="client-item ${cls}" style="animation-delay:${i*0.1}s">
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-                        <div class="dot" style="background:${g.cor};width:10px;height:10px"></div>
-                        <span style="font-weight:600;font-size:14px">${g.nome}</span>
-                        <span style="color:${g.cor};font-weight:700">${prog}%</span>
-                        <span style="color:var(--text3);font-size:11px">${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio + g.duracao)}</span>
+                const icone = prog >= 100 ? '✅' : prog > 0 ? '🔨' : '⏳';
+                const corStatus = prog >= 100 ? 'var(--accent3)' : prog > 0 ? 'var(--accent)' : 'var(--text3)';
+                const labelStatus = prog >= 100 ? 'Concluído' : prog > 0 ? 'Em andamento' : 'Aguardando';
+                return `
+                <div style="background:var(--surface); border:1px solid ${prog>0?g.cor+'44':'var(--border)'};
+                            border-radius:16px; padding:18px; overflow:hidden; position:relative;
+                            animation:fadeSlideDown ${.9+(i*.1)}s ease forwards; opacity:0;
+                            animation-delay:${.3+(i*.08)}s; transition:transform .2s, box-shadow .2s"
+                     onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.3)'"
+                     onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+                    <!-- Faixa de cor lateral -->
+                    <div style="position:absolute; top:0; left:0; bottom:0; width:4px; background:${g.cor}; border-radius:4px 0 0 4px"></div>
+
+                    <div style="padding-left:12px">
+                        <!-- Topo da etapa -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px">
+                            <div style="display:flex; align-items:center; gap:10px">
+                                <span style="font-size:20px">${icone}</span>
+                                <span style="font-family:'Syne',sans-serif; font-weight:700; font-size:15px">${g.nome}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px">
+                                <span style="font-size:10px; background:${corStatus}22; color:${corStatus};
+                                             padding:3px 10px; border-radius:20px; border:1px solid ${corStatus}44">
+                                    ${labelStatus}
+                                </span>
+                                <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:20px; color:${g.cor}">
+                                    ${prog}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Datas -->
+                        <div style="font-size:11px; color:var(--text3); margin-bottom:10px">
+                            ${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio + g.duracao)}
+                            &nbsp;·&nbsp; ${g.duracao} semana${g.duracao>1?'s':''}
+                            &nbsp;·&nbsp; Resp: ${g.responsavel}
+                        </div>
+
+                        <!-- Barra de progresso da etapa -->
+                        <div style="background:var(--surface2); border-radius:10px; height:10px;
+                                    overflow:hidden; margin-bottom:10px; position:relative">
+                            <div style="height:100%; width:${prog}%; background:${g.cor};
+                                        border-radius:10px; transition:width 1.2s ease;
+                                        box-shadow:0 0 10px ${g.cor}66; position:relative">
+                                <!-- shimmer -->
+                                <div style="position:absolute;top:0;right:0;bottom:0;width:30px;
+                                            background:linear-gradient(90deg,transparent,rgba(255,255,255,.3));
+                                            animation:shimmer 1.5s infinite"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tarefas filhas -->
+                        ${g.tarefas.length > 0 ? `
+                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px">
+                            ${g.tarefas.map(t => {
+                                const tIco = t.progresso >= 100 ? '✔' : t.progresso > 0 ? '▶' : '○';
+                                const tCor = t.progresso >= 100 ? 'var(--accent3)' : t.progresso > 0 ? g.cor : 'var(--text3)';
+                                return `<div style="display:flex; align-items:center; gap:5px; background:var(--surface2);
+                                            border-radius:8px; padding:4px 10px; font-size:11px; color:var(--text2)">
+                                    <span style="color:${tCor}; font-size:9px">${tIco}</span>
+                                    ${t.nome}
+                                    <span style="color:${tCor}; font-weight:600">${t.progresso}%</span>
+                                </div>`;
+                            }).join('')}
+                        </div>` : ''}
                     </div>
-                    ${g.tarefas.map(t => `<div style="margin-left:22px;margin-bottom:4px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px"><span style="color:var(--text3)">•</span>${t.nome}<span style="color:${g.cor}">${t.progresso}%</span></div>`).join('')}
-                    <div class="stat-bar-bg" style="margin-top:8px;margin-left:22px"><div class="stat-bar-fill" style="width:${prog}%;background:${g.cor}"></div></div>
                 </div>`;
             }).join('')}
         </div>
+
+        <!-- FOTOS -->
         ${dados.fotos.length > 0 ? `
-        <div class="page-header"><div class="page-title">📸 Fotos da Obra</div></div>
-        <div class="photo-grid">
-            ${dados.fotos.map(foto => `
-            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}','<img src=\\'${foto.url}\\' style=\\'width:100%;border-radius:12px\\'>')">
-                <img src="${foto.url}" alt="${foto.ambiente}" loading="lazy">
-                <div class="photo-card-info"><div class="photo-card-ambiente">${foto.ambiente}</div><div class="photo-card-data">${foto.data}</div></div>
-            </div>`).join('')}
+        <div style="animation:fadeSlideDown 1s ease forwards; opacity:0; animation-delay:.6s">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px">
+                <div style="width:4px; height:28px; background:var(--accent2); border-radius:2px"></div>
+                <div>
+                    <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:18px">Fotos da Obra</div>
+                    <div style="font-size:12px; color:var(--text2)">Veja como está ficando</div>
+                </div>
+            </div>
+            <div class="photo-grid">
+                ${dados.fotos.map(foto => `
+                <div class="photo-card"
+                     onmouseover="this.style.transform='translateY(-6px) scale(1.02)'"
+                     onmouseout="this.style.transform=''"
+                     onclick="abrirModal('Foto — ${foto.ambiente}', '<img src=\\'${foto.url}\\' style=\\'width:100%; border-radius:12px\\'>')">
+                    <img src="${foto.url}" alt="${foto.ambiente}" style="transition:transform .3s">
+                    <div class="photo-card-info">
+                        <div class="photo-card-ambiente">${foto.ambiente}</div>
+                        <div class="photo-card-data">${foto.data}</div>
+                    </div>
+                </div>`).join('')}
+            </div>
         </div>` : ''}
+
+        <!-- RODAPÉ -->
+        <div style="text-align:center; padding:20px 0; font-size:11px; color:var(--text3);
+                    animation:fadeSlideDown 1.1s ease forwards; opacity:0; animation-delay:.7s">
+            ${dados.titulo} · ${dados.obra.tipo} · ${dados.obra.area}<br>
+            Acompanhamento gerado em ${new Date().toLocaleDateString('pt-BR')}
+        </div>
+
     </div>`;
+
+    // Anima a barra e o operário após renderizar
+    setTimeout(() => {
+        const barra = document.getElementById('barra-prog');
+        const op    = document.getElementById('operario-wrap');
+        if (barra) barra.style.width = progGeral + '%';
+        if (op) {
+            // Mantém o operário na ponta da barra (com pequeno offset)
+            const pct = Math.max(2, Math.min(progGeral, 97));
+            op.style.left = 'calc(' + pct + '% - 18px)';
+            // Se progresso for alto, operário corre
+            const operarioEl = document.getElementById('operario');
+            if (operarioEl) {
+                if (progGeral >= 75) operarioEl.style.animationDuration = '0.2s';
+                else if (progGeral >= 40) operarioEl.style.animationDuration = '0.35s';
+            }
+        }
+    }, 300);
 }
 
 // ==================== INIT ====================
-async function iniciar() {
-    // ?cliente → área do cliente direto, sem login
-    const isCliente = location.search.includes('cliente') || location.hash === '#cliente';
-    const cfg = getCfg();
-
-    if (!cfg && !isCliente) {
-        // Primeiro acesso admin → tela de setup do GitHub
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('setupOverlay').style.display = 'flex';
-        return;
-    }
-
-    await carregarDados();
-
-    if (isCliente) {
-        document.getElementById('loginModal').style.display = 'none';
-        renderizarCliente();
-        return;
-    }
-
-    if (cfg && !cfg.local) setLoginStatus('☁️ GitHub Sync ativo — dados sincronizados', 'var(--accent3)');
-}
-
-iniciar();
+carregarDados();
 </script>
 </body>
 </html>
