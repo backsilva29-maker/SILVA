@@ -45,7 +45,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .sidebar-section { margin-bottom: 24px; }
 .sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; padding: 0 16px; margin-bottom: 6px; }
 .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; }
-.sidebar-item:hover { background: var(--surface2); color: var(--text); }
+.sidebar-item:hover { background: var(--surface2); color: var(--text); transform: translateX(4px); }
 .sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,160,32,.06); }
 
 /* MAIN */
@@ -91,7 +91,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .worker-container { position: absolute; top: 50%; transform: translateY(-50%); height: 24px; width: 24px; z-index: 10; transition: left 1s ease-in-out; }
 .worker-emoji { font-size: 18px; animation: walk 0.5s ease-in-out infinite alternate; }
 @keyframes walk { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
-@keyframes workerMove { from { left: 0; } to { left: 100%; } }
 
 /* ANIMATED PROGRESS */
 .animated-progress { position: relative; overflow: hidden; }
@@ -230,13 +229,14 @@ let modoAtual = 'cronograma';
 let ambienteFotoSelecionado = 'todos';
 let dadosAlterados = false;
 
-// ==================== DADOS INICIAIS (BASEADO NO PDF) ====================
+// ==================== DADOS CENTRALIZADOS (SINCRONIZADOS) ====================
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
     dataInicio: "2024-03-01",
     duracaoTotal: 20,
     valor: 234943.54,
+    // DADOS DO CLIENTE (USADO EM TODAS AS TELAS)
     cliente: {
         nome: "Seu Aldebaner",
         email: "aldebaner@email.com",
@@ -248,6 +248,7 @@ let dados = {
         area: "180 m²",
         tipo: "Reforma Completa"
     },
+    // CRONOGRAMA (BASEADO NO PDF)
     grupos: [
         { id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', inicio: 0, duracao: 2, responsavel: 'Admin', tarefas: [
             { id: 't1_1', nome: 'Placa de Obra', duracao: 1, responsavel: 'Admin', progresso: 100 },
@@ -327,14 +328,14 @@ let dados = {
 
 // ==================== PERSISTÊNCIA ====================
 function salvarDados() {
-    localStorage.setItem('obraLiris_v5', JSON.stringify(dados));
+    localStorage.setItem('obraLiris_v6', JSON.stringify(dados));
     dadosAlterados = false;
     atualizarIndicadorSave();
     mostrarNotificacao('Dados salvos!', 'success');
 }
 
 function carregarDados() {
-    const salvos = localStorage.getItem('obraLiris_v5');
+    const salvos = localStorage.getItem('obraLiris_v6');
     if (salvos) dados = JSON.parse(salvos);
 }
 
@@ -358,11 +359,11 @@ function verificarSenha() {
 function entrarComoCliente() {
     admin = false;
     document.getElementById('loginModal').style.display = 'none';
-    carregarDados();
+    carregarDados(); // MESMOS DADOS DO ADMIN
     renderizarCliente();
 }
 
-// ==================== DATAS ====================
+// ==================== DATAS (CALCULADAS AUTOMATICAMENTE) ====================
 const SEMANA_PX = 35;
 
 function fmtDataCompleta(d) {
@@ -463,7 +464,7 @@ function renderizarConteudoAdmin() {
     return (mapas[modoAtual] || mapas.cronograma)();
 }
 
-// ==================== DADOS DO CLIENTE ====================
+// ==================== DADOS DO CLIENTE (ADMIN) - EDITÁVEL ====================
 function renderizarDadosClienteAdmin() {
     return `<div class="page-header"><div class="page-title">👤 Dados do Cliente</div></div>
     <div class="client-data-card">
@@ -578,33 +579,77 @@ function adicionarAmbiente(){dados.ambientes.push('Novo');marcarAlterado();rende
 function editarAmbiente(x,v){dados.ambientes[x]=v;marcarAlterado();}
 function excluirAmbiente(x){if(confirm('Excluir?')){dados.ambientes.splice(x,1);marcarAlterado();renderizarAmbientesAdmin();mostrarNotificacao('Excluído!');}}
 
-// ==================== CLIENTE ====================
-function renderizarCliente(){document.getElementById('app').innerHTML=`<div class="topbar"><div class="logo"><div class="logo-badge">C</div>${dados.titulo}</div><button class="btn btn-ghost btn-small" onclick="location.reload()">🔄 Sair</button></div><div class="main">
-${renderizarDadosClienteView()}${renderizarStatsCliente()}${renderizarCronogramaAnimadoCliente()}${renderizarFotosCliente()}</div>`;}
+// ==================== CLIENTE (USA OS MESMOS DADOS DO ADMIN) ====================
+function renderizarCliente(){
+    document.getElementById('app').innerHTML=`
+    <div class="topbar">
+        <div class="logo"><div class="logo-badge">C</div>${dados.titulo}</div>
+        <button class="btn btn-ghost btn-small" onclick="location.reload()">🔄 Sair</button>
+    </div>
+    <div class="main">
+        ${renderizarDadosClienteView()}
+        ${renderizarStatsCliente()}
+        ${renderizarCronogramaAnimadoCliente()}
+        ${renderizarFotosCliente()}
+    </div>`;
+}
 
-function renderizarDadosClienteView(){return `<div class="client-data-card"><div class="client-data-grid">
-<div class="client-data-item"><div class="client-data-label">Cliente</div><div class="client-data-value" style="color:var(--accent)">👤 ${dados.cliente.nome}</div></div>
-<div class="client-data-item"><div class="client-data-label">Contato</div><div class="client-data-value">📞 ${dados.cliente.telefone}</div></div>
-<div class="client-data-item"><div class="client-data-label">Arquiteto</div><div class="client-data-value">📐 ${dados.obra.arquiteto}</div></div>
-<div class="client-data-item"><div class="client-data-label">Obra</div><div class="client-data-value">🏠 ${dados.obra.area}</div></div>
-</div></div>`;}
+function renderizarDadosClienteView(){
+    return `<div class="client-data-card"><div class="client-data-grid">
+        <div class="client-data-item"><div class="client-data-label">Cliente</div><div class="client-data-value" style="color:var(--accent)">👤 ${dados.cliente.nome}</div></div>
+        <div class="client-data-item"><div class="client-data-label">Contato</div><div class="client-data-value">📞 ${dados.cliente.telefone}</div></div>
+        <div class="client-data-item"><div class="client-data-label">Arquiteto</div><div class="client-data-value">📐 ${dados.obra.arquiteto}</div></div>
+        <div class="client-data-item"><div class="client-data-label">Obra</div><div class="client-data-value">🏠 ${dados.obra.area}</div></div>
+    </div></div>`;
+}
 
-function renderizarStatsCliente(){let t=0,p=0;dados.grupos.forEach(g=>g.tarefas.forEach(ta=>{t++;p+=ta.progresso;}));const m=t?Math.round(p/t):0;return `<div class="stats-row">
-<div class="stat-card"><div class="stat-label">Progresso</div><div class="stat-value" style="color:var(--accent3)">${m}%</div><div class="stat-bar-bg"><div class="stat-bar-fill animated-progress" style="width:${m}%"></div></div></div>
-<div class="stat-card"><div class="stat-label">Previsão</div><div class="stat-value">${calcularPrevisao()}</div></div>
-<div class="stat-card"><div class="stat-label">Etapas</div><div class="stat-value">${dados.grupos.length}</div></div>
-</div>`;}
+function renderizarStatsCliente(){
+    let t=0,p=0;
+    dados.grupos.forEach(g=>g.tarefas.forEach(ta=>{t++;p+=ta.progresso;}));
+    const m=t?Math.round(p/t):0;
+    return `<div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Progresso</div><div class="stat-value" style="color:var(--accent3)">${m}%</div><div class="stat-bar-bg"><div class="stat-bar-fill animated-progress" style="width:${m}%"></div></div></div>
+        <div class="stat-card"><div class="stat-label">Previsão</div><div class="stat-value">${calcularPrevisao()}</div></div>
+        <div class="stat-card"><div class="stat-label">Etapas</div><div class="stat-value">${dados.grupos.length}</div></div>
+    </div>`;
+}
 
-function renderizarCronogramaAnimadoCliente(){return `<div class="page-header"><div class="page-title">📅 Cronograma</div></div><div class="client-timeline">
-${dados.grupos.map((g,i)=>{const prog=g.tarefas.reduce((a,t)=>a+t.progresso,0)/g.tarefas.length;const status=prog>=100?'Concluído':prog>0?'Em andamento':'Pendente';const cls=prog>=100?'concluido':prog>0?'em-andamento':'pendente';const dataIni=getDataInicioEtapa(i);const dataFim=getDataFimEtapa(i);return `<div class="client-item ${cls}">
-<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">${g.nome}</span><span style="color:${g.cor};font-weight:700">${Math.round(prog)}%</span></div>
-<div class="client-dates">📅 ${dataIni} → ${dataFim}</div>
-<div class="client-status status-${cls}">${status}</div>
-<div class="stat-bar-bg" style="margin-top:6px"><div class="stat-bar-fill animated-progress progress-pulse" style="width:${prog}%;background:${g.cor}"></div></div>
-${prog>0&&prog<100?`<div class="worker-container" style="left:${prog}%"><span class="worker-emoji">👷</span></div>`:''}
-</div>`}).join('')}</div>`;}
+function renderizarCronogramaAnimadoCliente(){
+    return `<div class="page-header"><div class="page-title">📅 Cronograma</div></div>
+    <div class="client-timeline">
+        ${dados.grupos.map((g,i)=>{
+            const prog=g.tarefas.reduce((a,t)=>a+t.progresso,0)/g.tarefas.length;
+            const status=prog>=100?'Concluído':prog>0?'Em andamento':'Pendente';
+            const cls=prog>=100?'concluido':prog>0?'em-andamento':'pendente';
+            const dataIni=getDataInicioEtapa(i);
+            const dataFim=getDataFimEtapa(i);
+            return `<div class="client-item ${cls}">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-weight:600">${g.nome}</span>
+                    <span style="color:${g.cor};font-weight:700">${Math.round(prog)}%</span>
+                </div>
+                <div class="client-dates">📅 ${dataIni} → ${dataFim}</div>
+                <div class="client-status status-${cls}">${status}</div>
+                <div class="stat-bar-bg" style="margin-top:6px">
+                    <div class="stat-bar-fill animated-progress progress-pulse" style="width:${prog}%;background:${g.cor}"></div>
+                </div>
+                ${prog>0&&prog<100?`<div class="worker-container" style="left:${prog}%"><span class="worker-emoji">👷</span></div>`:''}
+            </div>`;
+        }).join('')}
+    </div>`;
+}
 
-function renderizarFotosCliente(){return `<div class="page-header"><div class="page-title">📸 Galeria</div></div><div class="photo-grid">${dados.fotos.slice(0,8).map((f,x)=>`<div class="photo-card" style="animation:slideUp 0.4s ${x*0.1}s forwards;opacity:0"><img src="${f.url}"><div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div></div></div>`).join('')}</div>`;}
+function renderizarFotosCliente(){
+    return `<div class="page-header"><div class="page-title">📸 Galeria</div></div>
+    <div class="photo-grid">
+        ${dados.fotos.slice(0,8).map((f,x)=>`
+            <div class="photo-card" style="animation:slideUp 0.4s ${x*0.1}s forwards;opacity:0">
+                <img src="${f.url}">
+                <div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div></div>
+            </div>
+        `).join('')}
+    </div>`;
+}
 
 // ==================== INICIALIZAÇÃO ====================
 carregarDados();
