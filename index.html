@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* ===== RESET E VARIÁVEIS ===== */
 :root {
     --bg: #0d0f14;
     --surface: #13161e;
@@ -454,7 +453,6 @@ function getSemanaAtual() {
     if (isNaN(start.getTime())) return 0;
     return Math.round((new Date() - start) / (7 * 24 * 3600 * 1000));
 }
-const semanaAtual = getSemanaAtual();
 
 // ==================== FUNÇÕES DE PROGRESSO ====================
 function calcularProgressoGrupo(g) {
@@ -542,6 +540,21 @@ function fecharModal() {
     document.getElementById('modalGenerico').classList.remove('open');
 }
 
+// ==================== FUNÇÃO ESPECÍFICA PARA DATA ====================
+function atualizarDataInicio(novaData) {
+    dados.dataInicio = novaData;
+    marcarAlterado();
+    
+    // Atualiza a visualização atual
+    if (admin) {
+        renderizarAdmin();
+    } else {
+        renderizarCliente();
+    }
+    
+    mostrarNotificacao('Data de início atualizada! Cronograma recalculado.', 'success');
+}
+
 // ==================== RENDERIZAÇÃO ADMIN ====================
 function renderizarAdmin() {
     const app = document.getElementById('app');
@@ -605,6 +618,7 @@ function renderizarConteudoAdmin() {
     }
 }
 
+// ==================== DADOS DO CLIENTE (ADMIN) ====================
 function renderizarDadosClienteAdmin() {
     return `
     <div class="page-header">
@@ -644,8 +658,8 @@ function renderizarDadosClienteAdmin() {
                 <input class="client-data-input" value="${dados.obra.tipo}" onchange="dados.obra.tipo=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">📅 Data de Início</label>
-                <input class="client-data-input" type="month" value="${dados.dataInicio.substring(0,7)}" onchange="dados.dataInicio=this.value+'-01'; marcarAlterado();">
+                <label class="client-data-label">📅 Data de Início (DIA/MÊS/ANO)</label>
+                <input class="client-data-input" type="date" value="${dados.dataInicio}" onchange="atualizarDataInicio(this.value)">
             </div>
             <div class="client-data-item">
                 <label class="client-data-label">⏱️ Duração (semanas)</label>
@@ -655,6 +669,7 @@ function renderizarDadosClienteAdmin() {
     </div>`;
 }
 
+// ==================== CRONOGRAMA ====================
 function renderizarCronogramaAdmin() {
     return `
     <div class="page-header">
@@ -687,6 +702,7 @@ function renderizarGantt() {
     
     dados.grupos.forEach((g, gIndex) => {
         const progressoGrupo = calcularProgressoGrupo(g);
+        const semanaAtual = getSemanaAtual();
         
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
@@ -799,6 +815,7 @@ function exportarCronograma() {
     mostrarNotificacao('Cronograma exportado!');
 }
 
+// ==================== ORÇAMENTO ====================
 function renderizarOrcamentoAdmin() {
     const total = dados.orcamento.reduce((acc, item) => acc + item.valor, 0);
     return `
@@ -838,6 +855,7 @@ function excluirOrcamento(index) {
     }
 }
 
+// ==================== FOTOS ====================
 function renderizarFotosAdmin() {
     return `
     <div class="page-header">
@@ -908,6 +926,7 @@ function excluirFoto(index) {
     }
 }
 
+// ==================== AMBIENTES ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -943,6 +962,7 @@ function excluirAmbiente(index) {
 // ==================== CLIENTE ====================
 function renderizarCliente() {
     const progressoGeral = calcularProgressoGeral();
+    const semanaAtual = getSemanaAtual();
     
     let html = `
     <div class="topbar">
@@ -965,8 +985,12 @@ function renderizarCliente() {
                     <div class="client-data-value">${dados.obra.arquiteto}</div>
                 </div>
                 <div class="client-data-item">
-                    <div class="client-data-label">Início/Término</div>
-                    <div class="client-data-value">${fmtSemanaCompleta(0)} - ${calcularPrevisao()}</div>
+                    <div class="client-data-label">Data de Início</div>
+                    <div class="client-data-value">${new Date(dados.dataInicio).toLocaleDateString('pt-BR')}</div>
+                </div>
+                <div class="client-data-item">
+                    <div class="client-data-label">Previsão Término</div>
+                    <div class="client-data-value">${calcularPrevisao()}</div>
                 </div>
             </div>
         </div>
@@ -1010,7 +1034,7 @@ function renderizarCliente() {
         </div>
         <div class="photo-grid">
             ${dados.fotos.map(foto => `
-            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}', '<img src=\'${foto.url}\' style=\'width:100%\'>')">
+            <div class="photo-card" onclick="abrirModal('📸 ${foto.ambiente}', '<img src=\\'${foto.url}\\' style=\\'width:100%\\'>')">
                 <img src="${foto.url}" alt="${foto.ambiente}">
                 <div class="photo-card-info">
                     <div class="photo-card-ambiente">${foto.ambiente}</div>
