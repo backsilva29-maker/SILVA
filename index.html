@@ -355,15 +355,16 @@ body {
 .status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
 /* botões inline do gantt */
 .btn-crud {
-    width: 20px; height: 20px; border-radius: 4px; border: none;
-    cursor: pointer; font-size: 10px; display: inline-flex;
-    align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all .15s; padding: 0;
+    height: 22px; padding: 0 7px; border-radius: 4px; border: none;
+    cursor: pointer; font-size: 10px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .15s; white-space: nowrap;
 }
-.btn-crud-del { background: rgba(244,63,94,.15); color: #fb7185; }
-.btn-crud-del:hover { background: rgba(244,63,94,.35); }
-.btn-crud-edit { background: rgba(59,130,246,.15); color: #60a5fa; }
-.btn-crud-edit:hover { background: rgba(59,130,246,.35); }
+.btn-crud-del { background: rgba(244,63,94,.2); color: #fb7185; border: 1px solid rgba(244,63,94,.3); }
+.btn-crud-del:hover { background: rgba(244,63,94,.4); }
+.btn-crud-edit { background: rgba(59,130,246,.2); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.btn-crud-edit:hover { background: rgba(59,130,246,.4); }
 </style>
 </head>
 <body>
@@ -818,9 +819,9 @@ function renderizarGantt() {
                     <input class="gc-edit" value="${t.nome}"
                         onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
                     <button class="btn-crud btn-crud-edit" title="Editar tarefa"
-                        onclick="abrirModalTarefa(${gIndex}, ${tIndex})">✏️</button>
+                        onclick="abrirModalTarefa(${gIndex}, ${tIndex})">Edit</button>
                     <button class="btn-crud btn-crud-del" title="Excluir tarefa"
-                        onclick="excluirTarefa(${gIndex},${tIndex})">✕</button>
+                        onclick="excluirTarefa(${gIndex},${tIndex})">Del</button>
                 </div>
                 <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
                 <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + t.duracao)}</div>
@@ -851,11 +852,11 @@ function renderizarGantt() {
         actRow.innerHTML = `
             <div class="gc" style="padding-left:12px; gap:6px; flex-wrap:wrap">
                 <button class="btn btn-primary" style="font-size:11px; padding:5px 10px"
-                    onclick="abrirModalTarefa(${gIndex}, null)">＋ Tarefa</button>
+                    onclick="abrirModalTarefa(${gIndex}, null)">+ Tarefa</button>
                 <button class="btn btn-ghost" style="font-size:11px; padding:5px 10px"
-                    onclick="abrirModalGrupo(${gIndex})">✏️ Grupo</button>
+                    onclick="abrirModalGrupo(${gIndex})">Editar Grupo</button>
                 <button class="btn btn-danger" style="font-size:11px; padding:5px 10px"
-                    onclick="excluirGrupo(${gIndex})">🗑️ Grupo</button>
+                    onclick="excluirGrupo(${gIndex})">Excluir Grupo</button>
             </div>
             <div class="gc"></div><div class="gc"></div>
             <div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
@@ -900,7 +901,7 @@ function abrirModalGrupo(gIndex) {
             <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
                 <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
                 <button class="btn btn-primary" onclick="salvarGrupo(${novo ? 'null' : gIndex})">
-                    ${novo ? '➕ Criar Grupo' : '💾 Salvar Alterações'}
+                    ${novo ? '+ Criar Grupo' : 'Salvar Alteracoes'}
                 </button>
             </div>
         </div>`);
@@ -977,7 +978,7 @@ function abrirModalTarefa(gIndex, tIndex) {
             <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
                 <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
                 <button class="btn btn-primary" onclick="salvarTarefa(${gIndex}, ${novo ? 'null' : tIndex})">
-                    ${novo ? '➕ Adicionar Tarefa' : '💾 Salvar Alterações'}
+                    ${novo ? '+ Adicionar Tarefa' : 'Salvar Alteracoes'}
                 </button>
             </div>
         </div>`);
