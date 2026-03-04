@@ -369,7 +369,7 @@ let dadosAlterados = false;
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
-    dataInicio: "2024-08-01",
+    dataInicio: "2024-08-01", // ← ÚNICA DATA QUE IMPORTA
     duracaoTotal: 20,
     valor: 234943.54,
     cliente: {
@@ -540,7 +540,7 @@ function fecharModal() {
     document.getElementById('modalGenerico').classList.remove('open');
 }
 
-// ==================== FUNÇÃO ESPECÍFICA PARA DATA ====================
+// ==================== FUNÇÃO ESPECÍFICA PARA DATA (AGORA NO CRONOGRAMA) ====================
 function atualizarDataInicio(novaData) {
     dados.dataInicio = novaData;
     marcarAlterado();
@@ -618,7 +618,7 @@ function renderizarConteudoAdmin() {
     }
 }
 
-// ==================== DADOS DO CLIENTE (ADMIN) ====================
+// ==================== DADOS DO CLIENTE (ADMIN) - AGORA SEM DATA ====================
 function renderizarDadosClienteAdmin() {
     return `
     <div class="page-header">
@@ -658,10 +658,6 @@ function renderizarDadosClienteAdmin() {
                 <input class="client-data-input" value="${dados.obra.tipo}" onchange="dados.obra.tipo=this.value; marcarAlterado();">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">📅 Data de Início (DIA/MÊS/ANO)</label>
-                <input class="client-data-input" type="date" value="${dados.dataInicio}" onchange="atualizarDataInicio(this.value)">
-            </div>
-            <div class="client-data-item">
                 <label class="client-data-label">⏱️ Duração (semanas)</label>
                 <input class="client-data-input" type="number" value="${dados.duracaoTotal}" onchange="dados.duracaoTotal=parseInt(this.value); marcarAlterado();">
             </div>
@@ -669,15 +665,19 @@ function renderizarDadosClienteAdmin() {
     </div>`;
 }
 
-// ==================== CRONOGRAMA ====================
+// ==================== CRONOGRAMA (COM DATA EDITÁVEL) ====================
 function renderizarCronogramaAdmin() {
     return `
     <div class="page-header">
         <div>
             <div class="page-title">📅 Cronograma Inteligente</div>
-            <div class="page-sub">${dados.endereco} · Início: ${fmtSemanaCompleta(0)} · Previsão: ${calcularPrevisao()}</div>
+            <div class="page-sub">${dados.endereco} · Previsão: ${calcularPrevisao()}</div>
         </div>
         <div style="display:flex; gap:10px">
+            <div style="display:flex; align-items:center; gap:5px; background:var(--surface); padding:5px 10px; border-radius:8px">
+                <span style="color:var(--accent)">📅 Data de Início:</span>
+                <input type="date" value="${dados.dataInicio}" onchange="atualizarDataInicio(this.value)" style="background:var(--bg); border:1px solid var(--border); color:var(--text); padding:5px; border-radius:4px">
+            </div>
             <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
             <button class="btn btn-primary" onclick="adicionarGrupo()">+ Novo Grupo</button>
         </div>
@@ -985,11 +985,11 @@ function renderizarCliente() {
                     <div class="client-data-value">${dados.obra.arquiteto}</div>
                 </div>
                 <div class="client-data-item">
-                    <div class="client-data-label">Data de Início</div>
+                    <div class="client-data-label">Início</div>
                     <div class="client-data-value">${new Date(dados.dataInicio).toLocaleDateString('pt-BR')}</div>
                 </div>
                 <div class="client-data-item">
-                    <div class="client-data-label">Previsão Término</div>
+                    <div class="client-data-label">Previsão</div>
                     <div class="client-data-value">${calcularPrevisao()}</div>
                 </div>
             </div>
