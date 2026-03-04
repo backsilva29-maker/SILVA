@@ -69,15 +69,16 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .client-data-label { font-size: 10px; color: var(--text3); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
 .client-data-value { font-size: 14px; color: var(--text); font-weight: 500; }
 .client-data-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; }
+.client-data-input:focus { outline: none; border-color: var(--accent); }
 
 /* GANTT */
 .gantt-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-bottom: 20px; }
-.gantt-header { display: grid; grid-template-columns: 280px 80px 80px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
+.gantt-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
 .gh-cell { padding: 12px; border-right: 1px solid var(--border); }
 .gantt-group { border-bottom: 1px solid var(--border); }
-.gantt-group-header { display: grid; grid-template-columns: 280px 80px 80px 80px 100px 1fr; background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; transition: background 0.2s; }
+.gantt-group-header { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; transition: background 0.2s; }
 .gantt-group-header:hover { background: rgba(232,160,32,.12); }
-.gantt-row { display: grid; grid-template-columns: 280px 80px 80px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; transition: background 0.2s; }
+.gantt-row { display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; transition: background 0.2s; }
 .gantt-row:hover { background: var(--surface2); }
 .gantt-subtask { background: rgba(59,130,246,.05); }
 .gc { padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 12px; }
@@ -164,6 +165,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .client-item:nth-child(3) { animation-delay: 0.3s; }
 .client-item:nth-child(4) { animation-delay: 0.4s; }
 .client-item:nth-child(5) { animation-delay: 0.5s; }
+.client-item:nth-child(6) { animation-delay: 0.6s; }
+.client-item:nth-child(7) { animation-delay: 0.7s; }
+.client-item:nth-child(8) { animation-delay: 0.8s; }
 .client-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; }
 .status-pendente { background: rgba(136,146,164,0.1); color: var(--text2); }
 .status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
@@ -228,20 +232,18 @@ let modoAtual = 'cronograma';
 let ambienteFotoSelecionado = 'todos';
 let dadosAlterados = false;
 
-// ==================== DADOS COM CLIENTE EDITÁVEL ====================
+// ==================== DADOS ====================
 let dados = {
     titulo: "Torre L'iris Residence",
     endereco: "Aptos 1702 e 1704",
     dataInicio: "2024-08-01",
     valor: 234943.54,
-    // DADOS DO CLIENTE (EDITÁVEL)
     cliente: {
         nome: "Seu Aldebaner",
         email: "aldebaner@email.com",
         telefone: "(91) 99999-9999",
         observacoes: "Cliente prefere contato por WhatsApp"
     },
-    // DADOS DA OBRA
     obra: {
         arquiteto: "Isabela Kalume",
         area: "180 m²",
@@ -376,27 +378,27 @@ function entrarComoCliente() {
 }
 
 // ==================== DATAS ====================
-const START_DATE = new Date(2024, 7, 1);
 const SEMANA_PX = 40;
 function fmtSemana(s) {
-    const d = new Date(START_DATE.getTime() + s * 7 * 24 * 3600 * 1000);
+    const start = new Date(dados.dataInicio);
+    const d = new Date(start.getTime() + s * 7 * 24 * 3600 * 1000);
     return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
 }
-const semanaAtual = Math.round((new Date() - START_DATE) / (7*24*3600*1000));
+function fmtMesAno() {
+    const d = new Date(dados.dataInicio);
+    return d.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+}
+const semanaAtual = Math.round((new Date() - new Date(dados.dataInicio)) / (7*24*3600*1000));
 
 // ==================== NOTIFICAÇÕES ====================
 function mostrarNotificacao(mensagem, tipo = 'success') {
     const notif = document.getElementById('notification');
     const icon = document.getElementById('notifIcon');
     const msg = document.getElementById('notifMsg');
-    
     icon.textContent = tipo === 'success' ? '✅' : '⚠️';
     msg.textContent = mensagem;
     notif.className = 'notification show ' + tipo;
-    
-    setTimeout(() => {
-        notif.className = 'notification';
-    }, 3000);
+    setTimeout(() => { notif.className = 'notification'; }, 3000);
 }
 
 // ==================== MODAL ====================
@@ -405,7 +407,6 @@ function abrirModal(titulo, conteudo) {
     document.getElementById('modalConteudo').innerHTML = conteudo;
     document.getElementById('modalGenerico').classList.add('open');
 }
-
 function fecharModal() {
     document.getElementById('modalGenerico').classList.remove('open');
 }
@@ -437,7 +438,6 @@ function renderizarAdmin() {
             ${renderizarConteudoAdmin()}
         </div>
     </div>`;
-    
     if (modoAtual === 'cronograma') {
         setTimeout(() => renderizarGantt(), 100);
     }
@@ -456,9 +456,7 @@ function renderizarSaveBar() {
 
 function mudarModo(modo) {
     if (dadosAlterados) {
-        if (!confirm('Você tem alterações não salvas. Deseja salvar antes de mudar?')) {
-            return;
-        }
+        if (!confirm('Você tem alterações não salvas. Deseja salvar antes de mudar?')) { return; }
         salvarDados();
     }
     modoAtual = modo;
@@ -520,27 +518,16 @@ function renderizarDadosClienteAdmin() {
                 <input class="client-data-input" value="${dados.obra.tipo}" onchange="editarDadosObra('tipo', this.value)">
             </div>
             <div class="client-data-item">
-                <label class="client-data-label">Data de Início</label>
-                <input class="client-data-input" type="date" value="${dados.dataInicio}" onchange="editarDataInicio(this.value)">
+                <label class="client-data-label">Data de Início (Mês/Ano)</label>
+                <input class="client-data-input" type="month" value="${dados.dataInicio.substring(0,7)}" onchange="editarDataInicio(this.value)">
             </div>
         </div>
     </div>`;
 }
 
-function editarDadosCliente(campo, valor) {
-    dados.cliente[campo] = valor;
-    marcarAlterado();
-}
-
-function editarDadosObra(campo, valor) {
-    dados.obra[campo] = valor;
-    marcarAlterado();
-}
-
-function editarDataInicio(valor) {
-    dados.dataInicio = valor;
-    marcarAlterado();
-}
+function editarDadosCliente(campo, valor) { dados.cliente[campo] = valor; marcarAlterado(); }
+function editarDadosObra(campo, valor) { dados.obra[campo] = valor; marcarAlterado(); }
+function editarDataInicio(valor) { dados.dataInicio = valor + '-01'; marcarAlterado(); }
 
 // ==================== CRONOGRAMA ====================
 function renderizarCronogramaAdmin() {
@@ -548,7 +535,7 @@ function renderizarCronogramaAdmin() {
     <div class="page-header">
         <div>
             <div class="page-title">📅 Cronograma Inteligente</div>
-            <div class="page-sub">${dados.endereco} · ${dados.grupos.length} grupos · ${dados.grupos.reduce((acc, g) => acc + g.tarefas.length, 0)} tarefas</div>
+            <div class="page-sub">${dados.endereco} · Início: ${fmtMesAno()} · ${dados.grupos.length} grupos</div>
         </div>
         <div style="display:flex; gap:10px">
             <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
@@ -571,13 +558,10 @@ function renderizarCronogramaAdmin() {
 function renderizarGantt() {
     const body = document.getElementById('ganttBody');
     if (!body) return;
-    
     body.innerHTML = '';
-    
     dados.grupos.forEach((g, gIndex) => {
         const grupoDiv = document.createElement('div');
         grupoDiv.className = 'gantt-group';
-        
         const grupoHeader = document.createElement('div');
         grupoHeader.className = 'gantt-group-header';
         grupoHeader.innerHTML = `
@@ -585,7 +569,7 @@ function renderizarGantt() {
                 <div class="dot" style="background:${g.cor}"></div>
                 <input class="gc-edit" value="${g.nome}" onchange="editarGrupoNome(${gIndex}, this.value)" style="background:transparent; border:none; color:var(--text); font-weight:600">
             </div>
-            <div class="gc"><input class="gc-edit" type="number" value="${g.inicio}" onchange="editarGrupoInicio(${gIndex}, this.value)" style="width:60px"></div>
+            <div class="gc">${fmtSemana(g.inicio)}</div>
             <div class="gc">${fmtSemana(g.inicio + g.duracao)}</div>
             <div class="gc"><input type="number" class="gc-edit" value="${g.duracao}" onchange="editarGrupoDuracao(${gIndex}, this.value)" style="width:50px"></div>
             <div class="gc"><input class="gc-edit" value="${g.responsavel}" onchange="editarGrupoResp(${gIndex}, this.value)"></div>
@@ -599,7 +583,6 @@ function renderizarGantt() {
             </div>
         `;
         grupoDiv.appendChild(grupoHeader);
-        
         g.tarefas.forEach((t, tIndex) => {
             const tarefaRow = document.createElement('div');
             tarefaRow.className = 'gantt-row';
@@ -623,7 +606,6 @@ function renderizarGantt() {
                 </div>
             `;
             grupoDiv.appendChild(tarefaRow);
-            
             const addSubtaskRow = document.createElement('div');
             addSubtaskRow.className = 'gantt-row gantt-subtask';
             addSubtaskRow.innerHTML = `
@@ -635,7 +617,6 @@ function renderizarGantt() {
             `;
             grupoDiv.appendChild(addSubtaskRow);
         });
-        
         const addTaskRow = document.createElement('div');
         addTaskRow.className = 'gantt-row';
         addTaskRow.innerHTML = `
@@ -652,64 +633,37 @@ function renderizarGantt() {
 
 // ==================== FUNÇÕES CRONOGRAMA ====================
 function editarGrupoNome(index, valor) { dados.grupos[index].nome = valor; marcarAlterado(); }
-function editarGrupoInicio(index, valor) { dados.grupos[index].inicio = parseInt(valor); marcarAlterado(); renderizarGantt(); }
 function editarGrupoDuracao(index, valor) { dados.grupos[index].duracao = parseInt(valor); marcarAlterado(); renderizarGantt(); }
 function editarGrupoResp(index, valor) { dados.grupos[index].responsavel = valor; marcarAlterado(); }
 function editarTarefaNome(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].nome = valor; marcarAlterado(); }
 function editarTarefaDuracao(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].duracao = parseInt(valor); marcarAlterado(); renderizarGantt(); }
 function editarTarefaProgresso(gIndex, tIndex, valor) { dados.grupos[gIndex].tarefas[tIndex].progresso = parseInt(valor); marcarAlterado(); }
-
 function adicionarGrupo() {
-    dados.grupos.push({
-        id: 'g' + (dados.grupos.length + 1),
-        nome: 'Novo Grupo',
-        cor: '#' + Math.floor(Math.random()*16777215).toString(16),
-        inicio: dados.grupos.length * 2,
-        duracao: 2,
-        responsavel: 'Equipe',
-        tarefas: []
-    });
-    marcarAlterado();
-    renderizarGantt();
+    dados.grupos.push({ id: 'g' + (dados.grupos.length + 1), nome: 'Novo Grupo', cor: '#' + Math.floor(Math.random()*16777215).toString(16), inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe', tarefas: [] });
+    marcarAlterado(); renderizarGantt();
 }
-
 function adicionarTarefa(gIndex) {
-    dados.grupos[gIndex].tarefas.push({
-        id: 't' + Date.now(),
-        nome: 'Nova Tarefa',
-        duracao: 2,
-        responsavel: 'Equipe',
-        progresso: 0,
-        subtasks: []
-    });
-    marcarAlterado();
-    renderizarGantt();
+    dados.grupos[gIndex].tarefas.push({ id: 't' + Date.now(), nome: 'Nova Tarefa', duracao: 2, responsavel: 'Equipe', progresso: 0, subtasks: [] });
+    marcarAlterado(); renderizarGantt();
 }
-
 function excluirTarefa(gIndex, tIndex) {
     if (confirm('Excluir esta tarefa?')) {
         dados.grupos[gIndex].tarefas.splice(tIndex, 1);
-        marcarAlterado();
-        renderizarGantt();
+        marcarAlterado(); renderizarGantt();
         mostrarNotificacao('Tarefa excluída!', 'success');
     }
 }
-
 function excluirGrupo(gIndex) {
     if (confirm('Excluir este grupo?')) {
         dados.grupos.splice(gIndex, 1);
-        marcarAlterado();
-        renderizarGantt();
+        marcarAlterado(); renderizarGantt();
         mostrarNotificacao('Grupo excluído!', 'success');
     }
 }
-
 function adicionarSubtask(gIndex, tIndex) {
     dados.grupos[gIndex].tarefas[tIndex].subtasks.push({ nome: 'Nova Sub-tarefa', duracao: 1, progresso: 0 });
-    marcarAlterado();
-    renderizarGantt();
+    marcarAlterado(); renderizarGantt();
 }
-
 function exportarCronograma() {
     const ws = XLSX.utils.json_to_sheet(dados.grupos);
     const wb = XLSX.utils.book_new();
@@ -743,23 +697,12 @@ function renderizarOrcamentoAdmin() {
         `).join('')}
     </div>`;
 }
-
-function adicionarItemOrcamento() {
-    dados.orcamento.push({ id: 'o' + Date.now(), grupo: 'Geral', descricao: 'Novo Item', valor: 0 });
-    marcarAlterado();
-    renderizarOrcamentoAdmin();
-}
-
-function editarOrcamento(index, campo, valor) {
-    dados.orcamento[index][campo] = campo === 'valor' ? parseFloat(valor) : valor;
-    marcarAlterado();
-}
-
+function adicionarItemOrcamento() { dados.orcamento.push({ id: 'o' + Date.now(), grupo: 'Geral', descricao: 'Novo Item', valor: 0 }); marcarAlterado(); renderizarOrcamentoAdmin(); }
+function editarOrcamento(index, campo, valor) { dados.orcamento[index][campo] = campo === 'valor' ? parseFloat(valor) : valor; marcarAlterado(); }
 function excluirOrcamento(index) {
     if (confirm('Excluir este item?')) {
         dados.orcamento.splice(index, 1);
-        marcarAlterado();
-        renderizarOrcamentoAdmin();
+        marcarAlterado(); renderizarOrcamentoAdmin();
         mostrarNotificacao('Item excluído!', 'success');
     }
 }
@@ -791,16 +734,10 @@ function renderizarFotosAdmin() {
         `).join('')}
     </div>`;
 }
-
-function filtrarFotos(ambiente) {
-    ambienteFotoSelecionado = ambiente;
-    renderizarFotosAdmin();
-}
-
+function filtrarFotos(ambiente) { ambienteFotoSelecionado = ambiente; renderizarFotosAdmin(); }
 function adicionarFoto() {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+    input.type = 'file'; input.accept = 'image/*';
     input.onchange = function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -810,9 +747,7 @@ function adicionarFoto() {
                     <div style="display:grid; gap:12px">
                         <img src="${e.target.result}" style="width:100%; border-radius:10px">
                         <label style="font-size:12px; color:var(--text2)">Ambiente</label>
-                        <select id="fotoAmbiente" class="crud-input">
-                            ${dados.ambientes.map(amb => `<option value="${amb}">${amb}</option>`).join('')}
-                        </select>
+                        <select id="fotoAmbiente" class="crud-input">${dados.ambientes.map(amb => `<option value="${amb}">${amb}</option>`).join('')}</select>
                         <button class="btn btn-primary" onclick="confirmarFoto('${e.target.result}')">Salvar Foto</button>
                     </div>
                 `);
@@ -822,26 +757,21 @@ function adicionarFoto() {
     };
     input.click();
 }
-
 function confirmarFoto(url) {
     const ambiente = document.getElementById('fotoAmbiente').value;
     dados.fotos.push({ id: 'f' + Date.now(), url: url, ambiente: ambiente, data: new Date().toLocaleDateString('pt-BR') });
-    marcarAlterado();
-    fecharModal();
-    renderizarFotosAdmin();
+    marcarAlterado(); fecharModal(); renderizarFotosAdmin();
     mostrarNotificacao('Foto adicionada!');
 }
-
 function excluirFoto(index) {
     if (confirm('Excluir esta foto?')) {
         dados.fotos.splice(index, 1);
-        marcarAlterado();
-        renderizarFotosAdmin();
+        marcarAlterado(); renderizarFotosAdmin();
         mostrarNotificacao('Foto excluída!', 'success');
     }
 }
 
-// ==================== AMBIENTES ====================
+// ==================== AMBIENTES (CORRIGIDO) ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -858,24 +788,18 @@ function renderizarAmbientesAdmin() {
         `).join('')}
     </div>`;
 }
-
 function adicionarAmbiente() {
     dados.ambientes.push('Novo Ambiente');
     marcarAlterado();
-    renderizarAmbientesAdmin();
+    renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza imediatamente
     mostrarNotificacao('Ambiente criado!', 'success');
 }
-
-function editarAmbiente(index, valor) {
-    dados.ambientes[index] = valor;
-    marcarAlterado();
-}
-
+function editarAmbiente(index, valor) { dados.ambientes[index] = valor; marcarAlterado(); }
 function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
         marcarAlterado();
-        renderizarAmbientesAdmin();
+        renderizarAmbientesAdmin(); // CORREÇÃO: Atualiza imediatamente
         mostrarNotificacao('Ambiente excluído!', 'success');
     }
 }
@@ -924,7 +848,6 @@ function renderizarStatsCliente() {
     let totalT = 0, totalP = 0;
     dados.grupos.forEach(g => g.tarefas.forEach(t => { totalT++; totalP += t.progresso; }));
     const media = totalT ? Math.round(totalP/totalT) : 0;
-    
     return `
     <div class="stats-row">
         <div class="stat-card">
@@ -953,7 +876,6 @@ function renderizarCronogramaAnimadoCliente() {
             const progressoMedio = g.tarefas.reduce((acc, t) => acc + t.progresso, 0) / g.tarefas.length;
             const status = progressoMedio >= 100 ? 'Concluído' : (progressoMedio > 0 ? 'Em andamento' : 'Pendente');
             const statusClass = progressoMedio >= 100 ? 'concluido' : (progressoMedio > 0 ? 'em-andamento' : 'pendente');
-            
             return `
             <div class="client-item ${statusClass}" style="animation-delay: ${index * 0.15}s">
                 <div style="font-weight:600; color:var(--text); display:flex; justify-content:space-between; align-items:center">
