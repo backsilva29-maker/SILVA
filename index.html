@@ -407,6 +407,53 @@ let admin = false;
 let modoAtual = 'cronograma';
 let dadosAlterados = false;
 
+// ==================== GEMINI IA ====================
+// Cole sua chave aqui (so voce ve este arquivo):
+const GEMINI_KEY = "AIzaSyAWsj-jQp-xEa2A67q4lrr1oQHxMNqCCtA";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+
+async function consultarGemini(prompt) {
+    if (!GEMINI_KEY || GEMINI_KEY === "cole_sua_chave_aqui") {
+        return "Chave da IA nao configurada. Abra o arquivo HTML, localize GEMINI_KEY e cole sua chave.";
+    }
+    try {
+        const resp = await fetch(GEMINI_URL + GEMINI_KEY, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+            })
+        });
+        const data = await resp.json();
+        if (data.error) return "Erro da IA: " + data.error.message;
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.";
+    } catch(e) {
+        return "Erro de conexao com a IA: " + e.message;
+    }
+}
+
+function contextoObra() {
+    const prog = calcularProgressoGeral();
+    const grupos = dados.grupos.map(g => {
+        const p = calcularProgressoGrupo(g);
+        const tarefas = g.tarefas.map(t =>
+            "    - " + t.nome + ": inicio S" + t.inicio + ", duracao " + t.duracao + " sem., progresso " + t.progresso + "%"
+        ).join("\n");
+        return "  " + g.nome + " (" + p + "% concluido, inicio S" + g.inicio + ", duracao " + g.duracao + " sem.):\n" + tarefas;
+    }).join("\n");
+    return "Obra: " + dados.titulo + "\n" +
+        "Endereco: " + dados.endereco + "\n" +
+        "Tipo: " + dados.obra.tipo + " | Area: " + dados.obra.area + " | Arquiteto: " + dados.obra.arquiteto + "\n" +
+        "Cliente: " + dados.cliente.nome + "\n" +
+        "Inicio: " + fmtData(getDataInicio()) + " | Termino previsto: " + calcularPrevisao() + "\n" +
+        "Duracao total: " + dados.duracaoTotal + " semanas\n" +
+        "Progresso geral: " + prog + "%\n" +
+        "Semana atual: S" + getSemanaAtual() + "\n\n" +
+        "CRONOGRAMA:\n" + grupos + "\n\n" +
+        "ORCAMENTO TOTAL: R$ " + dados.orcamento.reduce(function(s,i){return s+(i.valor||0);},0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+}
+
 // ==================== DADOS PADRÃO ====================
 let dados = {
     titulo: "Torre L'iris Residence",
@@ -618,7 +665,10 @@ function renderizarAdmin() {
                 <div class="sidebar-item ${modoAtual==='cronograma'?'active':''}" onclick="mudarModo('cronograma')">📅 Cronograma</div>
                 <div class="sidebar-item ${modoAtual==='orcamento'?'active':''}" onclick="mudarModo('orcamento')">💰 Orçamento</div>
                 <div class="sidebar-item ${modoAtual==='fotos'?'active':''}" onclick="mudarModo('fotos')">📸 Fotos</div>
-                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">🏠 Ambientes</div>
+                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">Ambientes</div>
+                <div class="sidebar-item ${modoAtual==='ia'?'active':''}" onclick="mudarModo('ia')" style="border-left:2px solid transparent">
+                    <span style="color:#60a5fa">IA Assistente</span>
+                </div>
             </div>
         </div>
         <div class="main">
@@ -649,6 +699,7 @@ function renderizarConteudoAdmin() {
         case 'orcamento':    return renderizarOrcamentoAdmin();
         case 'fotos':        return renderizarFotosAdmin();
         case 'ambientes':    return renderizarAmbientesAdmin();
+        case 'ia':           return renderizarIAAdmin();
         default:             return renderizarDadosClienteAdmin();
     }
 }
@@ -1240,6 +1291,234 @@ function excluirAmbiente(index) {
         marcarAlterado(); renderizarAdmin();
         mostrarNotificacao('Ambiente excluído!');
     }
+}
+
+// ==================== IA ASSISTENTE ====================
+function renderizarIAAdmin() {
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">IA Assistente</div>
+            <div class="page-sub">Gemini integrado — analise, relatorios e sugestoes em tempo real</div>
+        </div>
+    </div>
+
+    <!-- STATUS DA CHAVE -->
+    <div id="ia-status-bar" style="background:var(--surface2); border:1px solid var(--border);
+        border-radius:10px; padding:12px 16px; margin-bottom:16px;
+        display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px">
+        <div style="font-size:12px; color:var(--text2)">
+            Status da chave: <span id="ia-key-status" style="color:var(--accent)">verificando...</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+            <input id="ia-key-input" type="password" placeholder="Cole sua chave Gemini aqui para testar"
+                style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                       padding:6px 10px; color:var(--text); font-size:12px; width:280px; outline:none">
+            <button class="btn btn-primary" onclick="salvarChaveIA()" style="font-size:11px; padding:6px 12px">
+                Salvar Chave
+            </button>
+        </div>
+    </div>
+
+    <!-- ACOES RAPIDAS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:20px">
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(59,130,246,.3)"
+            onclick="acaoIA('relatorio')">
+            <div class="stat-label">Relatorio Semanal</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Gera texto de atualizacao para enviar ao cliente baseado no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Gerar Relatorio
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(244,63,94,.3)"
+            onclick="acaoIA('alertas')">
+            <div class="stat-label">Analise de Alertas</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Detecta tarefas atrasadas, conflitos de sequencia e riscos no cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Analisar Cronograma
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(16,185,129,.3)"
+            onclick="acaoIA('materiais')">
+            <div class="stat-label">Lista de Materiais</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Sugere lista de materiais e mao de obra com base nas etapas do cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Sugerir Materiais
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(232,160,32,.3)"
+            onclick="acaoIA('prazo')">
+            <div class="stat-label">Analise de Prazo</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Avalia se o prazo e realista e sugere ajustes com base no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Avaliar Prazo
+            </button>
+        </div>
+
+    </div>
+
+    <!-- CHAT LIVRE -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden">
+        <div style="padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+                    font-size:12px; font-weight:600; color:var(--text2)">
+            Pergunte qualquer coisa sobre a obra
+        </div>
+        <div id="ia-chat" style="height:280px; overflow-y:auto; padding:16px;
+                                  display:flex; flex-direction:column; gap:12px">
+            <div style="background:var(--surface2); border-radius:8px; padding:12px;
+                        font-size:12px; color:var(--text2); border-left:3px solid var(--accent2)">
+                Ola! Sou o assistente de IA da Torre L'iris. Posso analisar o cronograma,
+                gerar relatorios para o cliente, sugerir materiais ou responder qualquer
+                pergunta sobre a obra. Como posso ajudar?
+            </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px">
+            <input id="ia-pergunta" class="crud-input" placeholder="Ex: Quais tarefas estao atrasadas? Gere um resumo da obra..."
+                style="flex:1" onkeydown="if(event.key==='Enter') enviarPerguntaIA()">
+            <button class="btn btn-primary" onclick="enviarPerguntaIA()" style="font-size:12px; white-space:nowrap">
+                Enviar
+            </button>
+        </div>
+    </div>`;
+}
+
+// Verifica status da chave ao entrar na aba
+setTimeout(() => {
+    const el = document.getElementById('ia-key-status');
+    if (!el) return;
+    if (GEMINI_KEY && GEMINI_KEY !== "cole_sua_chave_aqui") {
+        el.textContent = "Chave configurada no arquivo";
+        el.style.color = "var(--accent3)";
+    } else {
+        const salva = localStorage.getItem('gemini_key');
+        if (salva) {
+            el.textContent = "Chave salva localmente";
+            el.style.color = "var(--accent3)";
+        } else {
+            el.textContent = "Nao configurada — cole sua chave acima";
+            el.style.color = "var(--accent4)";
+        }
+    }
+}, 200);
+
+function getChaveAtiva() {
+    if (GEMINI_KEY && GEMINI_KEY !== "cole_sua_chave_aqui") return GEMINI_KEY;
+    return localStorage.getItem('gemini_key') || "";
+}
+
+function salvarChaveIA() {
+    const val = document.getElementById('ia-key-input').value.trim();
+    if (!val) { mostrarNotificacao("Cole a chave antes de salvar", "erro"); return; }
+    localStorage.setItem('gemini_key', val);
+    const el = document.getElementById('ia-key-status');
+    if (el) { el.textContent = "Chave salva!"; el.style.color = "var(--accent3)"; }
+    document.getElementById('ia-key-input').value = '';
+    mostrarNotificacao("Chave salva com sucesso!", "success");
+}
+
+async function acaoIA(tipo) {
+    const chave = getChaveAtiva();
+    let prompt = "";
+    if (tipo === "relatorio") {
+        prompt = "Voce e um assistente de gestao de obra. Com base nos dados abaixo, escreva um relatorio semanal " +
+            "profissional e cordial para enviar ao cliente via WhatsApp. Use linguagem simples, destaque o que foi " +
+            "concluido, o que esta em andamento e a previsao proxima. Maximo 200 palavras.\n\n" + contextoObra();
+    } else if (tipo === "alertas") {
+        prompt = "Voce e um especialista em gestao de obras. Analise o cronograma abaixo e identifique: " +
+            "1) Tarefas que parecem atrasadas (progresso baixo vs semana atual), " +
+            "2) Possiveis conflitos de sequencia entre tarefas, " +
+            "3) Grupos com risco de nao cumprir o prazo. Seja objetivo e pratico.\n\n" + contextoObra();
+    } else if (tipo === "materiais") {
+        prompt = "Voce e um mestre de obras experiente. Com base nas etapas e tarefas do cronograma abaixo, " +
+            "gere uma lista resumida de materiais e servicos de mao de obra necessarios, agrupados por etapa. " +
+            "Inclua unidade de medida sugerida (m², m, un, kg, etc). Seja pratico.\n\n" + contextoObra();
+    } else if (tipo === "prazo") {
+        prompt = "Voce e um consultor de obras. Analise o progresso atual vs a semana em que estamos e diga: " +
+            "1) O prazo final e realista? " +
+            "2) Qual o percentual esperado de conclusao para esta semana? " +
+            "3) Se houver desvio, quanto tempo de atraso esta acumulando? " +
+            "Seja direto e use os dados reais.\n\n" + contextoObra();
+    }
+    await enviarParaChat(prompt, tipo);
+}
+
+async function enviarPerguntaIA() {
+    const input = document.getElementById('ia-pergunta');
+    const pergunta = input.value.trim();
+    if (!pergunta) return;
+    input.value = '';
+    const prompt = "Voce e um assistente especialista em gestao de obras. Responda a pergunta abaixo com base " +
+        "nos dados da obra. Seja objetivo e pratico.\n\nDADOS DA OBRA:\n" + contextoObra() +
+        "\n\nPERGUNTA DO USUARIO:\n" + pergunta;
+    await enviarParaChat(prompt, 'usuario', pergunta);
+}
+
+async function enviarParaChat(prompt, tipo, textoUsuario) {
+    const chat = document.getElementById('ia-chat');
+    if (!chat) return;
+
+    // Mostra mensagem do usuario se for chat livre
+    if (textoUsuario) {
+        const msgUser = document.createElement('div');
+        msgUser.style.cssText = "background:rgba(232,160,32,.1); border-radius:8px; padding:10px 12px; " +
+            "font-size:12px; color:var(--text); border-left:3px solid var(--accent); align-self:flex-end";
+        msgUser.textContent = textoUsuario;
+        chat.appendChild(msgUser);
+    }
+
+    // Loader
+    const loader = document.createElement('div');
+    loader.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px; " +
+        "font-size:12px; color:var(--text2); border-left:3px solid var(--accent2)";
+    loader.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block">Analisando com IA...</span>';
+    chat.appendChild(loader);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Usa chave salva localmente se não tiver no arquivo
+    const chave = getChaveAtiva();
+    let resposta;
+    if (!chave) {
+        resposta = "Chave nao configurada. Cole sua chave Gemini no campo acima e clique em Salvar Chave.";
+    } else {
+        // Chama Gemini com a chave ativa
+        try {
+            const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + chave;
+            const resp = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+                })
+            });
+            const data = await resp.json();
+            if (data.error) resposta = "Erro: " + data.error.message;
+            else resposta = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.";
+        } catch(e) {
+            resposta = "Erro de conexao: " + e.message;
+        }
+    }
+
+    // Remove loader e mostra resposta
+    chat.removeChild(loader);
+    const msgIA = document.createElement('div');
+    msgIA.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px; " +
+        "font-size:12px; color:var(--text); border-left:3px solid var(--accent2); white-space:pre-wrap; line-height:1.6";
+    msgIA.textContent = resposta;
+    chat.appendChild(msgIA);
+    chat.scrollTop = chat.scrollHeight;
 }
 
 // ==================== ÁREA DO CLIENTE ====================
