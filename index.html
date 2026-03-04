@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>🏗️ Obra Torre L'iris - Gestão Inteligente</title>
+<title>🏗️ Torre L'iris - Gestão Inteligente</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -14,7 +14,7 @@
 --text2: #8892a4; --text3: #4a5468; --gantt-h: 44px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; min-height: 100vh; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; min-height: 100vh; }
 
 /* LOGIN */
 .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -32,6 +32,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
 .btn-ghost:hover { border-color: var(--text2); color: var(--text); }
 .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
+.btn-primary:hover { background: #f5ae30; }
 .btn-danger { background: var(--accent4); color: white; }
 .btn-success { background: var(--accent3); color: white; }
 
@@ -50,6 +51,13 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
 .page-sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
 
+/* SAVE BAR */
+.save-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.save-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+.save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
+.save-indicator.saved { background: var(--accent3); }
+.save-indicator.pending { background: var(--accent); }
+
 /* GANTT */
 .gantt-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-bottom: 20px; }
 .gantt-header { display: grid; grid-template-columns: 280px 80px 80px 80px 100px 1fr; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); text-transform: uppercase; }
@@ -59,6 +67,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .gantt-group-header:hover { background: rgba(232,160,32,.12); }
 .gantt-row { display: grid; grid-template-columns: 280px 80px 80px 80px 100px 1fr; border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; }
 .gantt-row:hover { background: var(--surface2); }
+.gantt-subtask { background: rgba(59,130,246,.05); }
 .gc { padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; border-right: 1px solid var(--border); font-size: 12px; }
 .gc-name { font-weight: 500; }
 .gc-edit { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; }
@@ -68,7 +77,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .gantt-bar-fill { height: 100%; border-radius: 5px 0 0 5px; opacity: .95; transition: width 0.3s; }
 .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); opacity: .7; z-index: 5; }
 
-/* CRUD */
+/* CRUD CARDS */
 .crud-container { display: grid; gap: 12px; }
 .crud-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: 1fr 100px 100px 120px; gap: 12px; align-items: center; }
 .crud-card-header { background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text3); text-transform: uppercase; padding: 12px 16px; border-radius: 10px 10px 0 0; }
@@ -111,6 +120,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .ambiente-tab { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); }
 .ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
+/* RESPONSIVE */
 @media (max-width: 768px) {
     .sidebar { display: none; }
     .gantt-header, .gantt-row { grid-template-columns: 150px 1fr; }
@@ -364,9 +374,9 @@ function renderizarAdmin() {
 
 function renderizarSaveBar() {
     return `
-    <div class="save-bar" style="background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
-        <div class="save-status" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2);">
-            <div id="saveIndicator" class="save-indicator saved" style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent3);"></div>
+    <div class="save-bar">
+        <div class="save-status">
+            <div id="saveIndicator" class="save-indicator saved"></div>
             <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
         </div>
         <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
@@ -479,7 +489,31 @@ function renderizarGantt() {
             `;
             grupoDiv.appendChild(tarefaRow);
             
-            // Botão adicionar/excluir tarefa
+            // Sub-tarefas
+            if (t.subtasks && t.subtasks.length > 0) {
+                t.subtasks.forEach((st, stIndex) => {
+                    const subtaskRow = document.createElement('div');
+                    subtaskRow.className = 'gantt-row gantt-subtask';
+                    subtaskRow.innerHTML = `
+                        <div class="gc" style="padding-left:56px">
+                            <span style="color:var(--text3); margin-right:8px">↳</span>
+                            <input class="gc-edit" value="${st.nome}" onchange="editarSubtask(${gIndex}, ${tIndex}, ${stIndex}, 'nome', this.value)">
+                        </div>
+                        <div class="gc"></div>
+                        <div class="gc"></div>
+                        <div class="gc"><input type="number" class="gc-edit" value="${st.duracao}" onchange="editarSubtask(${gIndex}, ${tIndex}, ${stIndex}, 'duracao', this.value)" style="width:50px"></div>
+                        <div class="gc">
+                            <input type="range" min="0" max="100" value="${st.progresso || 0}" style="width:60px; accent-color:${g.cor}" onchange="editarSubtask(${gIndex}, ${tIndex}, ${stIndex}, 'progresso', this.value)">
+                        </div>
+                        <div class="gc">
+                            <button class="btn btn-danger" style="padding:4px 8px" onclick="excluirSubtask(${gIndex}, ${tIndex}, ${stIndex})">🗑️</button>
+                        </div>
+                    `;
+                    grupoDiv.appendChild(subtaskRow);
+                });
+            }
+            
+            // Botão adicionar sub-tarefa
             const addSubtaskRow = document.createElement('div');
             addSubtaskRow.className = 'gantt-row gantt-subtask';
             addSubtaskRow.innerHTML = `
@@ -516,7 +550,7 @@ function renderizarGantt() {
     });
 }
 
-// ==================== FUNÇÕES CRONOGRAMA (CORRIGIDAS) ====================
+// ==================== FUNÇÕES CRONOGRAMA ====================
 function editarGrupoNome(index, valor) { dados.grupos[index].nome = valor; marcarAlterado(); }
 function editarGrupoDuracao(index, valor) { dados.grupos[index].duracao = parseInt(valor); marcarAlterado(); }
 function editarGrupoResp(index, valor) { dados.grupos[index].responsavel = valor; marcarAlterado(); }
@@ -535,7 +569,7 @@ function adicionarGrupo() {
         tarefas: []
     });
     marcarAlterado();
-    renderizarGantt(); // Atualiza imediatamente
+    renderizarGantt();
 }
 
 function adicionarTarefa(gIndex) {
@@ -548,15 +582,14 @@ function adicionarTarefa(gIndex) {
         subtasks: []
     });
     marcarAlterado();
-    renderizarGantt(); // Atualiza imediatamente
+    renderizarGantt();
 }
 
 function excluirTarefa(gIndex, tIndex) {
     if (confirm('Excluir esta tarefa?')) {
         dados.grupos[gIndex].tarefas.splice(tIndex, 1);
         marcarAlterado();
-        renderizarGantt(); // Atualiza imediatamente
-        mostrarNotificacao('Tarefa excluída!', 'success');
+        renderizarGantt();
     }
 }
 
@@ -564,8 +597,7 @@ function excluirGrupo(gIndex) {
     if (confirm('Excluir este grupo e todas as tarefas?')) {
         dados.grupos.splice(gIndex, 1);
         marcarAlterado();
-        renderizarGantt(); // Atualiza imediatamente
-        mostrarNotificacao('Grupo excluído!', 'success');
+        renderizarGantt();
     }
 }
 
@@ -579,7 +611,19 @@ function adicionarSubtask(gIndex, tIndex) {
     renderizarGantt();
 }
 
+function editarSubtask(gIndex, tIndex, stIndex, campo, valor) {
+    dados.grupos[gIndex].tarefas[tIndex].subtasks[stIndex][campo] = campo === 'duracao' || campo === 'progresso' ? parseInt(valor) : valor;
+    marcarAlterado();
+}
+
+function excluirSubtask(gIndex, tIndex, stIndex) {
+    dados.grupos[gIndex].tarefas[tIndex].subtasks.splice(stIndex, 1);
+    marcarAlterado();
+    renderizarGantt();
+}
+
 function toggleSubtasks(gIndex, tIndex) {
+    // Implementar expandir/recolher se necessário
     renderizarGantt();
 }
 
@@ -626,7 +670,7 @@ function renderizarOrcamentoAdmin() {
 function adicionarItemOrcamento() {
     dados.orcamento.push({ id: 'o' + Date.now(), grupo: 'Geral', descricao: 'Novo Item', valor: 0 });
     marcarAlterado();
-    renderizarOrcamentoAdmin(); // Atualiza imediatamente
+    renderizarOrcamentoAdmin();
 }
 
 function editarOrcamento(index, campo, valor) {
@@ -638,8 +682,7 @@ function excluirOrcamento(index) {
     if (confirm('Excluir este item do orçamento?')) {
         dados.orcamento.splice(index, 1);
         marcarAlterado();
-        renderizarOrcamentoAdmin(); // Atualiza imediatamente
-        mostrarNotificacao('Item excluído!', 'success');
+        renderizarOrcamentoAdmin();
     }
 }
 
@@ -723,12 +766,11 @@ function excluirFoto(index) {
     if (confirm('Excluir esta foto?')) {
         dados.fotos.splice(index, 1);
         marcarAlterado();
-        renderizarFotosAdmin(); // Atualiza imediatamente
-        mostrarNotificacao('Foto excluída!', 'success');
+        renderizarFotosAdmin();
     }
 }
 
-// ==================== AMBIENTES (CORRIGIDO) ====================
+// ==================== AMBIENTES ====================
 function renderizarAmbientesAdmin() {
     return `
     <div class="page-header">
@@ -752,8 +794,7 @@ function renderizarAmbientesAdmin() {
 function adicionarAmbiente() {
     dados.ambientes.push('Novo Ambiente');
     marcarAlterado();
-    renderizarAmbientesAdmin(); // Atualiza imediatamente
-    mostrarNotificacao('Ambiente criado!', 'success');
+    renderizarAmbientesAdmin();
 }
 
 function editarAmbiente(index, valor) {
@@ -765,8 +806,7 @@ function excluirAmbiente(index) {
     if (confirm('Excluir este ambiente?')) {
         dados.ambientes.splice(index, 1);
         marcarAlterado();
-        renderizarAmbientesAdmin(); // Atualiza imediatamente
-        mostrarNotificacao('Ambiente excluído!', 'success');
+        renderizarAmbientesAdmin();
     }
 }
 
