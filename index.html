@@ -378,22 +378,34 @@ function setSyncStatus(st, msg) {
 
 async function carregarDoServidor() {
   setSyncStatus('syncing','Carregando...');
-  const remoto = await sb.get();
-  if(remoto && remoto.grupos) {
-    dados = remoto;
-    // Garantir campos novos
-    if(!dados.fotos) dados.fotos = [];
-    if(!dados.diario) dados.diario = [];
-    localStorage.setItem('torre_liris_cache', JSON.stringify(dados));
-    setSyncStatus('online');
-    return true;
-  } else {
-    // Tenta cache local
+  try {
+    const remoto = await sb.get();
+    if(remoto && remoto.grupos) {
+      dados = remoto;
+      if(!dados.fotos)  dados.fotos  = [];
+      if(!dados.diario) dados.diario = [];
+      localStorage.setItem('torre_liris_cache', JSON.stringify(dados));
+      setSyncStatus('online');
+      return true;
+    }
+  } catch(e) {}
+  // Fallback 1: cache local
+  try {
     const cache = localStorage.getItem('torre_liris_cache');
-    if(cache) { try { dados = JSON.parse(cache); setSyncStatus('offline','Cache local'); return true; } catch(e){} }
-    setSyncStatus('offline','Primeiro uso — dados padrão');
-    return false;
-  }
+    if(cache) {
+      const parsed = JSON.parse(cache);
+      if(parsed && parsed.grupos) {
+        dados = parsed;
+        if(!dados.fotos)  dados.fotos  = [];
+        if(!dados.diario) dados.diario = [];
+        setSyncStatus('offline','Cache local');
+        return true;
+      }
+    }
+  } catch(e) {}
+  // Fallback 2: dados padrao
+  setSyncStatus('offline','Dados padrão — crie a tabela no Supabase');
+  return false;
 }
 
 async function salvarNoServidor() {
@@ -485,17 +497,22 @@ function entrarComoCliente() {
   iniciarApp('cliente');
 }
 async function iniciarApp(perfil) {
-  mostrarCarregando(perfil);
-  await carregarDoServidor();
+  // Mostra tela de carregamento por no máximo 4s
+  mostrarCarregando();
+  const timeout = new Promise(r => setTimeout(r, 4000));
+  const carregar = carregarDoServidor();
+  await Promise.race([carregar, timeout]);
+  // Independente do resultado, renderiza com o que tiver (dados padrão ou nuvem)
   iniciarPolling();
   if(perfil === 'admin') renderizarAdmin();
   else renderizarCliente();
 }
-function mostrarCarregando(perfil) {
+function mostrarCarregando() {
   document.getElementById('app').innerHTML = `
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;gap:16px">
     <div style="width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite"></div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3)">Carregando dados da nuvem...</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3)">Conectando à nuvem...</div>
+    <div style="font-size:11px;color:var(--text3);opacity:.6">Se demorar, verifique a tabela no Supabase</div>
   </div>`;
 }
 
