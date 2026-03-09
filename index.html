@@ -2,1404 +2,1800 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torre L'iris — Gestão Profissional</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>🏗️ Torre L'iris - Gestão Inteligente</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg:#0d0f14; --surface:#13161e; --surface2:#1a1e2a; --surface3:#252a38;
-  --border:#2d3344; --accent:#e8a020; --accent2:#3b82f6; --accent3:#10b981;
-  --accent4:#f43f5e; --accent5:#8b5cf6; --text:#e8eaf0; --text2:#8892a4; --text3:#4a5568;
-  --r-sm:6px; --r-md:10px; --r-lg:16px; --r-xl:24px;
-  --shadow:0 4px 16px rgba(0,0,0,0.5); --tr:150ms ease;
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #e8a020;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #f43f5e;
+    --text: #e8eaf0;
+    --text2: #8892a4;
+    --text3: #4a5468;
+    --gantt-h: 44px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;min-height:100vh;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: 'Inter', sans-serif; 
+    font-size: 13px; 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+}
+.login-modal { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); 
+    display: flex; justify-content: center; align-items: center; 
+    z-index: 1000; 
+}
+.login-content { 
+    background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 48px; padding: 40px; width: 90%; max-width: 380px; 
+    text-align: center; 
+}
+.login-input { 
+    width: 100%; padding: 16px; margin: 15px 0; 
+    background: var(--bg); border: 1px solid var(--border); 
+    border-radius: 40px; color: var(--text); font-size: 16px; 
+    outline: none;
+}
+.login-btn { 
+    width: 100%; padding: 16px; margin: 8px 0; border: none; 
+    border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; 
+}
+.btn-admin { background: var(--accent); color: #000; }
+.btn-client { background: var(--accent2); color: white; }
+.topbar { 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 24px; height: 56px; background: var(--surface); 
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; 
+}
+.logo { 
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; 
+    display: flex; align-items: center; gap: 10px; 
+}
+.logo-badge { 
+    width: 28px; height: 28px; background: var(--accent); border-radius: 6px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 13px; color: #000; font-weight: 800; 
+}
+.btn { 
+    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; 
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; 
+    transition: all .15s; display: inline-flex; align-items: center; gap: 6px; 
+}
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+.btn-primary { background: var(--accent); color: #000; font-weight: 600; }
+.btn-primary:hover { background: #f5ae30; }
+.btn-danger { background: var(--accent4); color: white; }
+.btn-success { background: var(--accent3); color: white; }
+.layout { display: flex; height: calc(100vh - 56px); }
+.sidebar { 
+    width: 240px; min-width: 240px; background: var(--surface); 
+    border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; 
+}
+.sidebar-section { margin-bottom: 24px; }
+.sidebar-label { 
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; 
+    letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; 
+    padding: 0 16px; margin-bottom: 6px; 
+}
+.sidebar-item { 
+    display: flex; align-items: center; gap: 10px; padding: 10px 16px; 
+    color: var(--text2); cursor: pointer; border-left: 2px solid transparent; 
+    transition: all 0.2s; 
+}
+.sidebar-item:hover { background: var(--surface2); color: var(--text); transform: translateX(4px); }
+.sidebar-item.active { 
+    color: var(--accent); border-left-color: var(--accent); 
+    background: rgba(232,160,32,.06); 
+}
+.main { flex: 1; overflow: auto; padding: 20px 24px; }
+.page-header { 
+    display: flex; align-items: center; justify-content: space-between; 
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); 
+}
+.page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
+.page-sub { color: var(--text2); font-size: 12px; margin-top: 4px; }
+.save-bar { 
+    background: var(--surface2); border: 1px solid var(--border); 
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; 
+    display: flex; align-items: center; justify-content: space-between; 
+}
+.save-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+.save-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
+.save-indicator.saved { background: var(--accent3); }
+.save-indicator.pending { background: var(--accent); animation: pulse 1s infinite; }
+.client-data-card { 
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); 
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+}
+.client-data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.client-data-item { display: flex; flex-direction: column; gap: 6px; }
+.client-data-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; 
+}
+.client-data-value { font-size: 14px; color: var(--text); font-weight: 500; }
+.client-data-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 13px; width: 100%; 
+    outline: none;
+}
+.client-data-input:focus { border-color: var(--accent); }
 
-/* ── LOGIN ── */
-.login-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.96);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;z-index:2000;}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:40px;width:min(90%,400px);text-align:center;animation:fadeUp .4s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.login-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#f5c060);border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 24px rgba(232,160,32,.3);}
-.login-box h2{font-family:'Syne',sans-serif;font-size:22px;margin-bottom:4px;}
-.login-box p{color:var(--text3);font-size:12px;margin-bottom:24px;}
-.login-input{width:100%;padding:12px 16px;margin-bottom:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font-size:14px;outline:none;transition:border-color var(--tr);}
-.login-input:focus{border-color:var(--accent);}
-.login-err{color:var(--accent4);font-size:12px;margin-bottom:8px;display:none;}
-.login-sep{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:11px;margin:10px 0;}
-.login-sep::before,.login-sep::after{content:'';flex:1;height:1px;background:var(--border);}
-.lbtn{width:100%;padding:13px;border:none;border-radius:var(--r-md);font-size:14px;font-weight:600;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;}
-.lbtn-admin{background:var(--accent);color:#000;}
-.lbtn-client{background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
-.lbtn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+/* DATA PICKER */
+.data-picker-box {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+.data-part {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+.data-part label {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+}
+.data-part input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border-color .15s;
+}
+.data-part input:focus { border-color: var(--accent); }
+.data-sep {
+    font-size: 24px;
+    color: var(--text3);
+    padding-bottom: 10px;
+    user-select: none;
+}
+.data-preview {
+    margin-left: 12px;
+    padding-bottom: 10px;
+    font-size: 12px;
+    color: var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
 
-/* ── LAYOUT ── */
-.topbar{height:58px;background:rgba(19,22,30,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;display:flex;align-items:center;gap:10px;cursor:pointer;}
-.logo-badge{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#f5c060);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.layout{display:grid;grid-template-columns:220px 1fr;height:calc(100vh - 58px);}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 0;overflow-y:auto;}
-.sb-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;padding:0 16px;margin:0 0 6px;}
-.sb-item{display:flex;align-items:center;gap:10px;padding:10px 16px;color:var(--text2);cursor:pointer;border-left:3px solid transparent;transition:all var(--tr);font-size:13px;}
-.sb-item:hover,.sb-item.active{background:var(--surface2);color:var(--text);border-left-color:var(--accent);}
-.sb-item.active{color:var(--accent);font-weight:500;}
-.sb-info{padding:10px 16px;font-size:11px;color:var(--text3);line-height:1.6;}
-.sb-info strong{color:var(--text2);display:block;}
-.main{overflow-y:auto;padding:24px;background:var(--bg);}
-
-/* ── BOTÕES ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r-md);border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all var(--tr);}
-.btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
-.btn-primary{background:var(--accent);color:#000;}
-.btn-secondary{background:var(--accent2);color:#fff;}
-.btn-success{background:var(--accent3);color:#fff;}
-.btn-danger{background:var(--accent4);color:#fff;}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
-.btn-warn{background:var(--accent5);color:#fff;}
-.btn-sm{padding:5px 10px;font-size:11px;}
-.btn-xs{padding:3px 8px;font-size:10px;}
-
-/* ── CARDS / GRID ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:20px;}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;}
-.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-
-/* ── MÉTRICAS ── */
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;position:relative;overflow:hidden;}
-.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform var(--tr);}
-.metric:hover::after{transform:scaleX(1);}
-.metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
-.metric-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;line-height:1.1;margin-bottom:4px;}
-.metric-delta{font-size:11px;display:flex;align-items:center;gap:4px;}
-.pos{color:var(--accent3);} .neg{color:var(--accent4);} .warn{color:var(--accent);}
-
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:500;}
-.badge-ok{background:rgba(16,185,129,.12);color:var(--accent3);border:1px solid rgba(16,185,129,.2);}
-.badge-warn{background:rgba(232,160,32,.12);color:var(--accent);border:1px solid rgba(232,160,32,.2);}
-.badge-danger{background:rgba(244,63,94,.12);color:var(--accent4);border:1px solid rgba(244,63,94,.2);}
-.badge-info{background:rgba(59,130,246,.12);color:var(--accent2);border:1px solid rgba(59,130,246,.2);}
-
-/* ── TABELAS ── */
-.tbl-wrap{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{background:var(--surface2);padding:10px 12px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1px solid var(--border);}
-td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface2);color:var(--text);}
-
-/* ── FORMULÁRIOS ── */
-.form-group{margin-bottom:14px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.form-label{display:block;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;}
-.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;outline:none;transition:border-color var(--tr);font-family:'Inter',sans-serif;}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,160,32,.1);}
-.form-select option{background:var(--surface2);}
-.form-textarea{resize:vertical;min-height:80px;}
-
-/* ── MODAL ── */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:20px;}
-.modal.open{display:flex;}
-.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;width:min(94%,600px);max-height:92vh;overflow-y:auto;animation:fadeUp .25s ease;}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
-.modal-close{background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all var(--tr);}
-.modal-close:hover{background:var(--surface3);color:var(--text);}
-.modal-actions{display:flex;gap:8px;margin-top:16px;}
-
-/* ── GANTT ── */
-.gantt-wrap{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
-.gantt-head{display:grid;grid-template-columns:200px 55px 55px 55px 80px 1fr 80px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-family:'IBM Plex Mono',monospace;}
-.gantt-row{display:grid;grid-template-columns:200px 55px 55px 55px 80px 1fr 80px;border-bottom:1px solid var(--border);min-height:46px;align-items:center;transition:background var(--tr);}
-.gantt-row:hover{background:var(--surface2);}
-.gantt-row.crit{background:rgba(244,63,94,.04);}
-.gantt-row.crit .gc:first-child{border-left:3px solid var(--accent4);}
-.gc{padding:8px 10px;border-right:1px solid var(--border);display:flex;align-items:center;}
-.gc:last-child{border-right:none;}
-.task-name{font-weight:500;color:var(--text);font-size:12px;}
-.task-sub{color:var(--text3);font-size:10px;}
-.bar-area{position:relative;height:34px;padding:0 6px;}
-.gantt-bar{position:absolute;height:20px;border-radius:4px;top:50%;transform:translateY(-50%);overflow:hidden;cursor:pointer;transition:all var(--tr);min-width:3px;}
-.gantt-bar:hover{transform:translateY(-50%) scale(1.02);z-index:10;}
-.bar-fill{height:100%;transition:width .6s ease;}
-.today-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--accent4);z-index:5;box-shadow:0 0 6px rgba(244,63,94,.5);}
-
-/* ── PROGRESSO ── */
-.prog-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin:6px 0 3px;}
-.prog-fill{height:100%;border-radius:3px;transition:width .8s ease;}
-.prog-input{width:64px;padding:4px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:12px;font-family:'IBM Plex Mono',monospace;text-align:center;outline:none;}
-.prog-input:focus{border-color:var(--accent);}
-
-/* ── GALERIA ── */
-.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
-.gallery-item{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);background:var(--surface2);position:relative;cursor:pointer;}
-.gallery-item img{width:100%;height:120px;object-fit:cover;display:block;}
-.gallery-item .gi-info{padding:8px;font-size:11px;}
-.gallery-item .gi-info strong{color:var(--text);display:block;margin-bottom:2px;}
-.gallery-item .gi-info span{color:var(--text3);}
-.gallery-item .gi-del{position:absolute;top:6px;right:6px;background:rgba(244,63,94,.8);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--tr);}
-.gallery-item:hover .gi-del{opacity:1;}
-.upload-zone{border:2px dashed var(--border);border-radius:var(--r-lg);padding:32px;text-align:center;cursor:pointer;transition:all var(--tr);}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(232,160,32,.05);}
-.upload-zone input{display:none;}
-
-/* ── DIÁRIO ── */
-.diary-item{padding:14px;border-left:3px solid var(--border);margin-bottom:12px;background:var(--surface2);border-radius:0 var(--r-md) var(--r-md) 0;position:relative;}
-.diary-item.importante{border-left-color:var(--accent4);}
-.diary-item.info{border-left-color:var(--accent2);}
-.diary-item.progresso{border-left-color:var(--accent3);}
-.diary-meta{font-size:10px;color:var(--text3);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;display:flex;gap:12px;}
-.diary-text{font-size:13px;color:var(--text2);line-height:1.6;}
-.diary-del{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:13px;opacity:0;transition:opacity var(--tr);}
-.diary-item:hover .diary-del{opacity:1;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;font-size:13px;z-index:9999;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s ease;max-width:320px;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.ok{border-color:rgba(16,185,129,.4);}
-.toast.err{border-color:rgba(244,63,94,.4);}
-
-/* ── ALERTS ── */
-.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r-md);margin-bottom:14px;font-size:12px;}
-.alert-warn{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);color:var(--accent);}
-.alert-danger{background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);color:var(--accent4);}
-.alert-info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:var(--accent2);}
-
-/* ── ÁREA CLIENTE ── */
-.hero{background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:20px;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(232,160,32,.12),transparent);border-radius:50%;}
-.chart-wrap{height:260px;position:relative;}
-
-/* ── PAGE HEADER ── */
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);}
-.ph-title h1{font-family:'Syne',sans-serif;font-size:22px;margin-bottom:3px;}
-.ph-sub{color:var(--text2);font-size:12px;}
-
-/* ── SLIDER ── */
-.slider-wrap{display:flex;align-items:center;gap:8px;}
-input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--surface3);border-radius:2px;outline:none;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;}
-
-/* ── RESPONSIVO ── */
-@media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{display:none}.grid-4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.form-row,.form-row-3{grid-template-columns:1fr}.gantt-head,.gantt-row{grid-template-columns:160px 1fr}.gc:not(:first-child):not(:last-child){display:none}}
-
-/* UTILS */
-.mono{font-family:'IBM Plex Mono',monospace;}
-.mb-3{margin-bottom:12px;} .mb-4{margin-bottom:16px;} .mt-4{margin-top:16px;}
-.flex{display:flex;} .gap-2{gap:8px;} .gap-3{gap:12px;}
-.items-center{align-items:center;} .justify-between{justify-content:space-between;}
-.text-right{text-align:right;} .text-muted{color:var(--text3);}
-.divider{height:1px;background:var(--border);margin:16px 0;}
+.gantt-wrap { 
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; 
+    background: var(--surface); margin-bottom: 20px; 
+}
+.gantt-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: var(--surface2); border-bottom: 1px solid var(--border); 
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); 
+    text-transform: uppercase; 
+}
+.gh-cell { padding: 12px; border-right: 1px solid var(--border); }
+.gantt-group { border-bottom: 1px solid var(--border); }
+.gantt-group-header { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    background: rgba(232,160,32,.08); cursor: pointer; padding: 12px; align-items: center; 
+}
+.gantt-row { 
+    display: grid; grid-template-columns: 280px 100px 100px 80px 100px 1fr; 
+    border-bottom: 1px solid rgba(37,42,56,.6); align-items: center; 
+}
+.gantt-row:hover { background: var(--surface2); }
+.gc { 
+    padding: 0 12px; height: var(--gantt-h); display: flex; align-items: center; 
+    border-right: 1px solid var(--border); font-size: 12px; 
+}
+.gc-name { font-weight: 500; }
+.gc-edit { 
+    background: transparent; border: 1px solid var(--border); border-radius: 4px; 
+    padding: 4px 8px; color: var(--text); font-size: 11px; width: 100%; 
+    outline: none;
+}
+.gc-edit:focus { border-color: var(--accent); }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink:0; }
+.bar-area { position: relative; height: var(--gantt-h); min-width: 100%; overflow-x: auto; }
+.gantt-bar { 
+    position: absolute; top: 50%; transform: translateY(-50%); height: 20px; 
+    border-radius: 5px; display: flex; align-items: center; overflow: hidden; 
+    cursor: pointer; transition: all 0.3s; 
+}
+.gantt-bar:hover { transform: translateY(-50%) scale(1.02); }
+.gantt-bar-fill { 
+    height: 100%; border-radius: 5px 0 0 5px; opacity: .95; 
+    transition: width 0.5s ease-out; 
+}
+.today-line { 
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent4); 
+    opacity: .7; z-index: 5; 
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes slideInLeft { 
+    from { opacity: 0; transform: translateX(-20px); } 
+    to { opacity: 1; transform: translateX(0); } 
+}
+.animated-progress { position: relative; overflow: hidden; }
+.animated-progress::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes fadeSlideDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+@keyframes bobbing {
+    0%,100% { transform:translateY(0); }
+    50%      { transform:translateY(-4px); }
+}
+@keyframes operarioCaminha {
+    0%   { content:'🦺'; transform:scaleX(1); }
+    50%  { transform:scaleX(-1); }
+    100% { transform:scaleX(1); }
+}
+.crud-container { display: grid; gap: 12px; }
+.crud-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; display: grid; grid-template-columns: 1fr 100px 100px 120px; 
+    gap: 12px; align-items: center; 
+}
+.crud-card-header { 
+    background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text3); 
+    text-transform: uppercase; padding: 12px 16px; border-radius: 10px 10px 0 0; 
+}
+.crud-input { 
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px; 
+    padding: 8px 12px; color: var(--text); font-size: 12px; width: 100%; 
+    outline: none;
+}
+.crud-input:focus { border-color: var(--accent); }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.photo-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    overflow: hidden; transition: transform 0.2s; cursor: pointer; 
+}
+.photo-card:hover { transform: translateY(-4px); }
+.photo-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.photo-card-info { padding: 12px; }
+.photo-card-ambiente { font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+.photo-card-data { font-size: 10px; color: var(--text3); }
+.stats-row { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 16px; margin-bottom: 20px; 
+}
+.stat-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 16px; transition: transform 0.2s; 
+}
+.stat-card:hover { transform: translateY(-4px); }
+.stat-label { 
+    font-size: 10px; color: var(--text3); text-transform: uppercase; 
+    font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; 
+}
+.stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
+.stat-bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: var(--accent3); border-radius: 2px; transition: width 0.5s ease-out; }
+.modal { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; 
+    align-items: center; justify-content: center; 
+}
+.modal.open { display: flex; }
+.modal-content { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px; 
+    padding: 30px; width: 90%; max-width: 500px; 
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
+.modal-close:hover { color: var(--text); }
+.notification { 
+    position: fixed; bottom: 20px; right: 20px; background: var(--surface); 
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; 
+    display: flex; align-items: center; gap: 12px; z-index: 999; 
+    transform: translateY(100px); opacity: 0; transition: all 0.3s; 
+}
+.notification.show { transform: translateY(0); opacity: 1; }
+.notification.success { border-color: var(--accent3); }
+.ambientes-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.ambiente-tab { 
+    padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); 
+    border-radius: 20px; cursor: pointer; font-size: 12px; color: var(--text2); 
+}
+.ambiente-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.client-timeline { 
+    position: relative; padding-left: 30px; border-left: 3px solid var(--border); 
+    margin: 30px 0; 
+}
+.client-item { 
+    position: relative; padding-left: 20px; margin-bottom: 25px; 
+    opacity: 0; animation: slideInLeft 0.5s ease forwards; 
+    transition: all 0.3s ease; 
+}
+.client-item:hover { 
+    transform: translateX(10px); background: var(--surface); 
+    border-radius: 12px; padding: 15px; margin-left: -15px; 
+}
+.client-item::before { 
+    content: ''; position: absolute; left: -26px; top: 5px; 
+    width: 12px; height: 12px; border-radius: 50%; background: var(--border); 
+    transition: all 0.3s; 
+}
+.client-item.done::before { background: var(--accent3); }
+.client-item.active::before { background: var(--accent); animation: pulse 1.5s infinite; }
+.client-item:nth-child(1) { animation-delay: 0.1s; }
+.client-item:nth-child(2) { animation-delay: 0.2s; }
+.client-item:nth-child(3) { animation-delay: 0.3s; }
+.client-item:nth-child(4) { animation-delay: 0.4s; }
+.client-item:nth-child(5) { animation-delay: 0.5s; }
+.client-item:nth-child(6) { animation-delay: 0.6s; }
+.client-item:nth-child(7) { animation-delay: 0.7s; }
+.client-item:nth-child(8) { animation-delay: 0.8s; }
+.client-status { 
+    font-size: 11px; padding: 4px 8px; border-radius: 4px; 
+    display: inline-block; margin-top: 5px; 
+}
+.status-pendente { background: rgba(74,84,104,0.1); color: var(--text2); }
+.status-em-andamento { background: rgba(232,160,32,0.1); color: var(--accent); }
+.status-concluido { background: rgba(16,185,129,0.1); color: var(--accent3); }
+/* botões inline do gantt */
+.btn-crud {
+    height: 22px; padding: 0 7px; border-radius: 4px; border: none;
+    cursor: pointer; font-size: 10px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .15s; white-space: nowrap;
+}
+.btn-crud-del { background: rgba(244,63,94,.2); color: #fb7185; border: 1px solid rgba(244,63,94,.3); }
+.btn-crud-del:hover { background: rgba(244,63,94,.4); }
+.btn-crud-edit { background: rgba(59,130,246,.2); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.btn-crud-edit:hover { background: rgba(59,130,246,.4); }
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="loginWrap" class="login-wrap">
-  <div class="login-box">
-    <div class="login-icon">🏗️</div>
-    <h2>Torre L'iris</h2>
-    <p>Sistema de Gestão Profissional de Obras</p>
-    <input id="senhaInput" type="password" class="login-input" placeholder="Senha do administrador" onkeydown="if(event.key==='Enter')login('admin')">
-    <div id="loginErr" class="login-err">Senha incorreta. Tente novamente.</div>
-    <button class="lbtn lbtn-admin" onclick="login('admin')">🔐 Entrar como Administrador</button>
-    <div class="login-sep">ou</div>
-    <button class="lbtn lbtn-client" onclick="login('cliente')">👁️ Visualizar como Cliente</button>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3 class="modal-title" id="modalTitle"></h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+<div id="loginModal" class="login-modal">
+    <div class="login-content">
+        <h2 style="color: var(--accent); margin-bottom: 20px; font-family:'Syne'">🏗️ Torre L'iris</h2>
+        <p style="color:var(--text2); margin-bottom:20px; font-size:12px">Aptos 1702 e 1704</p>
+        <input type="password" id="senhaInput" class="login-input" placeholder="Senha do administrador"
+               onkeydown="if(event.key==='Enter') verificarSenha()">
+        <button class="login-btn btn-admin" onclick="verificarSenha()">Entrar como Admin</button>
+        <button class="login-btn btn-client" onclick="entrarComoCliente()">Visualizar como Cliente</button>
     </div>
-    <div id="modalBody"></div>
-  </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
+<!-- MODAL GENÉRICO -->
+<div id="modalGenerico" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitulo">Título</div>
+            <button class="modal-close" onclick="fecharModal()">&times;</button>
+        </div>
+        <div id="modalConteudo"></div>
+    </div>
+</div>
 
-<!-- APP -->
+<!-- NOTIFICATION -->
+<div id="notification" class="notification">
+    <span id="notifIcon">✅</span>
+    <span id="notifMsg">Mensagem</span>
+</div>
+
 <div id="app"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════════
-const CFG = {
-  HASH: btoa('torre2026'),
-  KEY: 'torre_liris_v4',
-  CATEGORIAS_ENTRADA: ['Contrato','Medição','Adiantamento','Outros'],
-  CATEGORIAS_SAIDA:   ['Mão de Obra','Elétrica','Hidráulica','Pavimentação','Materiais Gerais','Refrigeração','Transporte','Outros'],
-  TIPOS_DIARIO:       ['info','progresso','importante'],
-  GRUPOS_TAREFA:      ['Preliminares','Demolições','Paredes','Revestimentos','Pavimentação','Elétrica','Hidráulica','Refrigeração','Rede Lógica','Rodapés','Esquadrias','Forro','Pintura','Limpeza'],
-  CORES_GRUPOS: {
-    'Preliminares':'#3b82f6','Demolições':'#f43f5e','Paredes':'#e8a020',
-    'Revestimentos':'#10b981','Pavimentação':'#8b5cf6','Elétrica':'#f59e0b',
-    'Hidráulica':'#06b6d4','Refrigeração':'#14b8a6','Rede Lógica':'#6366f1',
-    'Rodapés':'#ec4899','Esquadrias':'#84cc16','Forro':'#0ea5e9',
-    'Pintura':'#a855f7','Limpeza':'#22c55e'
-  }
-};
+// ==================== CONFIG ====================
+const SENHA_ADMIN = "torre2026";
+let admin = false;
+let modoAtual = 'cronograma';
+let dadosAlterados = false;
 
-// ══════════════════════════════════════════════
-// ESTADO
-// ══════════════════════════════════════════════
-const S = { usuario: null, pagina: 'dashboard', dados: null, cpmCache: null };
+// ==================== CLAUDE IA (Anthropic) ====================
+// Sem chave necessaria — funciona automaticamente
+async function consultarClaude(prompt) {
+    try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-6",
+                max_tokens: 1024,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await resp.json();
+        if (data.error) return "Erro: " + (data.error.message || JSON.stringify(data.error));
+        return data.content?.[0]?.text || "Sem resposta.";
+    } catch(e) {
+        return "Erro de conexao: " + e.message;
+    }
+}
 
-// ══════════════════════════════════════════════
-// DADOS PADRÃO
-// ══════════════════════════════════════════════
-const DEFAULTS = {
-  projeto: {
-    nome:"Torre L'iris Residence", endereco:"Aptos 1702 e 1704",
-    dataInicio:'2026-03-09', prazoDias:20, orcamentoTotal:234943.54, reservaTecnica:0.10
-  },
-  cliente: { nome:'Seu Aldebaner', email:'aldebaner@email.com', telefone:'(91) 99999-9999' },
-  equipe:  { responsavel:'Eng. Isabela Kalume', crea:'CREA-PA 123456', art:'ART-2026-001' },
-  tarefas: [
-    {id:'T1', nome:'Placa de Obra',           grupo:'Preliminares',  dur:1,  custo:1639.05,  preds:[], prog:100},
-    {id:'T2', nome:'Administração',            grupo:'Preliminares',  dur:20, custo:8000,     preds:[{id:'T1',t:'FS',lag:0}], prog:40},
-    {id:'T3', nome:'Demolição Alvenaria',      grupo:'Demolições',    dur:2,  custo:5000,     preds:[{id:'T1',t:'FS',lag:0}], prog:0},
-    {id:'T4', nome:'Remoção Entulho',          grupo:'Demolições',    dur:2,  custo:2000,     preds:[{id:'T3',t:'FS',lag:0}], prog:0},
-    {id:'T5', nome:'Alvenaria Tijolo',         grupo:'Paredes',       dur:2,  custo:8000,     preds:[{id:'T4',t:'FS',lag:0}], prog:0},
-    {id:'T6', nome:'Chapisco',                 grupo:'Revestimentos', dur:2,  custo:3500,     preds:[{id:'T5',t:'FS',lag:0}], prog:0},
-    {id:'T7', nome:'Reboco Impermeabilizante', grupo:'Revestimentos', dur:4,  custo:6000,     preds:[{id:'T6',t:'SS',lag:0}], prog:0},
-    {id:'T8', nome:'Camada Regularizadora',    grupo:'Pavimentação',  dur:2,  custo:4500,     preds:[{id:'T7',t:'FS',lag:2}], prog:0},
-    {id:'T9', nome:'Porcelanato Portinari',    grupo:'Pavimentação',  dur:4,  custo:25000,    preds:[{id:'T8',t:'FS',lag:0}], prog:0},
-    {id:'T10',nome:'Pontos de Tomada',         grupo:'Elétrica',      dur:3,  custo:4000,     preds:[{id:'T5',t:'FS',lag:0}], prog:0},
-    {id:'T11',nome:'Iluminação LED',           grupo:'Elétrica',      dur:2,  custo:6000,     preds:[{id:'T10',t:'FS',lag:0}],prog:0},
-    {id:'T12',nome:'Água/Gás',                 grupo:'Hidráulica',    dur:2,  custo:5000,     preds:[{id:'T5',t:'FS',lag:0}], prog:0},
-    {id:'T13',nome:'Esgoto',                   grupo:'Hidráulica',    dur:2,  custo:3500,     preds:[{id:'T12',t:'FS',lag:0}],prog:0},
-    {id:'T14',nome:'Ar Condicionado',          grupo:'Refrigeração',  dur:2,  custo:8000,     preds:[{id:'T11',t:'FS',lag:0},{id:'T9',t:'FS',lag:0}],prog:0},
-    {id:'T15',nome:'Cabeamento Rede',          grupo:'Rede Lógica',   dur:2,  custo:3000,     preds:[{id:'T11',t:'FS',lag:0}],prog:0},
-    {id:'T16',nome:'Soleira Mármore',          grupo:'Rodapés',       dur:1,  custo:2000,     preds:[{id:'T9',t:'FS',lag:0}], prog:0},
-    {id:'T17',nome:'Rodapé',                   grupo:'Rodapés',       dur:2,  custo:3000,     preds:[{id:'T16',t:'FS',lag:0}],prog:0},
-    {id:'T18',nome:'Portas',                   grupo:'Esquadrias',    dur:2,  custo:8000,     preds:[{id:'T17',t:'FS',lag:0}],prog:0},
-    {id:'T19',nome:'Gesso Forro',              grupo:'Forro',         dur:3,  custo:7000,     preds:[{id:'T15',t:'FS',lag:0}],prog:0},
-    {id:'T20',nome:'Selador',                  grupo:'Pintura',       dur:1,  custo:1500,     preds:[{id:'T19',t:'FS',lag:2}],prog:0},
-    {id:'T21',nome:'Massa Corrida',            grupo:'Pintura',       dur:2,  custo:4000,     preds:[{id:'T20',t:'FS',lag:0}],prog:0},
-    {id:'T22',nome:'Tinta Acrílica',           grupo:'Pintura',       dur:2,  custo:5000,     preds:[{id:'T21',t:'FS',lag:0}],prog:0},
-    {id:'T23',nome:'Limpeza Final',            grupo:'Limpeza',       dur:1,  custo:2000,     preds:[{id:'T22',t:'FS',lag:0},{id:'T18',t:'FS',lag:0}],prog:0}
-  ],
-  financeiro: {
-    entradas: [
-      {id:'E1',data:'2026-03-09',desc:'Entrada 30% — Contrato',valor:70483.06,cat:'Contrato'},
-      {id:'E2',data:'2026-03-25',desc:'Parcela 2 — 30%',       valor:70483.06,cat:'Contrato'},
-      {id:'E3',data:'2026-04-15',desc:'Parcela 3 — 30%',       valor:70483.06,cat:'Contrato'},
-      {id:'E4',data:'2026-05-10',desc:'Parcela 4 — 10%',       valor:23494.36,cat:'Contrato'}
+function contextoObra() {
+    const prog = calcularProgressoGeral();
+    const grupos = dados.grupos.map(g => {
+        const p = calcularProgressoGrupo(g);
+        const tarefas = g.tarefas.map(t =>
+            "    - " + t.nome + ": inicio S" + t.inicio + ", duracao " + t.duracao + " sem., progresso " + t.progresso + "%"
+        ).join("\n");
+        return "  " + g.nome + " (" + p + "% concluido, inicio S" + g.inicio + ", duracao " + g.duracao + " sem.):\n" + tarefas;
+    }).join("\n");
+    return "Obra: " + dados.titulo + "\n" +
+        "Endereco: " + dados.endereco + "\n" +
+        "Tipo: " + dados.obra.tipo + " | Area: " + dados.obra.area + " | Arquiteto: " + dados.obra.arquiteto + "\n" +
+        "Cliente: " + dados.cliente.nome + "\n" +
+        "Inicio: " + fmtData(getDataInicio()) + " | Termino previsto: " + calcularPrevisao() + "\n" +
+        "Duracao total: " + dados.duracaoTotal + " semanas\n" +
+        "Progresso geral: " + prog + "%\n" +
+        "Semana atual: S" + getSemanaAtual() + "\n\n" +
+        "CRONOGRAMA:\n" + grupos + "\n\n" +
+        "ORCAMENTO TOTAL: R$ " + dados.orcamento.reduce(function(s,i){return s+(i.valor||0);},0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+}
+
+// ==================== DADOS PADRÃO ====================
+let dados = {
+    titulo: "Torre L'iris Residence",
+    endereco: "Aptos 1702 e 1704",
+    dataInicio: "2026-03-09",   // ← padrão 09/03/2026 conforme solicitado
+    duracaoTotal: 20,
+    valor: 234943.54,
+    cliente: {
+        nome: "Seu Aldebaner",
+        email: "aldebaner@email.com",
+        telefone: "(91) 99999-9999",
+        observacoes: "Cliente prefere contato por WhatsApp"
+    },
+    obra: {
+        arquiteto: "Isabela Kalume",
+        area: "180 m²",
+        tipo: "Reforma Completa"
+    },
+    grupos: [
+        { 
+            id: 'g1', nome: '1. Serviços Preliminares', cor: '#3b82f6', 
+            inicio: 0, duracao: 2, responsavel: 'Admin', 
+            tarefas: [
+                { nome: 'Placa de Obra',          inicio: 0, duracao: 1, responsavel: 'Admin',      progresso: 100 },
+                { nome: 'Administração da Obra',   inicio: 0, duracao: 5, responsavel: 'Engenheiro', progresso: 40  }
+            ] 
+        },
+        { 
+            id: 'g2', nome: '2. Demolições', cor: '#f43f5e', 
+            inicio: 2, duracao: 2, responsavel: 'Equipe A', 
+            tarefas: [
+                { nome: 'Demolição Alvenaria', inicio: 2, duracao: 2, responsavel: 'Pedreiro', progresso: 0 },
+                { nome: 'Remoção Entulho',     inicio: 4, duracao: 2, responsavel: 'Servente', progresso: 0 }
+            ] 
+        },
+        { 
+            id: 'g3', nome: '3. Paredes', cor: '#e8a020', 
+            inicio: 4, duracao: 2, responsavel: 'Pedreiro', 
+            tarefas: [
+                { nome: 'Alvenaria Tijolo', inicio: 4, duracao: 2, responsavel: 'Pedreiro', progresso: 0 }
+            ] 
+        }
     ],
-    saidas: [
-      {id:'S1',data:'2026-03-10',desc:'Material elétrico — Casa do Construtor',valor:8500,  cat:'Elétrica',    nf:'15432'},
-      {id:'S2',data:'2026-03-12',desc:'Mão de obra — 1ª quinzena',             valor:12000, cat:'Mão de Obra'},
-      {id:'S3',data:'2026-03-15',desc:'Porcelanato Portinari — 50%',           valor:12500, cat:'Pavimentação', nf:'9876'},
-      {id:'S4',data:'2026-03-18',desc:'Material hidráulico',                   valor:4500,  cat:'Hidráulica'},
-      {id:'S5',data:'2026-03-20',desc:'Mão de obra — 2ª quinzena',             valor:11000, cat:'Mão de Obra'}
+    orcamento: [
+        { id: 'o1', grupo: 'Serviços Preliminares', descricao: 'Placa de Obra', valor: 1639.05 },
+        { id: 'o2', grupo: 'Serviços Preliminares', descricao: 'Administração da Obra', valor: 38139.75 }
+    ],
+    ambientes: ['Sala', 'Cozinha', 'Quarto 1', 'Quarto 2', 'Banheiro 1', 'Banheiro 2', 'Área Serviço', 'Varanda'],
+    fotos: [
+        { url: 'https://via.placeholder.com/400x300/3b82f6/ffffff?text=Sala', ambiente: 'Sala', data: '09/03/2026' },
+        { url: 'https://via.placeholder.com/400x300/10b981/ffffff?text=Cozinha', ambiente: 'Cozinha', data: '09/03/2026' }
     ]
-  },
-  galeria: [],
-  diario: []
 };
 
-// ══════════════════════════════════════════════
-// PERSISTÊNCIA
-// ══════════════════════════════════════════════
-function salvar() {
-  try { localStorage.setItem(CFG.KEY, JSON.stringify(S.dados)); } catch(e){}
+const SEMANA_PX = 40;
+
+// ==================== FUNÇÕES DE DATA ====================
+// ► CORREÇÃO PRINCIPAL: parse local para evitar bug de fuso UTC (problema que
+//   fazia a data aparecer 1 dia antes — ex: 09/03 virava 08/03)
+function getDataInicio() {
+    const p = dados.dataInicio.split('-');
+    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
 }
-function carregar() {
-  try {
-    const raw = localStorage.getItem(CFG.KEY);
-    if (raw) {
-      const p = JSON.parse(raw);
-      if (p?.projeto && p?.tarefas) {
-        // Garantir campos novos caso dados antigos não os tenham
-        if (!p.galeria) p.galeria = [];
-        if (!p.diario)  p.diario  = [];
-        return p;
-      }
+
+function fmtData(d) {
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function fmtSemana(s) {
+    const d = new Date(getDataInicio().getTime() + s * 7 * 24 * 3600 * 1000);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+function calcularPrevisao() {
+    const end = new Date(getDataInicio().getTime() + (dados.duracaoTotal || 20) * 7 * 24 * 3600 * 1000);
+    return end.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function getSemanaAtual() {
+    return Math.round((new Date() - getDataInicio()) / (7 * 24 * 3600 * 1000));
+}
+
+// ► Extrai partes da data armazenada (sem depender de Date para evitar bugs)
+function getPartes() {
+    const p = dados.dataInicio.split('-');
+    return { ano: p[0], mes: p[1], dia: p[2] };
+}
+
+// ==================== FUNÇÕES DE PROGRESSO ====================
+function calcularProgressoGrupo(g) {
+    if (!g.tarefas || g.tarefas.length === 0) return 0;
+    return Math.round(g.tarefas.reduce((acc, t) => acc + (t.progresso || 0), 0) / g.tarefas.length);
+}
+function calcularProgressoGeral() {
+    let total = 0, soma = 0;
+    dados.grupos.forEach(g => g.tarefas.forEach(t => { total++; soma += t.progresso || 0; }));
+    return total > 0 ? Math.round(soma / total) : 0;
+}
+
+// ==================== PERSISTÊNCIA ====================
+function salvarDados() {
+    localStorage.setItem('obraLiris_v4', JSON.stringify(dados));
+    dadosAlterados = false;
+    atualizarIndicadorSave();
+    mostrarNotificacao('Dados salvos com sucesso!', 'success');
+}
+function carregarDados() {
+    const salvos = localStorage.getItem('obraLiris_v4');
+    if (salvos) {
+        try { dados = JSON.parse(salvos); } catch(e) { /* mantém padrão */ }
     }
-  } catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+function marcarAlterado() {
+    dadosAlterados = true;
+    atualizarIndicadorSave();
+}
+function atualizarIndicadorSave() {
+    const el = document.getElementById('saveIndicator');
+    if (el) el.className = 'save-indicator ' + (dadosAlterados ? 'pending' : 'saved');
 }
 
-// ══════════════════════════════════════════════
-// CPM
-// ══════════════════════════════════════════════
-function calcCPM() {
-  if (S.cpmCache) return S.cpmCache;
-  const ts = S.dados.tarefas.map(t => ({...t}));
-  const n  = ts.length;
-  const ix = {};
-  ts.forEach((t,i) => { ix[t.id]=i; t.es=0;t.ef=0;t.ls=0;t.lf=0;t.folga=0;t.critico=false;t.pimap=[]; });
-  ts.forEach(t => { t.preds.forEach(p => { if(ix[p.id]!==undefined) t.pimap.push({i:ix[p.id],t:p.t,lag:p.lag}); }); });
-
-  // Kahn topological sort
-  const grau = new Array(n).fill(0);
-  const adj  = Array.from({length:n},()=>[]);
-  ts.forEach((t,i) => t.pimap.forEach(p => { adj[p.i].push(i); grau[i]++; }));
-  const q=[]; grau.forEach((g,i)=>{ if(g===0)q.push(i); });
-  const ord=[]; while(q.length){ const v=q.shift(); ord.push(v); adj[v].forEach(w=>{ if(--grau[w]===0)q.push(w); }); }
-  if(ord.length!==n) ts.forEach((_,i)=>ord.push(i)); // fallback
-
-  // Forward
-  ord.forEach(i => {
-    const t=ts[i];
-    if(!t.pimap.length){ t.es=0; t.ef=t.dur; return; }
-    let mx=0;
-    t.pimap.forEach(p => {
-      const pr=ts[p.i]; let c=0;
-      if(p.t==='SS') c=pr.es+p.lag;
-      else if(p.t==='FF') c=pr.ef+p.lag-t.dur;
-      else if(p.t==='SF') c=pr.es+p.lag-t.dur;
-      else c=pr.ef+p.lag;
-      mx=Math.max(mx,c);
-    });
-    t.es=Math.max(0,mx); t.ef=t.es+t.dur;
-  });
-
-  const dur = Math.max(...ts.map(t=>t.ef));
-
-  // Backward
-  [...ord].reverse().forEach(i => {
-    const t=ts[i];
-    const sucs=[];
-    ts.forEach(t2=>t2.pimap.forEach(p=>{ if(p.i===i) sucs.push({t:t2,p}); }));
-    if(!sucs.length){ t.lf=dur; t.ls=t.lf-t.dur; return; }
-    let mn=dur;
-    sucs.forEach(({t:s,p}) => {
-      let c=0;
-      if(p.t==='SS') c=s.ls-p.lag+t.dur;
-      else if(p.t==='FF') c=s.lf-p.lag;
-      else if(p.t==='SF') c=s.ef-p.lag+t.dur;
-      else c=s.ls-p.lag;
-      mn=Math.min(mn,c);
-    });
-    t.lf=mn; t.ls=t.lf-t.dur;
-  });
-
-  ts.forEach(t=>{ t.folga=Math.round((t.ls-t.es)*10)/10; t.critico=t.folga<=0; });
-  S.cpmCache = { ts, dur, fim: addDias(S.dados.projeto.dataInicio, dur) };
-  return S.cpmCache;
-}
-
-// ══════════════════════════════════════════════
-// EVM
-// ══════════════════════════════════════════════
-function calcEVM() {
-  const {ts,dur} = calcCPM();
-  const hoje  = new Date();
-  const ini   = parseD(S.dados.projeto.dataInicio);
-  const dias  = Math.max(0, Math.floor((hoje-ini)/86400000));
-  const BAC   = S.dados.projeto.orcamentoTotal;
-  let EV=0, PV=0;
-  ts.forEach(t => {
-    const v=t.custo||0;
-    if(dias>=t.es) PV+=v*Math.min(1,(dias-t.es)/t.dur);
-    EV+=v*(t.prog/100);
-  });
-  const AC  = S.dados.financeiro.saidas.reduce((a,s)=>a+s.valor,0);
-  const SV  = EV-PV, CV=EV-AC;
-  const SPI = PV>0?EV/PV:1, CPI=AC>0?EV/AC:1;
-  const EAC = CPI>0?BAC/CPI:BAC, ETC=EAC-AC, VAC=BAC-EAC;
-  const dRest = Math.max(0,dur-dias);
-  const dProj = SPI>0?dRest/SPI:dRest;
-  return {BAC,EV,PV,AC,SV,CV,SPI,CPI,EAC,ETC,VAC,dias,
-    pConc:(EV/BAC)*100, pPlan:(PV/BAC)*100, pGasto:(AC/BAC)*100,
-    dataProj: addDias(isoHoje(), Math.round(dProj))};
-}
-
-// ══════════════════════════════════════════════
-// FINANCEIRO
-// ══════════════════════════════════════════════
-function calcFluxo() {
-  const {entradas,saidas}=S.dados.financeiro;
-  const m={};
-  [...entradas,...saidas].forEach(i=>{
-    const k=i.data.substring(0,7);
-    if(!m[k]) m[k]={e:0,s:0};
-    if(i.cat&&entradas.includes(i)) m[k].e+=i.valor; else m[k].s+=i.valor;
-  });
-  // Detectar entrada vs saida por presença no array
-  const mF={};
-  entradas.forEach(i=>{ const k=i.data.substring(0,7); if(!mF[k])mF[k]={e:0,s:0}; mF[k].e+=i.valor; });
-  saidas.forEach(i=>{   const k=i.data.substring(0,7); if(!mF[k])mF[k]={e:0,s:0}; mF[k].s+=i.valor; });
-  let ac=0;
-  const fluxo=Object.keys(mF).sort().map(k=>{
-    ac+=mF[k].e-mF[k].s;
-    return {mes:fmtMes(k),e:mF[k].e,s:mF[k].s,saldo:ac};
-  });
-  const tE=entradas.reduce((a,i)=>a+i.valor,0);
-  const tS=saidas.reduce((a,i)=>a+i.valor,0);
-  return {fluxo,tE,tS,saldo:tE-tS,aReceber:S.dados.projeto.orcamentoTotal-tE};
-}
-
-// ══════════════════════════════════════════════
-// UTILITÁRIOS
-// ══════════════════════════════════════════════
-function parseD(s){ return new Date(s+'T00:00:00'); }
-function isoHoje(){ const d=new Date(); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
-function p2(n){ return String(n).padStart(2,'0'); }
-function addDias(s,n){ const d=parseD(s); d.setDate(d.getDate()+Math.round(n)); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
-function fmtD(s){ if(!s)return''; const d=parseD(s); return `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`; }
-function fmtMes(ym){ const [a,m]=ym.split('-'); const ns=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; return `${ns[+m-1]}/${a}`; }
-function fmtR(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
-function fmtP(v){ return `${(v||0).toFixed(1)}%`; }
-function diasAte(s){ return Math.ceil((parseD(s)-new Date())/86400000); }
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-
-function toast(msg,tipo='ok'){
-  const el=document.getElementById('toast');
-  el.className=`toast ${tipo}`;
-  el.innerHTML=`<span>${tipo==='ok'?'✓':'✕'}</span> ${msg}`;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),3000);
-}
-
-// ══════════════════════════════════════════════
-// LOGIN / LOGOUT
-// ══════════════════════════════════════════════
-function login(tipo){
-  if(tipo==='admin'){
-    const s=document.getElementById('senhaInput').value;
-    if(btoa(s)!==CFG.HASH){
-      document.getElementById('loginErr').style.display='block';
-      setTimeout(()=>document.getElementById('loginErr').style.display='none',3000);
-      return;
+// ==================== LOGIN ====================
+function verificarSenha() {
+    if (document.getElementById('senhaInput').value === SENHA_ADMIN) {
+        admin = true;
+        document.getElementById('loginModal').style.display = 'none';
+        carregarDados();
+        renderizarAdmin();
+    } else {
+        alert('Senha incorreta');
     }
-  }
-  S.usuario=tipo; S.dados=carregar();
-  S.pagina=tipo==='admin'?'dashboard':'cliente';
-  document.getElementById('loginWrap').style.display='none';
-  render();
 }
-function logout(){
-  S.usuario=null; S.dados=null; S.cpmCache=null; S.pagina='dashboard';
-  document.getElementById('loginWrap').style.display='flex';
-  document.getElementById('senhaInput').value='';
-  document.getElementById('app').innerHTML='';
+function entrarComoCliente() {
+    admin = false;
+    document.getElementById('loginModal').style.display = 'none';
+    carregarDados();
+    renderizarCliente();
 }
 
-// ══════════════════════════════════════════════
-// NAVEGAÇÃO
-// ══════════════════════════════════════════════
-function nav(p){
-  if(S.usuario==='cliente'&&p!=='cliente') return;
-  S.pagina=p; S.cpmCache=null; render();
+// ==================== NOTIFICAÇÕES ====================
+function mostrarNotificacao(mensagem, tipo = 'success') {
+    const notif = document.getElementById('notification');
+    document.getElementById('notifIcon').textContent = tipo === 'success' ? '✅' : '⚠️';
+    document.getElementById('notifMsg').textContent = mensagem;
+    notif.className = 'notification show ' + tipo;
+    setTimeout(() => { notif.className = 'notification'; }, 3000);
 }
 
-// ══════════════════════════════════════════════
-// RENDER PRINCIPAL
-// ══════════════════════════════════════════════
-function render(){
-  const app=document.getElementById('app');
-  app.innerHTML=renderTopbar()+`<div class="layout">${renderSidebar()}<main class="main" id="main">${renderPage()}</main></div>`;
-  if(S.pagina==='dashboard') setTimeout(renderCharts,120);
+// ==================== MODAL ====================
+function abrirModal(titulo, conteudo) {
+    document.getElementById('modalTitulo').textContent = titulo;
+    document.getElementById('modalConteudo').innerHTML = conteudo;
+    document.getElementById('modalGenerico').classList.add('open');
+}
+function fecharModal() {
+    document.getElementById('modalGenerico').classList.remove('open');
 }
 
-function renderTopbar(){
-  const evm=calcEVM();
-  const al=evm.SPI<0.9?'warn':evm.CPI<0.9?'danger':null;
-  return `<div class="topbar">
-    <div class="logo" onclick="nav('dashboard')"><div class="logo-badge">🏗️</div> Torre L'iris</div>
-    <div class="flex items-center gap-2">
-      ${al?`<span class="badge badge-${al==='warn'?'warn':'danger'}">${al==='warn'?'⚠️ Atraso':'🚨 Sobrecusto'}</span>`:''}
-      <span class="badge badge-info">${S.usuario==='admin'?'🔐 Admin':'👁️ Cliente'}</span>
-      ${S.usuario==='admin'?`<button class="btn btn-primary btn-sm" onclick="exportarXLSX()">📊 Exportar</button>`:''}
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+// ==================== ATUALIZAÇÃO DE DATA ====================
+// ► Esta é a função MANDANTE — chamada pelos campos DIA/MÊS/ANO em
+//   Dados do Cliente e propaga para Cronograma Admin + área do Cliente
+function atualizarDataPartes() {
+    const diaEl = document.getElementById('inputDia');
+    const mesEl = document.getElementById('inputMes');
+    const anoEl = document.getElementById('inputAno');
+    if (!diaEl || !mesEl || !anoEl) return;
+
+    let dia = parseInt(diaEl.value) || 9;
+    let mes = parseInt(mesEl.value) || 3;
+    let ano = parseInt(anoEl.value) || 2026;
+
+    // Validação básica
+    dia = Math.min(Math.max(dia, 1), 31);
+    mes = Math.min(Math.max(mes, 1), 12);
+    ano = Math.min(Math.max(ano, 2020), 2040);
+
+    dados.dataInicio = String(ano) + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
+    marcarAlterado();
+
+    // Atualiza preview sem re-renderizar tudo
+    const prev = document.getElementById('dataPreview');
+    if (prev) {
+        prev.innerHTML =
+            '<span>📅 ' + fmtData(getDataInicio()) + '</span>' +
+            '<span style="color:var(--text2)">Término: ' + calcularPrevisao() + '</span>';
+    }
+    // Atualiza legenda do cronograma se estiver visível
+    const cronSub = document.getElementById('cronSub');
+    if (cronSub) cronSub.textContent = dados.endereco + ' · Início: ' + fmtData(getDataInicio()) + ' · Término: ' + calcularPrevisao();
+
+    mostrarNotificacao('Data atualizada: ' + fmtData(getDataInicio()), 'success');
+}
+
+// ==================== RENDERIZAÇÃO ADMIN ====================
+function renderizarAdmin() {
+    document.getElementById('app').innerHTML = `
+    <div class="topbar">
+        <div class="logo"><div class="logo-badge">A</div> Admin — ${dados.titulo}</div>
+        <div style="display:flex; gap:10px; align-items:center">
+            <span style="color:var(--accent); font-size:12px">👑 Administrador</span>
+            <button class="btn btn-ghost" onclick="renderizarCliente()">👁️ Ver como Cliente</button>
+        </div>
     </div>
-  </div>`;
-}
-
-function renderSidebar(){
-  const cpm=calcCPM();
-  const menus=[
-    {id:'dashboard',  icon:'📊', label:'Dashboard',       roles:['admin']},
-    {id:'projeto',    icon:'⚙️', label:'Configurações',   roles:['admin']},
-    {id:'cronograma', icon:'📅', label:'Cronograma CPM',  roles:['admin']},
-    {id:'tarefas',    icon:'✅', label:'Tarefas',          roles:['admin']},
-    {id:'financeiro', icon:'💰', label:'Financeiro',       roles:['admin']},
-    {id:'galeria',    icon:'📷', label:'Galeria de Fotos', roles:['admin']},
-    {id:'diario',     icon:'📝', label:'Diário de Obra',   roles:['admin']},
-    {id:'cliente',    icon:'👤', label:'Área do Cliente',  roles:['admin','cliente']}
-  ].filter(m=>m.roles.includes(S.usuario));
-
-  return `<aside class="sidebar">
-    <div style="margin-bottom:16px;">
-      <div class="sb-label">Menu</div>
-      ${menus.map(m=>`<div class="sb-item ${S.pagina===m.id?'active':''}" onclick="nav('${m.id}')">${m.icon} ${m.label}</div>`).join('')}
-    </div>
-    <div class="sb-label">Projeto</div>
-    <div class="sb-info"><strong>${S.dados.projeto.nome}</strong>${S.dados.projeto.endereco}</div>
-    <div class="sb-info"><strong>Término</strong>${fmtD(cpm.fim)}</div>
-    <div class="sb-info"><strong>Orçamento</strong>${fmtR(S.dados.projeto.orcamentoTotal)}</div>
-  </aside>`;
-}
-
-function renderPage(){
-  switch(S.pagina){
-    case 'dashboard':  return renderDashboard();
-    case 'projeto':    return renderProjeto();
-    case 'cronograma': return renderCronograma();
-    case 'tarefas':    return renderTarefas();
-    case 'financeiro': return renderFinanceiro();
-    case 'galeria':    return renderGaleria();
-    case 'diario':     return renderDiario();
-    case 'cliente':    return renderCliente();
-    default:           return renderDashboard();
-  }
-}
-
-// ══════════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════════
-function renderDashboard(){
-  const evm=calcEVM(), cpm=calcCPM(), fl=calcFluxo();
-  const dr=diasAte(cpm.fim);
-  const concl=cpm.ts.filter(t=>t.prog===100).length;
-  const anda=cpm.ts.filter(t=>t.prog>0&&t.prog<100).length;
-
-  return `<div class="ph"><div class="ph-title"><h1>Dashboard</h1><p class="ph-sub">Visão geral do projeto</p></div>
-    <div class="flex gap-2">
-      <span class="badge ${evm.SPI>=0.95?'badge-ok':evm.SPI>=0.85?'badge-warn':'badge-danger'}">SPI ${evm.SPI.toFixed(2)}</span>
-      <span class="badge ${evm.CPI>=0.95?'badge-ok':evm.CPI>=0.85?'badge-warn':'badge-danger'}">CPI ${evm.CPI.toFixed(2)}</span>
-    </div></div>
-
-  <div class="grid-4 mb-4">
-    ${metricCard('Término Previsto', fmtD(cpm.fim), dr>0?`✓ ${dr} dias restantes`:`⚠ ${Math.abs(dr)} dias atrasado`, dr>0?'pos':'neg')}
-    ${metricCard('Progresso Físico', fmtP(evm.pConc), evm.SV>=0?`✓ ${fmtR(Math.abs(evm.SV))} adiantado`:`⚠ ${fmtR(Math.abs(evm.SV))} atrasado`, evm.SV>=0?'pos':'neg')}
-    ${metricCard('Custo Real / BAC', fmtP(evm.pGasto), evm.CV>=0?`✓ ${fmtR(Math.abs(evm.CV))} economia`:`⚠ ${fmtR(Math.abs(evm.CV))} sobrecusto`, evm.CV>=0?'pos':'neg')}
-    ${metricCard('Saldo em Caixa', fmtR(fl.saldo), fl.aReceber>0?`A receber: ${fmtR(fl.aReceber)}`:'Contrato quitado', fl.saldo>0?'pos':'neg')}
-  </div>
-
-  <div class="grid-4 mb-4">
-    ${metricCard('Tarefas', `${cpm.ts.length}`, 'Total cadastradas', '')}
-    ${metricCard('Concluídas', `${concl}`, `${fmtP(concl/cpm.ts.length*100)} do total`, 'pos')}
-    ${metricCard('Em andamento', `${anda}`, 'Tarefas parciais', 'warn')}
-    ${metricCard('Não iniciadas', `${cpm.ts.filter(t=>t.prog===0).length}`, 'Aguardando início', '')}
-  </div>
-
-  <div class="grid-2">
-    <div class="card"><div class="card-header"><h3 class="card-title">Curva S — Valor Agregado</h3></div><div class="chart-wrap"><canvas id="curvaS"></canvas></div></div>
-    <div class="card"><div class="card-header"><h3 class="card-title">Fluxo de Caixa</h3></div><div class="chart-wrap"><canvas id="fluxoChart"></canvas></div></div>
-  </div>
-
-  <div class="card mt-4">
-    <div class="card-header"><h3 class="card-title">Caminho Crítico</h3><span class="badge badge-danger">Não podem atrasar</span></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Tarefa</th><th>Grupo</th><th>ES</th><th>EF</th><th>Folga</th><th>Progresso</th><th>Custo</th></tr></thead>
-      <tbody>${cpm.ts.filter(t=>t.critico).map(t=>`<tr>
-        <td><strong style="color:var(--text)">${t.nome}</strong></td>
-        <td><span class="badge badge-info">${t.grupo}</span></td>
-        <td class="mono">D${t.es}</td><td class="mono">D${t.ef}</td>
-        <td><span class="badge badge-danger">0d</span></td>
-        <td><div class="flex items-center gap-2"><div class="prog-bar" style="flex:1;margin:0;"><div class="prog-fill" style="width:${t.prog}%;background:${t.prog===100?'var(--accent3)':'var(--accent)'}"></div></div><span class="mono" style="font-size:11px;width:32px">${t.prog}%</span></div></td>
-        <td class="mono">${fmtR(t.custo)}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>
-  </div>`;
-}
-
-function metricCard(label,val,delta,cls){
-  return `<div class="metric">
-    <div class="metric-label">${label}</div>
-    <div class="metric-value">${val}</div>
-    <div class="metric-delta ${cls}">${delta}</div>
-  </div>`;
-}
-
-// ══════════════════════════════════════════════
-// CONFIGURAÇÕES DO PROJETO (CRUD)
-// ══════════════════════════════════════════════
-function renderProjeto(){
-  const {projeto:p,cliente:c,equipe:e}=S.dados;
-  return `<div class="ph"><div class="ph-title"><h1>Configurações</h1><p class="ph-sub">Dados do projeto, cliente e equipe</p></div></div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><h3 class="card-title">📋 Dados do Projeto</h3><button class="btn btn-primary btn-sm" onclick="editarProjeto()">✏️ Editar</button></div>
-      <table><tbody>
-        <tr><td style="color:var(--text3);width:140px">Nome</td><td><strong>${p.nome}</strong></td></tr>
-        <tr><td style="color:var(--text3)">Endereço</td><td>${p.endereco}</td></tr>
-        <tr><td style="color:var(--text3)">Data de Início</td><td>${fmtD(p.dataInicio)}</td></tr>
-        <tr><td style="color:var(--text3)">Prazo (dias)</td><td>${p.prazoDias} dias</td></tr>
-        <tr><td style="color:var(--text3)">Orçamento</td><td class="mono">${fmtR(p.orcamentoTotal)}</td></tr>
-        <tr><td style="color:var(--text3)">Reserva Técnica</td><td>${(p.reservaTecnica*100).toFixed(0)}%</td></tr>
-      </tbody></table>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><h3 class="card-title">👤 Dados do Cliente</h3><button class="btn btn-primary btn-sm" onclick="editarCliente()">✏️ Editar</button></div>
-      <table><tbody>
-        <tr><td style="color:var(--text3);width:140px">Nome</td><td><strong>${c.nome}</strong></td></tr>
-        <tr><td style="color:var(--text3)">E-mail</td><td>${c.email}</td></tr>
-        <tr><td style="color:var(--text3)">Telefone</td><td>${c.telefone}</td></tr>
-      </tbody></table>
-      <div class="divider"></div>
-      <div class="card-header" style="margin-bottom:8px"><h3 class="card-title">👷 Equipe Técnica</h3><button class="btn btn-primary btn-sm" onclick="editarEquipe()">✏️ Editar</button></div>
-      <table><tbody>
-        <tr><td style="color:var(--text3);width:140px">Responsável</td><td><strong>${e.responsavel}</strong></td></tr>
-        <tr><td style="color:var(--text3)">CREA</td><td>${e.crea}</td></tr>
-        <tr><td style="color:var(--text3)">ART</td><td>${e.art}</td></tr>
-      </tbody></table>
-    </div>
-  </div>`;
-}
-
-function editarProjeto(){
-  const p=S.dados.projeto;
-  modal('Editar Projeto',`
-    <div class="form-group"><label class="form-label">Nome do Projeto</label><input id="pNome" class="form-input" value="${p.nome}"></div>
-    <div class="form-group"><label class="form-label">Endereço / Localização</label><input id="pEnd" class="form-input" value="${p.endereco}"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Data de Início</label><input id="pIni" type="date" class="form-input" value="${p.dataInicio}"></div>
-      <div class="form-group"><label class="form-label">Prazo (dias)</label><input id="pPrazo" type="number" class="form-input" value="${p.prazoDias}" min="1"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Orçamento Total (R$)</label><input id="pOrc" type="number" class="form-input" value="${p.orcamentoTotal}" step="0.01"></div>
-      <div class="form-group"><label class="form-label">Reserva Técnica (%)</label><input id="pRes" type="number" class="form-input" value="${p.reservaTecnica*100}" min="0" max="100"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarProjeto()">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-    </div>`);
-}
-function salvarProjeto(){
-  S.dados.projeto.nome=v('pNome'); S.dados.projeto.endereco=v('pEnd');
-  S.dados.projeto.dataInicio=v('pIni'); S.dados.projeto.prazoDias=+v('pPrazo');
-  S.dados.projeto.orcamentoTotal=+v('pOrc'); S.dados.projeto.reservaTecnica=+v('pRes')/100;
-  salvar(); S.cpmCache=null; closeModal(); toast('Projeto atualizado!'); nav('projeto');
-}
-
-function editarCliente(){
-  const c=S.dados.cliente;
-  modal('Editar Cliente',`
-    <div class="form-group"><label class="form-label">Nome</label><input id="cNome" class="form-input" value="${c.nome}"></div>
-    <div class="form-group"><label class="form-label">E-mail</label><input id="cEmail" class="form-input" value="${c.email}"></div>
-    <div class="form-group"><label class="form-label">Telefone</label><input id="cTel" class="form-input" value="${c.telefone}"></div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarCliente()">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-    </div>`);
-}
-function salvarCliente(){
-  S.dados.cliente.nome=v('cNome'); S.dados.cliente.email=v('cEmail'); S.dados.cliente.telefone=v('cTel');
-  salvar(); closeModal(); toast('Dados do cliente salvos!'); nav('projeto');
-}
-
-function editarEquipe(){
-  const e=S.dados.equipe;
-  modal('Editar Equipe Técnica',`
-    <div class="form-group"><label class="form-label">Responsável Técnico</label><input id="eResp" class="form-input" value="${e.responsavel}"></div>
-    <div class="form-group"><label class="form-label">CREA</label><input id="eCrea" class="form-input" value="${e.crea}"></div>
-    <div class="form-group"><label class="form-label">ART</label><input id="eArt" class="form-input" value="${e.art}"></div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarEquipe()">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-    </div>`);
-}
-function salvarEquipe(){
-  S.dados.equipe.responsavel=v('eResp'); S.dados.equipe.crea=v('eCrea'); S.dados.equipe.art=v('eArt');
-  salvar(); closeModal(); toast('Equipe técnica atualizada!'); nav('projeto');
-}
-
-// ══════════════════════════════════════════════
-// TAREFAS — CRUD COMPLETO
-// ══════════════════════════════════════════════
-function renderTarefas(){
-  const ts=S.dados.tarefas;
-  return `<div class="ph">
-    <div class="ph-title"><h1>Tarefas</h1><p class="ph-sub">Adicionar, editar, excluir e atualizar progresso</p></div>
-    <button class="btn btn-primary" onclick="novaT()">+ Nova Tarefa</button>
-  </div>
-  <div class="tbl-wrap"><table>
-    <thead><tr><th>ID</th><th>Tarefa</th><th>Grupo</th><th>Dur.</th><th>Custo</th><th>Predecessoras</th><th style="width:200px">Progresso</th><th>Ações</th></tr></thead>
-    <tbody id="tTbody">
-      ${ts.map(t=>`<tr id="tr_${t.id}">
-        <td class="mono" style="color:var(--text3)">${t.id}</td>
-        <td><strong style="color:var(--text)">${t.nome}</strong></td>
-        <td><span class="badge badge-info">${t.grupo}</span></td>
-        <td class="mono">${t.dur}d</td>
-        <td class="mono">${fmtR(t.custo)}</td>
-        <td style="font-size:11px;color:var(--text3)">${t.preds.map(p=>`${p.id}(${p.t})`).join(', ')||'—'}</td>
-        <td>
-          <div class="flex items-center gap-2">
-            <input type="range" min="0" max="100" value="${t.prog}" style="flex:1;min-width:80px"
-              oninput="updProg('${t.id}',this.value)" onchange="updProg('${t.id}',this.value)">
-            <input type="number" class="prog-input" min="0" max="100" value="${t.prog}"
-              onchange="updProg('${t.id}',this.value)">
-          </div>
-        </td>
-        <td>
-          <div class="flex gap-2">
-            <button class="btn btn-secondary btn-xs" onclick="editarT('${t.id}')">✏️</button>
-            <button class="btn btn-danger btn-xs" onclick="excluirT('${t.id}')">🗑️</button>
-          </div>
-        </td>
-      </tr>`).join('')}
-    </tbody>
-  </table></div>`;
-}
-
-function updProg(id, val){
-  const pct = Math.min(100, Math.max(0, Math.round(+val)));
-  const t = S.dados.tarefas.find(t=>t.id===id);
-  if(!t) return;
-  t.prog = pct;
-  S.cpmCache=null;
-  salvar();
-  // Atualizar só a linha sem re-render
-  const row=document.getElementById(`tr_${id}`);
-  if(row){
-    const inputs=row.querySelectorAll('input');
-    inputs[0].value=pct; inputs[1].value=pct;
-  }
-}
-
-function novaT(){
-  modal('Nova Tarefa', formTarefa(null), true);
-}
-function editarT(id){
-  const t=S.dados.tarefas.find(t=>t.id===id);
-  modal('Editar Tarefa', formTarefa(t));
-}
-function formTarefa(t){
-  const ids=S.dados.tarefas.map(tt=>tt.id).filter(i=>!t||i!==t.id);
-  const predsStr=t?t.preds.map(p=>`${p.id}:${p.t}:${p.lag}`).join(','):'';
-  return `
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">ID da Tarefa</label><input id="tId" class="form-input" value="${t?t.id:''}" placeholder="Ex: T24"></div>
-      <div class="form-group"><label class="form-label">Grupo</label>
-        <select id="tGrupo" class="form-select">${CFG.GRUPOS_TAREFA.map(g=>`<option ${t&&t.grupo===g?'selected':''}>${g}</option>`).join('')}</select>
-      </div>
-    </div>
-    <div class="form-group"><label class="form-label">Nome da Tarefa</label><input id="tNome" class="form-input" value="${t?t.nome:''}" placeholder="Ex: Impermeabilização"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Duração (dias)</label><input id="tDur" type="number" class="form-input" value="${t?t.dur:1}" min="1"></div>
-      <div class="form-group"><label class="form-label">Custo (R$)</label><input id="tCusto" type="number" class="form-input" value="${t?t.custo:0}" step="0.01"></div>
-    </div>
-    <div class="form-group"><label class="form-label">Progresso atual (%)</label>
-      <div class="slider-wrap"><input type="range" id="tProgSlider" min="0" max="100" value="${t?t.prog:0}" oninput="document.getElementById('tProg').value=this.value">
-      <input type="number" id="tProg" class="prog-input" min="0" max="100" value="${t?t.prog:0}" oninput="document.getElementById('tProgSlider').value=this.value"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Predecessoras (formato: ID:TIPO:LAG, separadas por vírgula)</label>
-      <input id="tPreds" class="form-input" value="${predsStr}" placeholder="Ex: T1:FS:0, T3:SS:2">
-      <div style="font-size:10px;color:var(--text3);margin-top:4px">Tipos: FS, SS, FF, SF | IDs disponíveis: ${ids.join(', ')}</div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarT('${t?t.id:''}')">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-    </div>`;
-}
-function salvarT(idAntigo){
-  const id=v('tId').trim().toUpperCase();
-  const nome=v('tNome').trim();
-  const grupo=v('tGrupo');
-  const dur=+v('tDur');
-  const custo=+v('tCusto');
-  const prog=Math.min(100,Math.max(0,+v('tProg')));
-  if(!id||!nome||dur<1){ toast('Preencha ID, nome e duração.','err'); return; }
-  if(!idAntigo&&S.dados.tarefas.find(t=>t.id===id)){ toast('ID já existe!','err'); return; }
-
-  const predsRaw=v('tPreds').trim();
-  const preds=predsRaw?predsRaw.split(',').map(s=>{
-    const [pid,pt='FS',plag='0']=s.trim().split(':');
-    return {id:pid.trim().toUpperCase(),t:pt.trim().toUpperCase(),lag:+plag||0};
-  }).filter(p=>p.id):[];
-
-  if(idAntigo){
-    const idx=S.dados.tarefas.findIndex(t=>t.id===idAntigo);
-    if(idx>=0) S.dados.tarefas[idx]={id,nome,grupo,dur,custo,preds,prog};
-  } else {
-    S.dados.tarefas.push({id,nome,grupo,dur,custo,preds,prog});
-  }
-  S.cpmCache=null; salvar(); closeModal(); toast('Tarefa salva!'); nav('tarefas');
-}
-function excluirT(id){
-  if(!confirm(`Excluir a tarefa ${id}?`)) return;
-  S.dados.tarefas=S.dados.tarefas.filter(t=>t.id!==id);
-  // Remover referências como predecessora
-  S.dados.tarefas.forEach(t=>{ t.preds=t.preds.filter(p=>p.id!==id); });
-  S.cpmCache=null; salvar(); toast('Tarefa excluída.'); nav('tarefas');
-}
-
-// ══════════════════════════════════════════════
-// CRONOGRAMA CPM (visualização)
-// ══════════════════════════════════════════════
-function renderCronograma(){
-  const cpm=calcCPM();
-  const esc=100/cpm.dur;
-  return `<div class="ph">
-    <div class="ph-title"><h1>Cronograma CPM</h1><p class="ph-sub">Caminho crítico em vermelho · Para editar tarefas, vá em Tarefas</p></div>
-    <div class="flex gap-2"><span class="badge badge-ok">Folga &gt; 0</span><span class="badge badge-danger">Crítico</span></div>
-  </div>
-  <div class="card mb-4">
-    <div class="grid-4">
-      <div><div class="metric-label">Início</div><div style="font-weight:600">${fmtD(S.dados.projeto.dataInicio)}</div></div>
-      <div><div class="metric-label">Término Previsto</div><div style="font-weight:600;color:var(--accent3)">${fmtD(cpm.fim)}</div></div>
-      <div><div class="metric-label">Duração Total</div><div style="font-weight:600">${cpm.dur} dias</div></div>
-      <div><div class="metric-label">Tarefas Críticas</div><div style="font-weight:600;color:var(--accent4)">${cpm.ts.filter(t=>t.critico).length} / ${cpm.ts.length}</div></div>
-    </div>
-  </div>
-  <div class="gantt-wrap">
-    <div class="gantt-head">
-      <div class="gc">Tarefa</div><div class="gc">ES</div><div class="gc">EF</div>
-      <div class="gc">Folga</div><div class="gc">Custo</div>
-      <div class="gc" style="flex:1">Timeline (${cpm.dur}d)</div>
-      <div class="gc">%</div>
-    </div>
-    ${cpm.ts.map(t=>{
-      const cor=CFG.CORES_GRUPOS[t.grupo]||'#888';
-      const l=t.es*esc, w=Math.max(t.dur*esc,0.5);
-      return `<div class="gantt-row ${t.critico?'crit':''}">
-        <div class="gc"><div><div class="task-name">${t.nome}</div><div class="task-sub">${t.grupo}</div></div></div>
-        <div class="gc mono" style="font-size:11px">${t.es}</div>
-        <div class="gc mono" style="font-size:11px">${t.ef}</div>
-        <div class="gc">${t.critico?'<span class="badge badge-danger">0d</span>':`<span style="color:var(--accent3);font-size:12px">${t.folga}d</span>`}</div>
-        <div class="gc mono" style="font-size:10px">${fmtR(t.custo)}</div>
-        <div class="gc" style="padding:0;position:relative">
-          <div class="bar-area" style="width:100%">
-            ${todayLine(cpm.dur)}
-            <div class="gantt-bar ${t.critico?'crit':''}" style="left:${l}%;width:${w}%;background:${cor}22" title="${t.nome}: D${t.es}→D${t.ef} | ${t.prog}%">
-              <div class="bar-fill" style="width:${t.prog}%;background:${cor}"></div>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-label">Módulos</div>
+                <div class="sidebar-item ${modoAtual==='dadosCliente'?'active':''}" onclick="mudarModo('dadosCliente')">👤 Dados do Cliente</div>
+                <div class="sidebar-item ${modoAtual==='cronograma'?'active':''}" onclick="mudarModo('cronograma')">📅 Cronograma</div>
+                <div class="sidebar-item ${modoAtual==='orcamento'?'active':''}" onclick="mudarModo('orcamento')">💰 Orçamento</div>
+                <div class="sidebar-item ${modoAtual==='fotos'?'active':''}" onclick="mudarModo('fotos')">📸 Fotos</div>
+                <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">Ambientes</div>
+                <div class="sidebar-item ${modoAtual==='ia'?'active':''}" onclick="mudarModo('ia')" style="border-left:2px solid transparent">
+                    <span style="color:#60a5fa">IA Assistente</span>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="gc mono" style="font-size:11px">${t.prog}%</div>
-      </div>`;
-    }).join('')}
-  </div>`;
+        <div class="main">
+            <div class="save-bar">
+                <div class="save-status">
+                    <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
+                    <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
+                </div>
+                <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
+            </div>
+            ${renderizarConteudoAdmin()}
+        </div>
+    </div>`;
+    if (modoAtual === 'cronograma') setTimeout(() => renderizarGantt(), 80);
 }
 
-function todayLine(dur){
-  const d=Math.floor((new Date()-parseD(S.dados.projeto.dataInicio))/86400000);
-  if(d<0||d>dur) return '';
-  return `<div class="today-line" style="left:${(d/dur)*100}%" title="Hoje — Dia ${d}"></div>`;
+function mudarModo(modo) {
+    if (dadosAlterados && !confirm('Alterações não salvas. Salvar antes de mudar?')) return;
+    if (dadosAlterados) salvarDados();
+    modoAtual = modo;
+    renderizarAdmin();
 }
 
-// ══════════════════════════════════════════════
-// FINANCEIRO — CRUD COMPLETO
-// ══════════════════════════════════════════════
-function renderFinanceiro(){
-  const fl=calcFluxo(), evm=calcEVM();
-  return `<div class="ph">
-    <div class="ph-title"><h1>Financeiro</h1><p class="ph-sub">Entradas, saídas e fluxo de caixa</p></div>
-    <div class="flex gap-2">
-      <button class="btn btn-success btn-sm" onclick="novoLanc('entrada')">+ Receita</button>
-      <button class="btn btn-danger btn-sm"  onclick="novoLanc('saida')">+ Despesa</button>
-    </div>
-  </div>
-
-  <div class="grid-4 mb-4">
-    ${metricCard('Total Recebido', fmtR(fl.tE), fmtP(fl.tE/S.dados.projeto.orcamentoTotal*100)+' do contrato','pos')}
-    ${metricCard('Total Pago', fmtR(fl.tS), fmtP(evm.pGasto)+' do orçamento','neg')}
-    ${metricCard('Saldo Atual', fmtR(fl.saldo), fl.saldo>0?'Caixa positivo':'Caixa negativo', fl.saldo>0?'pos':'neg')}
-    ${metricCard('EAC (Projeção)', fmtR(evm.EAC), (evm.VAC>=0?'Economia: ':'Sobrecusto: ')+fmtR(Math.abs(evm.VAC)), evm.VAC>=0?'pos':'neg')}
-  </div>
-
-  <div class="grid-2 mb-4">
-    <div class="card">
-      <div class="card-header"><h3 class="card-title">✅ Entradas</h3><span class="badge badge-ok">${S.dados.financeiro.entradas.length}</span></div>
-      ${S.dados.financeiro.entradas.map(e=>lancItem(e,'entrada')).join('')}
-    </div>
-    <div class="card">
-      <div class="card-header"><h3 class="card-title">❌ Saídas</h3><span class="badge badge-danger">${S.dados.financeiro.saidas.length}</span></div>
-      ${S.dados.financeiro.saidas.map(s=>lancItem(s,'saida')).join('')}
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header"><h3 class="card-title">Fluxo Mensal</h3></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Mês</th><th class="text-right">Entradas</th><th class="text-right">Saídas</th><th class="text-right">Saldo Mês</th><th class="text-right">Acumulado</th><th>Status</th></tr></thead>
-      <tbody>${fl.fluxo.map(f=>`<tr>
-        <td><strong>${f.mes}</strong></td>
-        <td class="text-right mono" style="color:var(--accent3)">+${fmtR(f.e)}</td>
-        <td class="text-right mono" style="color:var(--accent4)">-${fmtR(f.s)}</td>
-        <td class="text-right mono">${fmtR(f.e-f.s)}</td>
-        <td class="text-right mono" style="font-weight:600">${fmtR(f.saldo)}</td>
-        <td>${f.saldo<10000?'<span class="badge badge-warn">Gargalo</span>':'<span class="badge badge-ok">OK</span>'}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>
-  </div>`;
+function renderizarConteudoAdmin() {
+    switch(modoAtual) {
+        case 'dadosCliente': return renderizarDadosClienteAdmin();
+        case 'cronograma':   return renderizarCronogramaAdmin();
+        case 'orcamento':    return renderizarOrcamentoAdmin();
+        case 'fotos':        return renderizarFotosAdmin();
+        case 'ambientes':    return renderizarAmbientesAdmin();
+        case 'ia':           return renderizarIAAdmin();
+        default:             return renderizarDadosClienteAdmin();
+    }
 }
 
-function lancItem(i, tipo){
-  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-    <div>
-      <div style="font-size:13px;color:var(--text);font-weight:500">${i.desc}</div>
-      <div style="font-size:11px;color:var(--text3)">${fmtD(i.data)} · ${i.cat}${i.nf?` · NF ${i.nf}`:''}</div>
+// ==================== DADOS DO CLIENTE (MANDANTE DA DATA) ====================
+function renderizarDadosClienteAdmin() {
+    const p = getPartes();
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">👤 Dados do Cliente</div>
+            <div class="page-sub">⚠️ A data de início definida aqui é mandante — alimenta automaticamente o Cronograma e a área do Cliente</div>
+        </div>
     </div>
-    <div class="flex items-center gap-2">
-      <span class="mono" style="font-size:13px;font-weight:600;color:${tipo==='entrada'?'var(--accent3)':'var(--accent4)'}">${tipo==='entrada'?'+':'-'}${fmtR(i.valor)}</span>
-      <button class="btn btn-secondary btn-xs" onclick="editarLanc('${tipo}','${i.id}')">✏️</button>
-      <button class="btn btn-danger btn-xs"    onclick="excluirLanc('${tipo}','${i.id}')">🗑️</button>
-    </div>
-  </div>`;
-}
 
-function novoLanc(tipo){
-  modal((tipo==='entrada'?'Nova Receita':'Nova Despesa'), formLanc(tipo, null));
-}
-function editarLanc(tipo, id){
-  const arr=tipo==='entrada'?S.dados.financeiro.entradas:S.dados.financeiro.saidas;
-  const item=arr.find(i=>i.id===id);
-  modal((tipo==='entrada'?'Editar Receita':'Editar Despesa'), formLanc(tipo, item));
-}
-function formLanc(tipo, i){
-  const cats=tipo==='entrada'?CFG.CATEGORIAS_ENTRADA:CFG.CATEGORIAS_SAIDA;
-  return `
-    <input type="hidden" id="lTipo" value="${tipo}">
-    <input type="hidden" id="lId"   value="${i?i.id:''}">
-    <div class="form-group"><label class="form-label">Descrição</label><input id="lDesc" class="form-input" value="${i?i.desc:''}" placeholder="Ex: Material hidráulico"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Valor (R$)</label><input id="lValor" type="number" class="form-input" value="${i?i.valor:''}" step="0.01" min="0"></div>
-      <div class="form-group"><label class="form-label">Data</label><input id="lData" type="date" class="form-input" value="${i?i.data:isoHoje()}"></div>
+    <!-- BLOCO DE DATA — MANDANTE -->
+    <div class="client-data-card" style="border-color: var(--accent); margin-bottom:16px">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--accent); text-transform:uppercase; margin-bottom:12px">
+            📅 Data de Início da Obra — Mandante para todo o sistema
+        </div>
+        <div class="data-picker-box">
+            <div class="data-part">
+                <label>Dia</label>
+                <input id="inputDia" type="number" min="1" max="31" value="${parseInt(p.dia)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-sep">/</div>
+            <div class="data-part">
+                <label>Mês</label>
+                <input id="inputMes" type="number" min="1" max="12" value="${parseInt(p.mes)}"
+                       style="width:70px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-sep">/</div>
+            <div class="data-part">
+                <label>Ano</label>
+                <input id="inputAno" type="number" min="2020" max="2040" value="${parseInt(p.ano)}"
+                       style="width:90px" oninput="atualizarDataPartes()">
+            </div>
+            <div class="data-preview" id="dataPreview">
+                <span>📅 ${fmtData(getDataInicio())}</span>
+                <span style="color:var(--text2)">Término: ${calcularPrevisao()}</span>
+            </div>
+        </div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Categoria</label>
-        <select id="lCat" class="form-select">${cats.map(c=>`<option ${i&&i.cat===c?'selected':''}>${c}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label class="form-label">Nota Fiscal (opcional)</label><input id="lNF" class="form-input" value="${i&&i.nf?i.nf:''}" placeholder="Nº da NF"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarLanc()">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+
+    <!-- DEMAIS DADOS -->
+    <div class="client-data-card">
+        <div class="client-data-grid">
+            <div class="client-data-item">
+                <label class="client-data-label">Nome do Cliente</label>
+                <input class="client-data-input" value="${dados.cliente.nome}"
+                       onchange="dados.cliente.nome=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Email</label>
+                <input class="client-data-input" value="${dados.cliente.email}"
+                       onchange="dados.cliente.email=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Telefone</label>
+                <input class="client-data-input" value="${dados.cliente.telefone}"
+                       onchange="dados.cliente.telefone=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Observações</label>
+                <input class="client-data-input" value="${dados.cliente.observacoes}"
+                       onchange="dados.cliente.observacoes=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Arquiteto</label>
+                <input class="client-data-input" value="${dados.obra.arquiteto}"
+                       onchange="dados.obra.arquiteto=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Área</label>
+                <input class="client-data-input" value="${dados.obra.area}"
+                       onchange="dados.obra.area=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">Tipo</label>
+                <input class="client-data-input" value="${dados.obra.tipo}"
+                       onchange="dados.obra.tipo=this.value; marcarAlterado();">
+            </div>
+            <div class="client-data-item">
+                <label class="client-data-label">⏱️ Duração (semanas)</label>
+                <input class="client-data-input" type="number" value="${dados.duracaoTotal}"
+                       onchange="dados.duracaoTotal=parseInt(this.value)||20; marcarAlterado();">
+            </div>
+        </div>
     </div>`;
 }
-function salvarLanc(){
-  const tipo=v('lTipo'), id=v('lId');
-  const desc=v('lDesc').trim(), valor=+v('lValor'), data=v('lData'), cat=v('lCat'), nf=v('lNF').trim();
-  if(!desc||!valor||!data){ toast('Preencha descrição, valor e data.','err'); return; }
-  const item={id:id||uid(),data,desc,valor,cat};
-  if(nf) item.nf=nf;
-  const arr=tipo==='entrada'?S.dados.financeiro.entradas:S.dados.financeiro.saidas;
-  const idx=arr.findIndex(i=>i.id===id);
-  if(idx>=0) arr[idx]=item; else arr.push(item);
-  salvar(); closeModal(); toast('Lançamento salvo!'); nav('financeiro');
-}
-function excluirLanc(tipo,id){
-  if(!confirm('Excluir este lançamento?')) return;
-  if(tipo==='entrada') S.dados.financeiro.entradas=S.dados.financeiro.entradas.filter(i=>i.id!==id);
-  else                 S.dados.financeiro.saidas  =S.dados.financeiro.saidas.filter(i=>i.id!==id);
-  salvar(); toast('Lançamento excluído.'); nav('financeiro');
-}
 
-// ══════════════════════════════════════════════
-// GALERIA DE FOTOS — CRUD
-// ══════════════════════════════════════════════
-function renderGaleria(){
-  const fotos=S.dados.galeria||[];
-  return `<div class="ph">
-    <div class="ph-title"><h1>Galeria de Fotos</h1><p class="ph-sub">Registros fotográficos da obra — visíveis ao cliente</p></div>
-    <button class="btn btn-primary" onclick="addFoto()">📷 Adicionar Foto</button>
-  </div>
-  ${fotos.length===0?`<div class="alert alert-info">📷 Nenhuma foto cadastrada ainda. Clique em "Adicionar Foto" para começar.</div>`:''}
-  <div class="gallery-grid">
-    ${fotos.map(f=>`
-      <div class="gallery-item" onclick="verFoto('${f.id}')">
-        <img src="${f.src}" alt="${f.legenda}" loading="lazy">
-        <div class="gi-info">
-          <strong>${f.legenda}</strong>
-          <span>${fmtD(f.data)}${f.etapa?' · '+f.etapa:''}</span>
+// ==================== CRONOGRAMA ADMIN ====================
+function renderizarCronogramaAdmin() {
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">📅 Cronograma</div>
+            <div class="page-sub" id="cronSub">${dados.endereco} · Início: ${fmtData(getDataInicio())} · Término: ${calcularPrevisao()}</div>
         </div>
-        <button class="gi-del" onclick="event.stopPropagation();excluirFoto('${f.id}')">✕</button>
-      </div>`).join('')}
-  </div>`;
-}
-
-function addFoto(){
-  modal('Adicionar Foto', `
-    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
-         ondragover="event.preventDefault();this.classList.add('drag')"
-         ondragleave="this.classList.remove('drag')"
-         ondrop="event.preventDefault();this.classList.remove('drag');handleFiles(event.dataTransfer.files)">
-      <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
-      <div style="font-size:32px;margin-bottom:8px">📷</div>
-      <div style="font-weight:600;margin-bottom:4px">Clique ou arraste fotos aqui</div>
-      <div style="color:var(--text3);font-size:12px">JPG, PNG, WEBP — múltiplas fotos permitidas</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:11px; color:var(--text2)">
+                📅 Início: <strong style="color:var(--accent)">${fmtData(getDataInicio())}</strong>
+                &nbsp;·&nbsp; Altere em <strong style="color:var(--accent2)">Dados do Cliente</strong>
+            </div>
+            <button class="btn btn-ghost" onclick="exportarCronograma()">📥 Exportar</button>
+            <button class="btn btn-primary" onclick="adicionarGrupo()">+ Novo Grupo</button>
+        </div>
     </div>
-    <div id="previewArea" style="margin-top:16px"></div>
-    <div id="metaArea" style="display:none">
-      <div class="form-group"><label class="form-label">Legenda</label><input id="fLegenda" class="form-input" placeholder="Ex: Vista da sala após demolição"></div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Data</label><input id="fData" type="date" class="form-input" value="${isoHoje()}"></div>
-        <div class="form-group"><label class="form-label">Etapa (opcional)</label>
-          <select id="fEtapa" class="form-select"><option value="">— Selecione —</option>${CFG.GRUPOS_TAREFA.map(g=>`<option>${g}</option>`).join('')}</select>
+    <div class="gantt-wrap">
+        <div class="gantt-header">
+            <div class="gh-cell">Tarefa / Grupo</div>
+            <div class="gh-cell">Início</div>
+            <div class="gh-cell">Fim</div>
+            <div class="gh-cell">Dur. (sem)</div>
+            <div class="gh-cell">Progresso</div>
+            <div class="gh-cell">Cronograma Visual</div>
         </div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-primary" style="flex:1" onclick="salvarFotos()">💾 Salvar Foto(s)</button>
-        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      </div>
-    </div>`);
+        <div id="ganttBody"></div>
+    </div>`;
 }
 
-// Buffer para fotos em processo de upload
-let _fotosBuffer = [];
+// ── Garante que tarefas antigas (sem campo inicio) recebam um valor padrão ──
+function normalizarTarefas() {
+    dados.grupos.forEach(g => {
+        let cursor = g.inicio; // acumula o início sequencial
+        g.tarefas.forEach(t => {
+            if (t.inicio === undefined || t.inicio === null) {
+                t.inicio = cursor;
+            }
+            cursor = t.inicio + (t.duracao || 1);
+        });
+    });
+}
 
-function handleFiles(files){
-  _fotosBuffer = [];
-  const prev = document.getElementById('previewArea');
-  const meta = document.getElementById('metaArea');
-  if(!files.length) return;
-  prev.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:12px"></div>';
-  const grid = prev.querySelector('div');
-  let loaded = 0;
-  Array.from(files).forEach((file, idx) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      _fotosBuffer.push({ idx, src: e.target.result, name: file.name });
-      const img = document.createElement('div');
-      img.style.cssText = 'border-radius:6px;overflow:hidden;border:1px solid var(--border)';
-      img.innerHTML = `<img src="${e.target.result}" style="width:100%;height:80px;object-fit:cover">`;
-      grid.appendChild(img);
-      if(++loaded === files.length) meta.style.display = 'block';
+// ── Recalcula inicio e duracao do GRUPO com base nas tarefas filhas ──
+function recalcularGrupo(g) {
+    if (!g.tarefas || g.tarefas.length === 0) return;
+    const iMin = Math.min(...g.tarefas.map(t => t.inicio));
+    const iMax = Math.max(...g.tarefas.map(t => t.inicio + (t.duracao || 1)));
+    g.inicio   = iMin;
+    g.duracao  = iMax - iMin;
+}
+
+function renderizarGantt() {
+    normalizarTarefas(); // compatibilidade com dados antigos
+    const body = document.getElementById('ganttBody');
+    if (!body) return;
+    body.innerHTML = '';
+    const semanaAtual = getSemanaAtual();
+
+    dados.grupos.forEach((g, gIndex) => {
+        recalcularGrupo(g); // grupo espelha suas tarefas
+        const progGrupo = calcularProgressoGrupo(g);
+        const grupoDiv = document.createElement('div');
+        grupoDiv.className = 'gantt-group';
+
+        // ── CABEÇALHO DO GRUPO (barra engloba todas as tarefas) ──
+        const grupoHeader = document.createElement('div');
+        grupoHeader.className = 'gantt-group-header';
+        grupoHeader.innerHTML = `
+            <div class="gc">
+                <div class="dot" style="background:${g.cor}; cursor:pointer" title="Alterar cor"
+                    onclick="alterarCorGrupo(${gIndex})"></div>
+                <input class="gc-edit" value="${g.nome}"
+                    onchange="dados.grupos[${gIndex}].nome=this.value; marcarAlterado();">
+            </div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio)}</div>
+            <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(g.inicio + g.duracao)}</div>
+            <div class="gc" style="font-size:11px; color:var(--text3)">${g.duracao} sem.</div>
+            <div class="gc">
+                <span style="color:var(--accent); font-weight:600">${progGrupo}%</span>
+            </div>
+            <div class="gc" style="padding:0; overflow:hidden">
+                <div class="bar-area">
+                    <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                    <div class="gantt-bar" style="left:${g.inicio*SEMANA_PX}px; width:${g.duracao*SEMANA_PX}px;
+                        background:${g.cor}33; border:1px solid ${g.cor}">
+                        <div class="gantt-bar-fill" style="width:${progGrupo}%; background:${g.cor}"></div>
+                    </div>
+                </div>
+            </div>`;
+        grupoDiv.appendChild(grupoHeader);
+
+        // ── TAREFAS — cada uma com seu próprio início e duração ──
+        g.tarefas.forEach((t, tIndex) => {
+            // segurança: garante que t.inicio existe
+            if (t.inicio === undefined) t.inicio = g.inicio;
+            const tFim = t.inicio + (t.duracao || 1);
+
+            const row = document.createElement('div');
+            row.className = 'gantt-row';
+            row.innerHTML = `
+                <div class="gc" style="padding-left:36px; gap:4px">
+                    <input class="gc-edit" value="${t.nome}"
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].nome=this.value; marcarAlterado();">
+                    <button class="btn-crud btn-crud-edit" title="Editar tarefa"
+                        onclick="abrirModalTarefa(${gIndex}, ${tIndex})">Edit</button>
+                    <button class="btn-crud btn-crud-del" title="Excluir tarefa"
+                        onclick="excluirTarefa(${gIndex},${tIndex})">Del</button>
+                </div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(t.inicio)}</div>
+                <div class="gc" style="font-size:11px; color:var(--text2)">${fmtSemana(tFim)}</div>
+                <div class="gc">
+                    <input class="gc-edit" type="number" min="1" value="${t.duracao}"
+                        onchange="dados.grupos[${gIndex}].tarefas[${tIndex}].duracao=parseInt(this.value)||1;
+                                  marcarAlterado(); renderizarGantt();">
+                </div>
+                <div class="gc" style="gap:6px">
+                    <input type="range" min="0" max="100" value="${t.progresso}"
+                        style="width:70px; accent-color:${g.cor}"
+                        oninput="dados.grupos[${gIndex}].tarefas[${tIndex}].progresso=parseInt(this.value);
+                                 marcarAlterado(); this.nextElementSibling.textContent=this.value+'%';">
+                    <span style="min-width:32px; font-size:11px">${t.progresso}%</span>
+                </div>
+                <div class="gc" style="padding:0; overflow:hidden">
+                    <div class="bar-area">
+                        <div class="today-line" style="left:${semanaAtual * SEMANA_PX}px"></div>
+                        <div class="gantt-bar"
+                            style="left:${t.inicio*SEMANA_PX}px; width:${(t.duracao||1)*SEMANA_PX}px;
+                                   background:${g.cor}22; border:1px solid ${g.cor}55">
+                            <div class="gantt-bar-fill" style="width:${t.progresso}%; background:${g.cor}"></div>
+                        </div>
+                    </div>
+                </div>`;
+            grupoDiv.appendChild(row);
+        });
+
+        // ── BARRA DE AÇÕES DO GRUPO ──
+        const actRow = document.createElement('div');
+        actRow.className = 'gantt-row';
+        actRow.innerHTML = `
+            <div class="gc" style="padding-left:12px; gap:6px; flex-wrap:wrap">
+                <button class="btn btn-primary" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalTarefa(${gIndex}, null)">+ Tarefa</button>
+                <button class="btn btn-ghost" style="font-size:11px; padding:5px 10px"
+                    onclick="abrirModalGrupo(${gIndex})">Editar Grupo</button>
+                <button class="btn btn-danger" style="font-size:11px; padding:5px 10px"
+                    onclick="excluirGrupo(${gIndex})">Excluir Grupo</button>
+            </div>
+            <div class="gc"></div><div class="gc"></div>
+            <div class="gc"></div><div class="gc"></div><div class="gc"></div>`;
+        grupoDiv.appendChild(actRow);
+        body.appendChild(grupoDiv);
+    });
+}
+
+// ── MODAL GRUPO (criar / editar) ──────────────────────────────────────────
+function abrirModalGrupo(gIndex) {
+    // gIndex === null → novo grupo
+    const novo = gIndex === null;
+    const g = novo ? { nome: '', cor: '#3b82f6', inicio: dados.grupos.length * 2, duracao: 2, responsavel: 'Equipe' }
+                   : dados.grupos[gIndex];
+    abrirModal(novo ? '➕ Novo Grupo' : '✏️ Editar Grupo', `
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome do Grupo *</label>
+                <input id="mg-nome" class="crud-input" value="${g.nome}" placeholder="Ex: 4. Revestimentos">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Semana de Início</label>
+                    <input id="mg-inicio" class="crud-input" type="number" min="0" value="${g.inicio}">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duração (semanas)</label>
+                    <input id="mg-dur" class="crud-input" type="number" min="1" value="${g.duracao}">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsável</label>
+                    <input id="mg-resp" class="crud-input" value="${g.responsavel}" placeholder="Equipe responsável">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Cor</label>
+                    <input id="mg-cor" type="color" value="${g.cor}"
+                        style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border); background:var(--bg); cursor:pointer; padding:2px">
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
+                <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarGrupo(${novo ? 'null' : gIndex})">
+                    ${novo ? '+ Criar Grupo' : 'Salvar Alteracoes'}
+                </button>
+            </div>
+        </div>`);
+}
+
+function salvarGrupo(gIndex) {
+    const nome = document.getElementById('mg-nome').value.trim();
+    if (!nome) { mostrarNotificacao('Informe o nome do grupo!', 'erro'); return; }
+    const obj = {
+        nome,
+        inicio:      parseInt(document.getElementById('mg-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mg-dur').value)    || 2,
+        responsavel: document.getElementById('mg-resp').value.trim()      || 'Equipe',
+        cor:         document.getElementById('mg-cor').value
     };
-    reader.readAsDataURL(file);
-  });
+    if (gIndex === null) {
+        dados.grupos.push({ id: 'g' + Date.now(), tarefas: [], ...obj });
+        mostrarNotificacao('Grupo "' + obj.nome + '" criado!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex], obj);
+        mostrarNotificacao('Grupo atualizado!', 'success');
+    }
+    marcarAlterado();
+    fecharModal();
+    renderizarGantt();
 }
 
-function salvarFotos(){
-  if(!_fotosBuffer.length){ toast('Selecione ao menos uma foto.','err'); return; }
-  const leg = v('fLegenda').trim()||'Foto da obra';
-  const data = v('fData')||isoHoje();
-  const etapa = v('fEtapa');
-  _fotosBuffer.forEach(f => {
-    S.dados.galeria.push({ id:uid(), src:f.src, legenda:leg, data, etapa, nome:f.name });
-  });
-  _fotosBuffer = [];
-  salvar(); closeModal(); toast(`${S.dados.galeria.length>1?'Fotos adicionadas':'Foto adicionada'}!`); nav('galeria');
+function alterarCorGrupo(gIndex) {
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = dados.grupos[gIndex].cor;
+    input.onchange = () => {
+        dados.grupos[gIndex].cor = input.value;
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Cor do grupo alterada!', 'success');
+    };
+    input.click();
 }
 
-function excluirFoto(id){
-  if(!confirm('Excluir esta foto?')) return;
-  S.dados.galeria = S.dados.galeria.filter(f=>f.id!==id);
-  salvar(); toast('Foto excluída.'); nav('galeria');
-}
-
-function verFoto(id){
-  const f = S.dados.galeria.find(f=>f.id===id);
-  if(!f) return;
-  modal(f.legenda, `
-    <img src="${f.src}" style="width:100%;border-radius:var(--r-md);margin-bottom:12px">
-    <div style="font-size:12px;color:var(--text3)">📅 ${fmtD(f.data)}${f.etapa?' · 🏗️ '+f.etapa:''}</div>
-    <div class="modal-actions" style="margin-top:12px">
-      <button class="btn btn-danger" onclick="excluirFoto('${f.id}');closeModal()">🗑️ Excluir</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Fechar</button>
-    </div>`);
-}
-
-// ══════════════════════════════════════════════
-// DIÁRIO DE OBRA — CRUD
-// ══════════════════════════════════════════════
-function renderDiario(){
-  const diario=(S.dados.diario||[]).slice().reverse();
-  return `<div class="ph">
-    <div class="ph-title"><h1>Diário de Obra</h1><p class="ph-sub">Registro de atualizações — visível ao cliente</p></div>
-    <button class="btn btn-primary" onclick="novaEntradaDiario()">+ Nova Entrada</button>
-  </div>
-  ${diario.length===0?`<div class="alert alert-info">📝 Nenhuma entrada no diário. Registre a primeira atualização!</div>`:''}
-  ${diario.map(e=>`
-    <div class="diary-item ${e.tipo}">
-      <div class="diary-meta">
-        <span>📅 ${fmtD(e.data)}</span>
-        <span>${e.tipo==='importante'?'🔴 Importante':e.tipo==='progresso'?'🟢 Progresso':'🔵 Info'}</span>
-        ${e.etapa?`<span>🏗️ ${e.etapa}</span>`:''}
-      </div>
-      <div class="diary-text">${e.texto}</div>
-      <button class="diary-del" onclick="excluirDiario('${e.id}')">✕</button>
-    </div>`).join('')}`;
-}
-
-function novaEntradaDiario(){
-  modal('Nova Entrada no Diário', `
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Data</label><input id="dData" type="date" class="form-input" value="${isoHoje()}"></div>
-      <div class="form-group"><label class="form-label">Tipo</label>
-        <select id="dTipo" class="form-select">
-          <option value="info">🔵 Informação</option>
-          <option value="progresso">🟢 Progresso</option>
-          <option value="importante">🔴 Importante</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group"><label class="form-label">Etapa relacionada (opcional)</label>
-      <select id="dEtapa" class="form-select"><option value="">— Geral —</option>${CFG.GRUPOS_TAREFA.map(g=>`<option>${g}</option>`).join('')}</select>
-    </div>
-    <div class="form-group"><label class="form-label">Texto da atualização</label>
-      <textarea id="dTexto" class="form-textarea" placeholder="Ex: Demolição concluída. Equipe iniciou alvenaria conforme projeto." rows="4"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarDiario()">💾 Salvar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-    </div>`);
-}
-function salvarDiario(){
-  const texto=v('dTexto').trim();
-  if(!texto){ toast('Escreva o texto da entrada.','err'); return; }
-  S.dados.diario.push({ id:uid(), data:v('dData')||isoHoje(), tipo:v('dTipo'), etapa:v('dEtapa'), texto });
-  salvar(); closeModal(); toast('Entrada salva no diário!'); nav('diario');
-}
-function excluirDiario(id){
-  if(!confirm('Excluir esta entrada?')) return;
-  S.dados.diario=S.dados.diario.filter(e=>e.id!==id);
-  salvar(); toast('Entrada excluída.'); nav('diario');
-}
-
-// ══════════════════════════════════════════════
-// ÁREA DO CLIENTE — tudo visível, sem valores $
-// ══════════════════════════════════════════════
-function renderCliente(){
-  const cpm=calcCPM(), evm=calcEVM();
-  const dr=diasAte(cpm.fim);
-  const {cliente:c,equipe:e,projeto:p}=S.dados;
-  const fotos=(S.dados.galeria||[]).slice(-6).reverse();
-  const diario=(S.dados.diario||[]).slice(-5).reverse();
-
-  // Progresso por grupo
-  const grupos={};
-  cpm.ts.forEach(t=>{ if(!grupos[t.grupo]) grupos[t.grupo]=[]; grupos[t.grupo].push(t); });
-
-  return `<div class="ph">
-    <div class="ph-title"><h1>Olá, ${c.nome}!</h1><p class="ph-sub">Acompanhe o andamento da sua obra em tempo real</p></div>
-  </div>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="flex justify-between items-center" style="flex-wrap:wrap;gap:16px;margin-bottom:20px">
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-bottom:6px">Obra em andamento</div>
-        <h2 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:4px">${p.nome}</h2>
-        <p style="color:var(--text2);font-size:13px">📍 ${p.endereco}</p>
-        <p style="color:var(--text3);font-size:12px;margin-top:4px">👷 ${e.responsavel} · ${e.crea}</p>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Término previsto</div>
-        <div style="font-size:22px;font-weight:700;color:var(--accent)">${fmtD(cpm.fim)}</div>
-        <div style="font-size:12px;color:${dr>0?'var(--accent3)':'var(--accent4)'}">${dr>0?`${dr} dias restantes`:`${Math.abs(dr)} dias de atraso`}</div>
-      </div>
-    </div>
-    <div>
-      <div class="flex justify-between items-center" style="margin-bottom:6px">
-        <span style="font-size:12px;color:var(--text2)">Progresso geral da obra</span>
-        <span class="mono" style="font-size:15px;font-weight:700;color:var(--accent)">${fmtP(evm.pConc)}</span>
-      </div>
-      <div class="prog-bar" style="height:12px">
-        <div class="prog-fill" style="width:${evm.pConc}%;background:linear-gradient(90deg,var(--accent),var(--accent3))"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
-        <span>Início: ${fmtD(p.dataInicio)}</span>
-        <span>Término: ${fmtD(cpm.fim)}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- STATUS RÁPIDO -->
-  <div class="grid-3 mb-4">
-    ${metricCard('Concluídas', `${cpm.ts.filter(t=>t.prog===100).length}`, `de ${cpm.ts.length} tarefas`, 'pos')}
-    ${metricCard('Em Execução', `${cpm.ts.filter(t=>t.prog>0&&t.prog<100).length}`, 'tarefas em andamento', 'warn')}
-    ${metricCard('Dias Restantes', `${Math.max(0,dr)}`, dr>0?'para a entrega':'⚠ prazo vencido', dr>0?'pos':'neg')}
-  </div>
-
-  <!-- PROGRESSO POR ETAPA -->
-  <div class="card mb-4">
-    <div class="card-header"><h3 class="card-title">📊 Progresso por Etapa</h3></div>
-    ${Object.entries(grupos).map(([grupo,ts])=>{
-      const media=ts.reduce((a,t)=>a+t.prog,0)/ts.length;
-      const cor=CFG.CORES_GRUPOS[grupo]||'#888';
-      return `<div style="margin-bottom:14px">
-        <div class="flex justify-between items-center" style="margin-bottom:4px">
-          <span style="font-size:12px;font-weight:500;color:var(--text)">${grupo}</span>
-          <span class="mono" style="font-size:12px;color:${cor}">${fmtP(media)}</span>
+// ── MODAL TAREFA (criar / editar) ─────────────────────────────────────────
+function abrirModalTarefa(gIndex, tIndex) {
+    const novo = tIndex === null;
+    const g = dados.grupos[gIndex];
+    // inicio sugerido = fim da ultima tarefa do grupo
+    let inicioSug = g.inicio || 0;
+    if (g.tarefas.length > 0) {
+        const ul = g.tarefas[g.tarefas.length - 1];
+        inicioSug = (ul.inicio !== undefined ? ul.inicio : g.inicio) + (ul.duracao || 1);
+    }
+    const t = novo
+        ? { nome: '', inicio: inicioSug, duracao: 2, responsavel: g.responsavel || 'Equipe', progresso: 0 }
+        : g.tarefas[tIndex];
+    const tIni = t.inicio !== undefined ? t.inicio : inicioSug;
+    abrirModal(novo ? 'Nova Tarefa' : 'Editar Tarefa', `
+        <div style="margin-bottom:8px; font-size:11px; color:var(--text2)">
+            Grupo: <strong style="color:var(--accent)">${g.nome}</strong>
         </div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${media}%;background:${cor}"></div></div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${ts.map(t=>`${t.nome} (${t.prog}%)`).join(' · ')}</div>
-      </div>`;
-    }).join('')}
-  </div>
+        <div style="display:grid; gap:12px">
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Nome da Tarefa *</label>
+                <input id="mt-nome" class="crud-input" value="${t.nome}" placeholder="Ex: Assentamento de piso">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">
+                        Semana de Inicio &nbsp;<span style="color:var(--text3); font-size:10px">(S1=${fmtSemana(0)})</span>
+                    </label>
+                    <input id="mt-inicio" class="crud-input" type="number" min="0" value="${tIni}"
+                        oninput="atualizarPreviewTarefa()">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Duracao (semanas)</label>
+                    <input id="mt-dur" class="crud-input" type="number" min="1" value="${t.duracao}"
+                        oninput="atualizarPreviewTarefa()">
+                </div>
+            </div>
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                        padding:8px 12px; font-size:11px; color:var(--accent)" id="mt-preview">
+                Periodo: ${fmtSemana(tIni)} ate ${fmtSemana(tIni + t.duracao)}
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:4px">Responsavel</label>
+                <input id="mt-resp" class="crud-input" value="${t.responsavel}" placeholder="Nome ou equipe">
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--text2); display:block; margin-bottom:6px">
+                    Progresso: <strong id="mt-pct-lbl" style="color:${g.cor}">${t.progresso}%</strong>
+                </label>
+                <input id="mt-prog" type="range" min="0" max="100" value="${t.progresso}"
+                    style="width:100%; accent-color:${g.cor}"
+                    oninput="document.getElementById('mt-pct-lbl').textContent=this.value+'%'">
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px">
+                <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarTarefa(${gIndex}, ${novo ? 'null' : tIndex})">
+                    ${novo ? '+ Adicionar Tarefa' : 'Salvar Alteracoes'}
+                </button>
+            </div>
+        </div>`);
+}
 
-  <!-- CRONOGRAMA SIMPLIFICADO -->
-  <div class="card mb-4">
-    <div class="card-header"><h3 class="card-title">📅 Cronograma</h3></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Etapa</th><th>Grupo</th><th>Início</th><th>Fim Prev.</th><th>Progresso</th><th>Status</th></tr></thead>
-      <tbody>${cpm.ts.map(t=>`<tr>
-        <td><strong style="color:var(--text)">${t.nome}</strong></td>
-        <td><span class="badge badge-info">${t.grupo}</span></td>
-        <td class="mono" style="font-size:11px">${fmtD(addDias(p.dataInicio,t.es))}</td>
-        <td class="mono" style="font-size:11px">${fmtD(addDias(p.dataInicio,t.ef))}</td>
-        <td>
-          <div class="flex items-center gap-2">
-            <div class="prog-bar" style="flex:1;margin:0"><div class="prog-fill" style="width:${t.prog}%;background:${t.prog===100?'var(--accent3)':t.prog>0?'var(--accent)':'var(--surface3)'}"></div></div>
-            <span class="mono" style="font-size:11px;width:32px">${t.prog}%</span>
-          </div>
-        </td>
-        <td>${t.prog===100?'<span class="badge badge-ok">✓ Concluída</span>':t.prog>0?'<span class="badge badge-warn">Em andamento</span>':'<span style="color:var(--text3);font-size:11px">Aguardando</span>'}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>
-  </div>
+function atualizarPreviewTarefa() {
+    const ini = parseInt(document.getElementById('mt-inicio').value) || 0;
+    const dur = parseInt(document.getElementById('mt-dur').value)    || 1;
+    const el  = document.getElementById('mt-preview');
+    if (el) el.textContent = 'Periodo: ' + fmtSemana(ini) + ' ate ' + fmtSemana(ini + dur);
+}
 
-  <!-- DIÁRIO DE OBRA -->
-  <div class="card mb-4">
-    <div class="card-header"><h3 class="card-title">📝 Últimas Atualizações</h3>
-      ${diario.length<(S.dados.diario||[]).length?`<span class="badge badge-info">${(S.dados.diario||[]).length} entradas</span>`:''}
-    </div>
-    ${diario.length===0?`<p style="color:var(--text3);font-size:13px">Nenhuma atualização registrada ainda.</p>`:''}
-    ${diario.map(e=>`
-      <div class="diary-item ${e.tipo}">
-        <div class="diary-meta">
-          <span>📅 ${fmtD(e.data)}</span>
-          <span>${e.tipo==='importante'?'🔴 Importante':e.tipo==='progresso'?'🟢 Progresso':'🔵 Info'}</span>
-          ${e.etapa?`<span>🏗️ ${e.etapa}</span>`:''}
+function salvarTarefa(gIndex, tIndex) {
+    const nome = document.getElementById('mt-nome').value.trim();
+    if (!nome) { mostrarNotificacao('Informe o nome da tarefa!', 'erro'); return; }
+    const obj = {
+        nome,
+        inicio:      parseInt(document.getElementById('mt-inicio').value) || 0,
+        duracao:     parseInt(document.getElementById('mt-dur').value)    || 2,
+        responsavel: document.getElementById('mt-resp').value.trim()      || 'Equipe',
+        progresso:   parseInt(document.getElementById('mt-prog').value)   || 0
+    };
+    if (tIndex === null) {
+        dados.grupos[gIndex].tarefas.push(obj);
+        mostrarNotificacao('Tarefa "' + obj.nome + '" adicionada!', 'success');
+    } else {
+        Object.assign(dados.grupos[gIndex].tarefas[tIndex], obj);
+        mostrarNotificacao('Tarefa atualizada!', 'success');
+    }
+    marcarAlterado();
+    fecharModal();
+    renderizarGantt();
+}
+
+function excluirTarefa(gIndex, tIndex) {
+    const nome = dados.grupos[gIndex].tarefas[tIndex].nome;
+    if (confirm('Excluir a tarefa "' + nome + '"?')) {
+        dados.grupos[gIndex].tarefas.splice(tIndex, 1);
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Tarefa excluída!', 'success');
+    }
+}
+
+function adicionarGrupo() { abrirModalGrupo(null); }
+function adicionarTarefa(gIndex) { abrirModalTarefa(gIndex, null); }
+
+function excluirGrupo(gIndex) {
+    if (confirm('Excluir o grupo "' + dados.grupos[gIndex].nome + '" e todas as suas tarefas?')) {
+        dados.grupos.splice(gIndex, 1);
+        marcarAlterado();
+        renderizarGantt();
+        mostrarNotificacao('Grupo excluído!');
+    }
+}
+
+function exportarCronograma() {
+    const linhas = [];
+    dados.grupos.forEach(g => {
+        linhas.push({ Grupo: g.nome, Tarefa: '', Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + g.duracao), Duracao: g.duracao, Progresso: calcularProgressoGrupo(g) + '%' });
+        g.tarefas.forEach(t => {
+            linhas.push({ Grupo: g.nome, Tarefa: t.nome, Inicio: fmtSemana(g.inicio), Fim: fmtSemana(g.inicio + t.duracao), Duracao: t.duracao, Progresso: t.progresso + '%' });
+        });
+    });
+    const ws = XLSX.utils.json_to_sheet(linhas);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
+    XLSX.writeFile(wb, 'cronograma-torre-liris.xlsx');
+    mostrarNotificacao('Cronograma exportado!');
+}
+
+// ==================== ORÇAMENTO ====================
+function renderizarOrcamentoAdmin() {
+    const total = dados.orcamento.reduce((acc, item) => acc + (item.valor || 0), 0);
+    document.querySelector('.main') && (document.querySelector('.main').innerHTML = `
+        <div class="save-bar">
+            <div class="save-status">
+                <div id="saveIndicator" class="save-indicator ${dadosAlterados?'pending':'saved'}"></div>
+                <span>${dadosAlterados ? 'Alterações não salvas' : 'Tudo salvo'}</span>
+            </div>
+            <button class="btn btn-success" onclick="salvarDados()">💾 Salvar Alterações</button>
         </div>
-        <div class="diary-text">${e.texto}</div>
-      </div>`).join('')}
-  </div>
+        ${_htmlOrcamento(total)}`);
+    return _htmlOrcamento(total);
+}
 
-  <!-- GALERIA -->
-  <div class="card mb-4">
-    <div class="card-header"><h3 class="card-title">📷 Galeria da Obra</h3>
-      <span class="badge badge-info">${(S.dados.galeria||[]).length} fotos</span>
+function _htmlOrcamento(total) {
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">💰 Orçamento</div>
+            <div class="page-sub">Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+        </div>
+        <button class="btn btn-primary" onclick="adicionarItemOrcamento()">+ Adicionar Item</button>
     </div>
-    ${fotos.length===0?`<p style="color:var(--text3);font-size:13px">Nenhuma foto registrada ainda.</p>`:''}
-    <div class="gallery-grid">
-      ${fotos.map(f=>`
-        <div class="gallery-item" onclick="verFotoCliente('${f.id}')">
-          <img src="${f.src}" alt="${f.legenda}" loading="lazy">
-          <div class="gi-info"><strong>${f.legenda}</strong><span>${fmtD(f.data)}${f.etapa?' · '+f.etapa:''}</span></div>
+    <div class="crud-container">
+        ${dados.orcamento.map((item, index) => `
+        <div class="crud-card">
+            <input class="crud-input" value="${item.descricao}"
+                onchange="dados.orcamento[${index}].descricao=this.value; marcarAlterado();">
+            <input class="crud-input" type="number" value="${item.valor}"
+                onchange="dados.orcamento[${index}].valor=parseFloat(this.value)||0; marcarAlterado();">
+            <button class="btn btn-danger" onclick="excluirOrcamento(${index})">🗑️</button>
         </div>`).join('')}
+    </div>`;
+}
+
+function adicionarItemOrcamento() {
+    dados.orcamento.push({ descricao: 'Novo Item', valor: 0 });
+    marcarAlterado();
+    renderizarAdmin();
+}
+
+function excluirOrcamento(index) {
+    if (confirm('Excluir este item?')) {
+        dados.orcamento.splice(index, 1);
+        marcarAlterado();
+        renderizarAdmin();
+        mostrarNotificacao('Item excluído!');
+    }
+}
+
+// ==================== FOTOS ====================
+function renderizarFotosAdmin() {
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">📸 Fotos da Obra</div>
+            <div class="page-sub">${dados.fotos.length} foto(s)</div>
+        </div>
+        <button class="btn btn-primary" onclick="adicionarFoto()">+ Adicionar Foto</button>
     </div>
-  </div>
+    <div class="photo-grid">
+        ${dados.fotos.map((foto, index) => `
+        <div class="photo-card">
+            <img src="${foto.url}" alt="${foto.ambiente}">
+            <div class="photo-card-info">
+                <div class="photo-card-ambiente">${foto.ambiente}</div>
+                <div class="photo-card-data">${foto.data}</div>
+                <button class="btn btn-danger" style="margin-top:8px" onclick="excluirFoto(${index})">🗑️ Excluir</button>
+            </div>
+        </div>`).join('')}
+    </div>`;
+}
 
-  <!-- CONTATO -->
-  <div class="card">
-    <div class="card-header"><h3 class="card-title">📞 Equipe Responsável</h3></div>
-    <div class="grid-3">
-      <div style="text-align:center;padding:16px">
-        <div style="font-size:28px;margin-bottom:8px">👷</div>
-        <div style="font-weight:600;margin-bottom:4px">${e.responsavel}</div>
-        <div style="font-size:11px;color:var(--text3)">${e.crea}</div>
-      </div>
-      <div style="text-align:center;padding:16px">
-        <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <div style="font-weight:600;margin-bottom:4px">ART</div>
-        <div style="font-size:11px;color:var(--text3)">${e.art}</div>
-      </div>
-      <div style="text-align:center;padding:16px">
-        <div style="font-size:28px;margin-bottom:8px">📱</div>
-        <div style="font-weight:600;margin-bottom:4px">${c.telefone}</div>
-        <div style="font-size:11px;color:var(--text3)">${c.email}</div>
-      </div>
+function adicionarFoto() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            abrirModal('Adicionar Foto', `
+                <div style="display:grid; gap:12px">
+                    <img src="${ev.target.result}" style="width:100%; border-radius:10px; max-height:300px; object-fit:cover">
+                    <select id="fotoAmbiente" class="crud-input">
+                        ${dados.ambientes.map(a => `<option value="${a}">${a}</option>`).join('')}
+                    </select>
+                    <button class="btn btn-primary" onclick="confirmarFoto('${ev.target.result}')">💾 Salvar Foto</button>
+                </div>`);
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+function confirmarFoto(url) {
+    const ambiente = document.getElementById('fotoAmbiente').value;
+    dados.fotos.push({ url, ambiente, data: fmtData(new Date()) });
+    marcarAlterado(); fecharModal(); renderizarAdmin();
+    mostrarNotificacao('Foto adicionada!');
+}
+
+function excluirFoto(index) {
+    if (confirm('Excluir esta foto?')) {
+        dados.fotos.splice(index, 1);
+        marcarAlterado(); renderizarAdmin();
+        mostrarNotificacao('Foto excluída!');
+    }
+}
+
+// ==================== AMBIENTES ====================
+function renderizarAmbientesAdmin() {
+    return `
+    <div class="page-header">
+        <div class="page-title">🏠 Ambientes</div>
+        <button class="btn btn-primary" onclick="adicionarAmbiente()">+ Adicionar Ambiente</button>
     </div>
-  </div>`;
+    <div class="crud-container">
+        ${dados.ambientes.map((amb, index) => `
+        <div class="crud-card">
+            <input class="crud-input" value="${amb}"
+                onchange="dados.ambientes[${index}]=this.value; marcarAlterado();">
+            <button class="btn btn-danger" onclick="excluirAmbiente(${index})">🗑️</button>
+        </div>`).join('')}
+    </div>`;
 }
 
-function verFotoCliente(id){
-  const f=S.dados.galeria.find(f=>f.id===id);
-  if(!f) return;
-  modal(f.legenda, `
-    <img src="${f.src}" style="width:100%;border-radius:var(--r-md);margin-bottom:10px">
-    <div style="font-size:12px;color:var(--text3)">📅 ${fmtD(f.data)}${f.etapa?' · 🏗️ '+f.etapa:''}</div>
-    <div class="modal-actions" style="margin-top:12px"><button class="btn btn-ghost" onclick="closeModal()">Fechar</button></div>`);
+function adicionarAmbiente() {
+    dados.ambientes.push('Novo Ambiente');
+    marcarAlterado(); renderizarAdmin();
+    mostrarNotificacao('Ambiente adicionado!');
 }
 
-// ══════════════════════════════════════════════
-// GRÁFICOS
-// ══════════════════════════════════════════════
-function renderCharts(){
-  if(!window.Chart){ setTimeout(renderCharts,500); return; }
-  renderCurvaS(); renderFluxoChart();
+function excluirAmbiente(index) {
+    if (confirm('Excluir este ambiente?')) {
+        dados.ambientes.splice(index, 1);
+        marcarAlterado(); renderizarAdmin();
+        mostrarNotificacao('Ambiente excluído!');
+    }
 }
 
-function renderCurvaS(){
-  const c=document.getElementById('curvaS');
-  if(!c) return;
-  if(c._ch) c._ch.destroy();
-  const {ts,dur}=calcCPM(), BAC=S.dados.projeto.orcamentoTotal;
-  const ini=parseD(S.dados.projeto.dataInicio);
-  const dAtual=Math.min(Math.max(0,Math.floor((new Date()-ini)/86400000)),dur);
-  const labels=[],pvA=[],evA=[];
-  for(let d=0;d<=dur;d++){
-    labels.push(`D${d}`);
-    let pv=0,ev=0;
-    ts.forEach(t=>{ const vv=t.custo||0; if(d>=t.es) pv+=vv*Math.min(1,(d-t.es)/t.dur); ev+=vv*(t.prog/100); });
-    pvA.push((pv/BAC)*100); evA.push((ev/BAC)*100);
-  }
-  c._ch=new Chart(c,{type:'line',data:{labels,datasets:[
-    {label:'PV (Planejado)',data:pvA,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.06)',tension:.4,pointRadius:0,borderWidth:2},
-    {label:'EV (Realizado)',data:evA,borderColor:'#e8a020',backgroundColor:'rgba(232,160,32,.08)',tension:.4,pointRadius:0,borderWidth:2,borderDash:[5,3]}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}},
-    scales:{x:{ticks:{color:'#4a5568',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(45,51,68,.5)'}},
-            y:{ticks:{color:'#4a5568',font:{size:9},callback:vv=>`${vv.toFixed(0)}%`},grid:{color:'rgba(45,51,68,.5)'},min:0,max:100}}}});
+// ==================== IA ASSISTENTE ====================
+function renderizarIAAdmin() {
+    return `
+    <div class="page-header">
+        <div>
+            <div class="page-title">IA Assistente</div>
+            <div class="page-sub">Gemini integrado — analise, relatorios e sugestoes em tempo real</div>
+        </div>
+    </div>
+
+    <!-- STATUS DA CHAVE -->
+    <div id="ia-status-bar" style="background:var(--surface2); border:1px solid var(--border);
+        border-radius:10px; padding:12px 16px; margin-bottom:16px;
+        display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px">
+        <div style="font-size:12px; color:var(--text2)">
+            Status da chave: <span id="ia-key-status" style="color:var(--accent)">verificando...</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+            <input id="ia-key-input" type="password" placeholder="Cole sua chave Gemini aqui para testar"
+                style="background:var(--bg); border:1px solid var(--border); border-radius:6px;
+                       padding:6px 10px; color:var(--text); font-size:12px; width:280px; outline:none">
+            <button class="btn btn-primary" onclick="salvarChaveIA()" style="font-size:11px; padding:6px 12px">
+                Salvar Chave
+            </button>
+        </div>
+    </div>
+
+    <!-- ACOES RAPIDAS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:20px">
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(59,130,246,.3)"
+            onclick="acaoIA('relatorio')">
+            <div class="stat-label">Relatorio Semanal</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Gera texto de atualizacao para enviar ao cliente baseado no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Gerar Relatorio
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(244,63,94,.3)"
+            onclick="acaoIA('alertas')">
+            <div class="stat-label">Analise de Alertas</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Detecta tarefas atrasadas, conflitos de sequencia e riscos no cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Analisar Cronograma
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(16,185,129,.3)"
+            onclick="acaoIA('materiais')">
+            <div class="stat-label">Lista de Materiais</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Sugere lista de materiais e mao de obra com base nas etapas do cronograma
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Sugerir Materiais
+            </button>
+        </div>
+
+        <div class="stat-card" style="cursor:pointer; border-color:rgba(232,160,32,.3)"
+            onclick="acaoIA('prazo')">
+            <div class="stat-label">Analise de Prazo</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px">
+                Avalia se o prazo e realista e sugere ajustes com base no progresso atual
+            </div>
+            <button class="btn btn-ghost" style="margin-top:12px; font-size:11px; width:100%">
+                Avaliar Prazo
+            </button>
+        </div>
+
+    </div>
+
+    <!-- CHAT LIVRE -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden">
+        <div style="padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border);
+                    font-size:12px; font-weight:600; color:var(--text2)">
+            Pergunte qualquer coisa sobre a obra
+        </div>
+        <div id="ia-chat" style="height:280px; overflow-y:auto; padding:16px;
+                                  display:flex; flex-direction:column; gap:12px">
+            <div style="background:var(--surface2); border-radius:8px; padding:12px;
+                        font-size:12px; color:var(--text2); border-left:3px solid var(--accent2)">
+                Ola! Sou o assistente de IA da Torre L'iris. Posso analisar o cronograma,
+                gerar relatorios para o cliente, sugerir materiais ou responder qualquer
+                pergunta sobre a obra. Como posso ajudar?
+            </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px">
+            <input id="ia-pergunta" class="crud-input" placeholder="Ex: Quais tarefas estao atrasadas? Gere um resumo da obra..."
+                style="flex:1" onkeydown="if(event.key==='Enter') enviarPerguntaIA()">
+            <button class="btn btn-primary" onclick="enviarPerguntaIA()" style="font-size:12px; white-space:nowrap">
+                Enviar
+            </button>
+        </div>
+    </div>`;
 }
 
-function renderFluxoChart(){
-  const c=document.getElementById('fluxoChart');
-  if(!c) return;
-  if(c._ch) c._ch.destroy();
-  const fl=calcFluxo();
-  c._ch=new Chart(c,{type:'bar',data:{labels:fl.fluxo.map(f=>f.mes),datasets:[
-    {label:'Entradas',data:fl.fluxo.map(f=>f.e),backgroundColor:'rgba(16,185,129,.6)',borderColor:'#10b981',borderWidth:1,borderRadius:4},
-    {label:'Saídas',  data:fl.fluxo.map(f=>f.s),backgroundColor:'rgba(244,63,94,.6)', borderColor:'#f43f5e',borderWidth:1,borderRadius:4},
-    {label:'Saldo',   data:fl.fluxo.map(f=>f.saldo),type:'line',borderColor:'#e8a020',backgroundColor:'rgba(232,160,32,.08)',tension:.4,pointRadius:4,yAxisID:'y2',borderWidth:2}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}},
-    scales:{x:{ticks:{color:'#4a5568',font:{size:10}},grid:{color:'rgba(45,51,68,.4)'}},
-            y:{ticks:{color:'#4a5568',font:{size:9},callback:vv=>fmtR(vv)},grid:{color:'rgba(45,51,68,.4)'}},
-            y2:{position:'right',ticks:{color:'#e8a020',font:{size:9},callback:vv=>fmtR(vv)},grid:{display:false}}}}});
+// Status IA — sem chave necessaria
+setTimeout(() => {
+    const el = document.getElementById('ia-key-status');
+    if (el) { el.textContent = "Claude ativo — sem chave necessaria"; el.style.color = "var(--accent3)"; }
+}, 200);
+
+async function acaoIA(tipo) {
+    let prompt = "";
+    if (tipo === "relatorio") {
+        prompt = "Voce e um assistente de gestao de obra. Com base nos dados abaixo, escreva um relatorio semanal " +
+            "profissional e cordial para enviar ao cliente via WhatsApp. Use linguagem simples, destaque o que foi " +
+            "concluido, o que esta em andamento e a previsao proxima. Maximo 200 palavras. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "alertas") {
+        prompt = "Voce e um especialista em gestao de obras. Analise o cronograma abaixo e identifique: " +
+            "1) Tarefas que parecem atrasadas (progresso baixo vs semana atual), " +
+            "2) Possiveis conflitos de sequencia entre tarefas, " +
+            "3) Grupos com risco de nao cumprir o prazo. Seja objetivo e pratico. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "materiais") {
+        prompt = "Voce e um mestre de obras experiente. Com base nas etapas e tarefas do cronograma abaixo, " +
+            "gere uma lista resumida de materiais e servicos de mao de obra necessarios, agrupados por etapa. " +
+            "Inclua unidade de medida sugerida (m2, m, un, kg, etc). Seja pratico. Responda em portugues.\n\n" + contextoObra();
+    } else if (tipo === "prazo") {
+        prompt = "Voce e um consultor de obras. Analise o progresso atual vs a semana em que estamos e diga: " +
+            "1) O prazo final e realista? " +
+            "2) Qual o percentual esperado de conclusao para esta semana? " +
+            "3) Se houver desvio, quanto tempo de atraso esta acumulando? " +
+            "Seja direto e use os dados reais. Responda em portugues.\n\n" + contextoObra();
+    }
+    await enviarParaChat(prompt, tipo);
 }
 
-// ══════════════════════════════════════════════
-// EXPORTAR XLSX
-// ══════════════════════════════════════════════
-function exportarXLSX(){
-  if(typeof XLSX==='undefined'){ toast('Aguarde XLSX carregar.','err'); return; }
-  const cpm=calcCPM(), evm=calcEVM(), fl=calcFluxo();
-  const wb=XLSX.utils.book_new();
-  const cronRows=[['ID','Tarefa','Grupo','ES','EF','Dur','Folga','Crítico','Prog%','Custo']];
-  cpm.ts.forEach(t=>cronRows.push([t.id,t.nome,t.grupo,t.es,t.ef,t.dur,t.folga,t.critico?'SIM':'NÃO',t.prog,t.custo]));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cronRows),'Cronograma');
-  const evmR=[['Métrica','Valor'],['BAC',evm.BAC],['PV',evm.PV],['EV',evm.EV],['AC',evm.AC],
-    ['SV',evm.SV],['CV',evm.CV],['SPI',evm.SPI],['CPI',evm.CPI],['EAC',evm.EAC],['VAC',evm.VAC]];
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(evmR),'EVM');
-  const finR=[['Tipo','Data','Descrição','Categoria','NF','Valor']];
-  S.dados.financeiro.entradas.forEach(i=>finR.push(['ENTRADA',i.data,i.desc,i.cat,i.nf||'',i.valor]));
-  S.dados.financeiro.saidas.forEach(i  =>finR.push(['SAÍDA',  i.data,i.desc,i.cat,i.nf||'',i.valor]));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(finR),'Financeiro');
-  XLSX.writeFile(wb,`TorreLiris_${isoHoje()}.xlsx`);
-  toast('Relatório exportado!');
+async function enviarPerguntaIA() {
+    const input = document.getElementById('ia-pergunta');
+    const pergunta = input.value.trim();
+    if (!pergunta) return;
+    input.value = '';
+    const prompt = "Voce e um assistente especialista em gestao de obras. Responda a pergunta abaixo com base " +
+        "nos dados da obra. Seja objetivo e pratico. Responda em portugues.\n\nDADOS DA OBRA:\n" + contextoObra() +
+        "\n\nPERGUNTA DO USUARIO:\n" + pergunta;
+    await enviarParaChat(prompt, 'usuario', pergunta);
 }
 
-// ══════════════════════════════════════════════
-// MODAL / UTILS
-// ══════════════════════════════════════════════
-function modal(titulo, corpo){
-  document.getElementById('modalTitle').textContent=titulo;
-  document.getElementById('modalBody').innerHTML=corpo;
-  document.getElementById('modal').classList.add('open');
-}
-function closeModal(){
-  document.getElementById('modal').classList.remove('open');
-  _fotosBuffer=[];
-}
-function v(id){ const el=document.getElementById(id); return el?el.value:''; }
+async function enviarParaChat(prompt, tipo, textoUsuario) {
+    const chat = document.getElementById('ia-chat');
+    if (!chat) return;
 
-// Fechar modal clicando fora
-document.getElementById('modal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
-document.getElementById('senhaInput').addEventListener('keydown', e=>{ if(e.key==='Enter') login('admin'); });
+    // Mensagem do usuario (chat livre)
+    if (textoUsuario) {
+        const msgUser = document.createElement('div');
+        msgUser.style.cssText = "background:rgba(232,160,32,.1); border-radius:8px; padding:10px 12px;" +
+            "font-size:12px; color:var(--text); border-left:3px solid var(--accent);";
+        msgUser.textContent = textoUsuario;
+        chat.appendChild(msgUser);
+    }
+
+    // Loader
+    const loader = document.createElement('div');
+    loader.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px;" +
+        "font-size:12px; color:var(--text2); border-left:3px solid var(--accent2);";
+    loader.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block">Analisando com IA...</span>';
+    chat.appendChild(loader);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Chama Claude (Anthropic) — sem chave necessaria quando aberto no claude.ai
+    let resposta;
+    try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-6",
+                max_tokens: 1024,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await resp.json();
+        if (data.error) resposta = "Erro: " + (data.error.message || JSON.stringify(data.error));
+        else resposta = data.content?.[0]?.text || "Sem resposta.";
+    } catch(e) {
+        resposta = "Erro de conexao: " + e.message;
+    }
+
+    // Remove loader e mostra resposta
+    chat.removeChild(loader);
+    const msgIA = document.createElement('div');
+    msgIA.style.cssText = "background:var(--surface2); border-radius:8px; padding:12px;" +
+        "font-size:12px; color:var(--text); border-left:3px solid var(--accent2); white-space:pre-wrap; line-height:1.6";
+    msgIA.textContent = resposta;
+    chat.appendChild(msgIA);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// ==================== ÁREA DO CLIENTE (VERSÃO ANIMADA) ====================
+function renderizarCliente() {
+    const progGeral = calcularProgressoGeral();
+    const totalTarefas = dados.grupos.reduce((s,g)=>s+g.tarefas.length,0);
+    const concluidas  = dados.grupos.reduce((s,g)=>s+g.tarefas.filter(t=>t.progresso>=100).length,0);
+    const semAtual    = getSemanaAtual();
+
+    // Mensagem dinâmica de saudação baseada no progresso
+    let msgBoas, emojiBoas;
+    if (progGeral === 0)        { msgBoas = "Sua obra está prestes a começar!";    emojiBoas = "🚀"; }
+    else if (progGeral < 25)    { msgBoas = "Os trabalhos já começaram!";           emojiBoas = "⛏️"; }
+    else if (progGeral < 50)    { msgBoas = "Estamos avançando muito bem!";         emojiBoas = "💪"; }
+    else if (progGeral < 75)    { msgBoas = "Já passamos da metade, quase lá!";     emojiBoas = "🏗️"; }
+    else if (progGeral < 100)   { msgBoas = "Reta final, falta pouco!";             emojiBoas = "🎯"; }
+    else                         { msgBoas = "Obra concluída, parabéns!";            emojiBoas = "🎉"; }
+
+    document.getElementById('app').innerHTML = `
+    <!-- TOPBAR CLIENTE -->
+    <div style="background:linear-gradient(135deg,#0d0f14 0%,#13161e 100%);
+                border-bottom:1px solid var(--border); padding:0 24px; height:60px;
+                display:flex; align-items:center; justify-content:space-between;
+                position:sticky; top:0; z-index:100">
+        <div style="display:flex; align-items:center; gap:12px">
+            <div style="width:36px; height:36px; background:var(--accent); border-radius:10px;
+                        display:flex; align-items:center; justify-content:center;
+                        font-size:18px; animation: bobbing 2s ease-in-out infinite">🏠</div>
+            <div>
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:16px">${dados.titulo}</div>
+                <div style="font-size:10px; color:var(--text3)">${dados.endereco}</div>
+            </div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:11px" onclick="location.reload()">Sair</button>
+    </div>
+
+    <div style="max-width:780px; margin:0 auto; padding:24px 20px; display:flex; flex-direction:column; gap:20px">
+
+        <!-- BOAS VINDAS ANIMADO -->
+        <div style="background:linear-gradient(135deg,rgba(232,160,32,.12),rgba(59,130,246,.08));
+                    border:1px solid rgba(232,160,32,.25); border-radius:20px; padding:24px;
+                    animation:fadeSlideDown .6s ease forwards; opacity:0">
+            <div style="font-size:32px; margin-bottom:8px">${emojiBoas}</div>
+            <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:22px; margin-bottom:4px">
+                Olá, ${dados.cliente.nome.split(' ')[0]}!
+            </div>
+            <div style="font-size:14px; color:var(--text2); margin-bottom:16px">${msgBoas}</div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap">
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Arquiteto</div>
+                    <div style="font-size:13px; font-weight:500">${dados.obra.arquiteto}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Início</div>
+                    <div style="font-size:13px; font-weight:500; color:var(--accent3)">${fmtData(getDataInicio())}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Término Previsto</div>
+                    <div style="font-size:13px; font-weight:500; color:var(--accent)">${calcularPrevisao()}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1px">Área</div>
+                    <div style="font-size:13px; font-weight:500">${dados.obra.area}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BARRA DE PROGRESSO GERAL COM OPERÁRIO -->
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:24px;
+                    animation:fadeSlideDown .7s ease forwards; opacity:0; animation-delay:.1s">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px">
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:16px">
+                    Andamento Geral da Obra
+                </div>
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:28px; color:var(--accent3)">
+                    ${progGeral}%
+                </div>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:16px">
+                ${concluidas} de ${totalTarefas} etapas concluídas · Semana ${semAtual > 0 ? semAtual : 0} de ${dados.duracaoTotal}
+            </div>
+
+            <!-- BARRA COM OPERÁRIO ANIMADO -->
+            <div style="position:relative; height:48px; background:var(--surface2);
+                        border-radius:24px; overflow:visible; border:1px solid var(--border)">
+
+                <!-- Preenchimento da barra -->
+                <div id="barra-prog" style="position:absolute; top:0; left:0; bottom:0;
+                    width:0%; background:linear-gradient(90deg,var(--accent3),var(--accent));
+                    border-radius:24px; transition:width 1.5s cubic-bezier(.4,0,.2,1);
+                    box-shadow:0 0 20px rgba(232,160,32,.3)">
+                    <!-- Brilho animado -->
+                    <div style="position:absolute; top:0; right:0; bottom:0; width:60px;
+                                background:linear-gradient(90deg,transparent,rgba(255,255,255,.15));
+                                border-radius:0 24px 24px 0"></div>
+                </div>
+
+                <!-- OPERÁRIO NA PONTA DA BARRA -->
+                <div id="operario-wrap" style="position:absolute; top:50%; transform:translateY(-60%);
+                    left:0%; transition:left 1.5s cubic-bezier(.4,0,.2,1); z-index:10">
+                    <div id="operario" style="font-size:28px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+                        animation: operarioCaminha 0.4s steps(1) infinite">🦺</div>
+                </div>
+
+                <!-- Marcadores de 25%, 50%, 75% -->
+                <div style="position:absolute; top:0; bottom:0; left:25%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+                <div style="position:absolute; top:0; bottom:0; left:50%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+                <div style="position:absolute; top:0; bottom:0; left:75%; width:1px;
+                            background:rgba(255,255,255,.08)"></div>
+            </div>
+
+            <!-- Labels abaixo da barra -->
+            <div style="display:flex; justify-content:space-between; margin-top:6px;
+                        font-size:10px; color:var(--text3); font-family:'IBM Plex Mono',monospace">
+                <span>Início</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>Conclusão</span>
+            </div>
+        </div>
+
+        <!-- CARDS DE STATUS RÁPIDO -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;
+                    animation:fadeSlideDown .8s ease forwards; opacity:0; animation-delay:.2s">
+            <div style="background:var(--surface); border:1px solid rgba(16,185,129,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">✅</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent3)">${concluidas}</div>
+                <div style="font-size:11px; color:var(--text2)">Etapas Concluídas</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(232,160,32,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">⚙️</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent)">
+                    ${dados.grupos.reduce((s,g)=>s+g.tarefas.filter(t=>t.progresso>0&&t.progresso<100).length,0)}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Em Andamento</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(59,130,246,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">📅</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:var(--accent2)">
+                    ${Math.max(0, dados.duracaoTotal - Math.max(0, semAtual))}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Semanas Restantes</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid rgba(244,63,94,.3);
+                        border-radius:16px; padding:16px; text-align:center">
+                <div style="font-size:28px; margin-bottom:6px">🏗️</div>
+                <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:22px; color:#fb7185">
+                    ${totalTarefas - concluidas}
+                </div>
+                <div style="font-size:11px; color:var(--text2)">Etapas Pendentes</div>
+            </div>
+        </div>
+
+        <!-- TÍTULO CRONOGRAMA -->
+        <div style="animation:fadeSlideDown .9s ease forwards; opacity:0; animation-delay:.3s">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px">
+                <div style="width:4px; height:28px; background:var(--accent); border-radius:2px"></div>
+                <div>
+                    <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:18px">
+                        Cronograma da Sua Obra
+                    </div>
+                    <div style="font-size:12px; color:var(--text2)">
+                        Acompanhe abaixo o andamento de cada etapa
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPAS ANIMADAS -->
+        <div style="display:flex; flex-direction:column; gap:12px">
+            ${dados.grupos.map((g, i) => {
+                const prog = calcularProgressoGrupo(g);
+                const icone = prog >= 100 ? '✅' : prog > 0 ? '🔨' : '⏳';
+                const corStatus = prog >= 100 ? 'var(--accent3)' : prog > 0 ? 'var(--accent)' : 'var(--text3)';
+                const labelStatus = prog >= 100 ? 'Concluído' : prog > 0 ? 'Em andamento' : 'Aguardando';
+                return `
+                <div style="background:var(--surface); border:1px solid ${prog>0?g.cor+'44':'var(--border)'};
+                            border-radius:16px; padding:18px; overflow:hidden; position:relative;
+                            animation:fadeSlideDown ${.9+(i*.1)}s ease forwards; opacity:0;
+                            animation-delay:${.3+(i*.08)}s; transition:transform .2s, box-shadow .2s"
+                     onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.3)'"
+                     onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+                    <!-- Faixa de cor lateral -->
+                    <div style="position:absolute; top:0; left:0; bottom:0; width:4px; background:${g.cor}; border-radius:4px 0 0 4px"></div>
+
+                    <div style="padding-left:12px">
+                        <!-- Topo da etapa -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px">
+                            <div style="display:flex; align-items:center; gap:10px">
+                                <span style="font-size:20px">${icone}</span>
+                                <span style="font-family:'Syne',sans-serif; font-weight:700; font-size:15px">${g.nome}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px">
+                                <span style="font-size:10px; background:${corStatus}22; color:${corStatus};
+                                             padding:3px 10px; border-radius:20px; border:1px solid ${corStatus}44">
+                                    ${labelStatus}
+                                </span>
+                                <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:20px; color:${g.cor}">
+                                    ${prog}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Datas -->
+                        <div style="font-size:11px; color:var(--text3); margin-bottom:10px">
+                            ${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio + g.duracao)}
+                            &nbsp;·&nbsp; ${g.duracao} semana${g.duracao>1?'s':''}
+                            &nbsp;·&nbsp; Resp: ${g.responsavel}
+                        </div>
+
+                        <!-- Barra de progresso da etapa -->
+                        <div style="background:var(--surface2); border-radius:10px; height:10px;
+                                    overflow:hidden; margin-bottom:10px; position:relative">
+                            <div style="height:100%; width:${prog}%; background:${g.cor};
+                                        border-radius:10px; transition:width 1.2s ease;
+                                        box-shadow:0 0 10px ${g.cor}66; position:relative">
+                                <!-- shimmer -->
+                                <div style="position:absolute;top:0;right:0;bottom:0;width:30px;
+                                            background:linear-gradient(90deg,transparent,rgba(255,255,255,.3));
+                                            animation:shimmer 1.5s infinite"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tarefas filhas -->
+                        ${g.tarefas.length > 0 ? `
+                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px">
+                            ${g.tarefas.map(t => {
+                                const tIco = t.progresso >= 100 ? '✔' : t.progresso > 0 ? '▶' : '○';
+                                const tCor = t.progresso >= 100 ? 'var(--accent3)' : t.progresso > 0 ? g.cor : 'var(--text3)';
+                                return `<div style="display:flex; align-items:center; gap:5px; background:var(--surface2);
+                                            border-radius:8px; padding:4px 10px; font-size:11px; color:var(--text2)">
+                                    <span style="color:${tCor}; font-size:9px">${tIco}</span>
+                                    ${t.nome}
+                                    <span style="color:${tCor}; font-weight:600">${t.progresso}%</span>
+                                </div>`;
+                            }).join('')}
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+
+        <!-- FOTOS -->
+        ${dados.fotos.length > 0 ? `
+        <div style="animation:fadeSlideDown 1s ease forwards; opacity:0; animation-delay:.6s">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px">
+                <div style="width:4px; height:28px; background:var(--accent2); border-radius:2px"></div>
+                <div>
+                    <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:18px">Fotos da Obra</div>
+                    <div style="font-size:12px; color:var(--text2)">Veja como está ficando</div>
+                </div>
+            </div>
+            <div class="photo-grid">
+                ${dados.fotos.map(foto => `
+                <div class="photo-card"
+                     onmouseover="this.style.transform='translateY(-6px) scale(1.02)'"
+                     onmouseout="this.style.transform=''"
+                     onclick="abrirModal('Foto — ${foto.ambiente}', '<img src=\\'${foto.url}\\' style=\\'width:100%; border-radius:12px\\'>')">
+                    <img src="${foto.url}" alt="${foto.ambiente}" style="transition:transform .3s">
+                    <div class="photo-card-info">
+                        <div class="photo-card-ambiente">${foto.ambiente}</div>
+                        <div class="photo-card-data">${foto.data}</div>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>` : ''}
+
+        <!-- RODAPÉ -->
+        <div style="text-align:center; padding:20px 0; font-size:11px; color:var(--text3);
+                    animation:fadeSlideDown 1.1s ease forwards; opacity:0; animation-delay:.7s">
+            ${dados.titulo} · ${dados.obra.tipo} · ${dados.obra.area}<br>
+            Acompanhamento gerado em ${new Date().toLocaleDateString('pt-BR')}
+        </div>
+
+    </div>`;
+
+    // Anima a barra e o operário após renderizar
+    setTimeout(() => {
+        const barra = document.getElementById('barra-prog');
+        const op    = document.getElementById('operario-wrap');
+        if (barra) barra.style.width = progGeral + '%';
+        if (op) {
+            // Mantém o operário na ponta da barra (com pequeno offset)
+            const pct = Math.max(2, Math.min(progGeral, 97));
+            op.style.left = 'calc(' + pct + '% - 18px)';
+            // Se progresso for alto, operário corre
+            const operarioEl = document.getElementById('operario');
+            if (operarioEl) {
+                if (progGeral >= 75) operarioEl.style.animationDuration = '0.2s';
+                else if (progGeral >= 40) operarioEl.style.animationDuration = '0.35s';
+            }
+        }
+    }, 300);
+}
+
+// ==================== INIT ====================
+carregarDados();
 </script>
 </body>
 </html>
