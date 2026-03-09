@@ -339,7 +339,8 @@ const DADOS_PADRAO = {
   ],
   ambientes: ['Sala','Cozinha','Quarto 1','Quarto 2','Banheiro 1','Banheiro 2','Área de Serviço','Varanda'],
   fotos: [],
-  diario: []
+  diario: [],
+  arquivos: []
 };
 
 let dados = JSON.parse(JSON.stringify(DADOS_PADRAO));
@@ -384,8 +385,9 @@ async function carregarDoServidor() {
     const remoto = await sb.get();
     if(remoto && remoto.grupos) {
       dados = remoto;
-      if(!dados.fotos)  dados.fotos  = [];
-      if(!dados.diario) dados.diario = [];
+      if(!dados.fotos)    dados.fotos    = [];
+      if(!dados.diario)   dados.diario   = [];
+      if(!dados.arquivos) dados.arquivos = [];
       localStorage.setItem('torre_liris_cache', JSON.stringify(dados));
       setSyncStatus('online');
       return true;
@@ -397,8 +399,9 @@ async function carregarDoServidor() {
       const parsed = JSON.parse(cache);
       if(parsed && parsed.grupos) {
         dados = parsed;
-        if(!dados.fotos)  dados.fotos  = [];
-        if(!dados.diario) dados.diario = [];
+        if(!dados.fotos)    dados.fotos    = [];
+        if(!dados.diario)   dados.diario   = [];
+        if(!dados.arquivos) dados.arquivos = [];
         setSyncStatus('offline','Cache local');
         return true;
       }
@@ -439,8 +442,9 @@ function iniciarPolling() {
       const remotoStr = JSON.stringify(remoto);
       if(remotoStr !== localStr) {
         dados = remoto;
-        if(!dados.fotos) dados.fotos=[];
-        if(!dados.diario) dados.diario=[];
+        if(!dados.fotos)    dados.fotos    = [];
+        if(!dados.diario)   dados.diario   = [];
+        if(!dados.arquivos) dados.arquivos = [];
         localStorage.setItem('torre_liris_cache', remotoStr);
         setSyncStatus('online','Atualizado de outro dispositivo ↻');
         if(!adminMode) renderizarCliente();
@@ -534,6 +538,7 @@ function renderizarAdmin() {
         <div class="sidebar-item ${modoAtual==='fotos'?'active':''}" onclick="mudarModo('fotos')">📸 Fotos</div>
         <div class="sidebar-item ${modoAtual==='diario'?'active':''}" onclick="mudarModo('diario')">📝 Diário de Obra</div>
         <div class="sidebar-item ${modoAtual==='ambientes'?'active':''}" onclick="mudarModo('ambientes')">🏠 Ambientes</div>
+        <div class="sidebar-item ${modoAtual==='arquivos'?'active':''}" onclick="mudarModo('arquivos')">📁 Arquivos</div>
       </div>
       <div class="sidebar-section" style="padding:0 16px">
         <div class="sidebar-label">Sincronização</div>
@@ -574,6 +579,7 @@ function renderizarConteudoAdmin() {
     case 'fotos':        return renderizarFotosAdmin();
     case 'diario':       return renderizarDiarioAdmin();
     case 'ambientes':    return renderizarAmbientesAdmin();
+    case 'arquivos':     return renderizarArquivosAdmin();
     default:             return renderizarDadosClienteAdmin();
   }
 }
@@ -1062,6 +1068,241 @@ function renderizarAmbientesAdmin() {
 }
 function adicionarAmbiente(){dados.ambientes.push('Novo Ambiente');agendarSync();renderizarAdmin();mostrarNotificacao('Adicionado!','success');}
 function excluirAmbiente(i){if(confirm('Excluir?')){dados.ambientes.splice(i,1);agendarSync();renderizarAdmin();mostrarNotificacao('Excluído!','success');}}
+
+// ══════════════════════════════════════════════
+// ARQUIVOS
+// ══════════════════════════════════════════════
+const ICONES_TIPO = {
+  'pdf':'📄', 'doc':'📝', 'docx':'📝', 'xls':'📊', 'xlsx':'📊',
+  'ppt':'📋', 'pptx':'📋', 'jpg':'🖼️', 'jpeg':'🖼️', 'png':'🖼️',
+  'webp':'🖼️', 'gif':'🖼️', 'mp4':'🎬', 'mov':'🎬', 'zip':'📦',
+  'rar':'📦', 'dwg':'📐', 'dxf':'📐', 'txt':'📃', 'csv':'📊'
+};
+function iconeArquivo(nome) {
+  const ext = (nome.split('.').pop()||'').toLowerCase();
+  return ICONES_TIPO[ext] || '📎';
+}
+function fmtTamanho(bytes) {
+  if(!bytes) return '—';
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function renderizarArquivosAdmin() {
+  if(!dados.arquivos) dados.arquivos = [];
+  const total = dados.arquivos.length;
+  const cats = [...new Set(dados.arquivos.map(a=>a.categoria))];
+
+  return `
+  <div class="page-header">
+    <div>
+      <div class="page-title">📁 Arquivos do Projeto</div>
+      <div class="page-sub">${total} arquivo(s) · Documentos, plantas, contratos e mais</div>
+    </div>
+    <button class="btn btn-primary" onclick="abrirUploadArquivos()">📎 Adicionar Arquivos</button>
+  </div>
+
+  <!-- FILTRO POR CATEGORIA -->
+  ${cats.length > 1 ? `
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <button class="btn btn-ghost" style="font-size:11px" onclick="renderizarAdmin()">Todos (${total})</button>
+    ${cats.map(c=>`<button class="btn btn-ghost" style="font-size:11px" onclick="filtrarArquivos('${c}')">${c} (${dados.arquivos.filter(a=>a.categoria===c).length})</button>`).join('')}
+  </div>` : ''}
+
+  ${total === 0 ? `
+  <div style="border:2px dashed var(--border);border-radius:16px;padding:60px 40px;text-align:center;color:var(--text3)">
+    <div style="font-size:48px;margin-bottom:16px">📁</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:8px">Nenhum arquivo ainda</div>
+    <div style="font-size:12px">Adicione plantas, contratos, orçamentos, fotos de referência...</div>
+    <button class="btn btn-primary" style="margin-top:20px" onclick="abrirUploadArquivos()">📎 Adicionar primeiro arquivo</button>
+  </div>` : `
+  <div style="display:grid;gap:10px" id="listaArquivos">
+    ${dados.arquivos.map((a,i) => `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:28px;flex-shrink:0">${iconeArquivo(a.nome)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.nome}</div>
+        <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap">
+          <span style="font-size:10px;background:var(--surface2);padding:2px 8px;border-radius:10px;color:var(--text2)">${a.categoria}</span>
+          <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">${fmtTamanho(a.tamanho)}</span>
+          <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">📅 ${fmtDataBR(a.data)}</span>
+          ${a.descricao ? `<span style="font-size:10px;color:var(--text2);font-style:italic">${a.descricao}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px" onclick="editarDescricaoArquivo(${i})" title="Editar descrição">✏️</button>
+        <button class="btn btn-primary" style="font-size:11px;padding:6px 10px" onclick="baixarArquivo(${i})" title="Baixar">⬇️ Baixar</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:6px 10px" onclick="excluirArquivo(${i})" title="Excluir">🗑️</button>
+      </div>
+    </div>`).join('')}
+  </div>`}`;
+}
+
+function abrirUploadArquivos() {
+  abrirModal('📎 Adicionar Arquivos', `
+    <div class="upload-zone" id="uploadZoneArq"
+         onclick="document.getElementById('fileInputArq').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="event.preventDefault();this.classList.remove('drag');handleArquivos(event.dataTransfer.files)">
+      <input type="file" id="fileInputArq" multiple style="display:none" onchange="handleArquivos(this.files)">
+      <div style="font-size:40px;margin-bottom:12px">📁</div>
+      <div style="font-weight:600;margin-bottom:6px">Clique ou arraste arquivos aqui</div>
+      <div style="color:var(--text3);font-size:12px">PDF, Word, Excel, DWG, imagens, vídeos e mais</div>
+    </div>
+    <div id="arqPreviewArea" style="margin-top:16px"></div>
+    <div id="arqMetaArea" style="display:none;margin-top:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Categoria</label>
+          <select id="arqCategoria" class="crud-select">
+            <option>Plantas</option>
+            <option>Contratos</option>
+            <option>Orçamentos</option>
+            <option>Memoriais</option>
+            <option>Fotos de Referência</option>
+            <option>Relatórios</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Descrição (opcional)</label>
+          <input id="arqDescricao" class="crud-input" placeholder="Ex: Planta baixa revisão 2">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarArquivos()">💾 Salvar Arquivos</button>
+      </div>
+    </div>`);
+}
+
+let _arquivosBuffer = [];
+function handleArquivos(files) {
+  _arquivosBuffer = [];
+  const prev = document.getElementById('arqPreviewArea');
+  const meta = document.getElementById('arqMetaArea');
+  if(!files.length) return;
+
+  prev.innerHTML = `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">${files.length} arquivo(s) selecionado(s):</div>
+    <div style="display:flex;flex-direction:column;gap:6px" id="arqLista"></div>`;
+  const lista = prev.querySelector('#arqLista');
+  let loaded = 0;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      _arquivosBuffer.push({ nome: file.name, data64: e.target.result, tamanho: file.size, tipo: file.type });
+      const item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:8px 12px;font-size:12px';
+      item.innerHTML = `<span style="font-size:18px">${iconeArquivo(file.name)}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span>
+        <span style="color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:10px;flex-shrink:0">${fmtTamanho(file.size)}</span>`;
+      lista.appendChild(item);
+      if(++loaded === files.length) meta.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function confirmarArquivos() {
+  if(!_arquivosBuffer.length){ mostrarNotificacao('Selecione ao menos um arquivo.','error'); return; }
+  const categoria = document.getElementById('arqCategoria').value;
+  const descricao = document.getElementById('arqDescricao').value.trim();
+  if(!dados.arquivos) dados.arquivos = [];
+  _arquivosBuffer.forEach(f => dados.arquivos.push({
+    id: uid(), nome: f.nome, data64: f.data64,
+    tamanho: f.tamanho, tipo: f.tipo,
+    categoria, descricao, data: isoHoje()
+  }));
+  _arquivosBuffer = [];
+  agendarSync();
+  fecharModal();
+  renderizarAdmin();
+  mostrarNotificacao(`Arquivo(s) salvo(s)!`, 'success');
+}
+
+function baixarArquivo(i) {
+  const a = dados.arquivos[i];
+  const link = document.createElement('a');
+  link.href = a.data64;
+  link.download = a.nome;
+  link.click();
+  mostrarNotificacao(`Baixando ${a.nome}...`, 'success');
+}
+
+function excluirArquivo(i) {
+  if(confirm(`Excluir "${dados.arquivos[i].nome}"?`)) {
+    dados.arquivos.splice(i, 1);
+    agendarSync();
+    renderizarAdmin();
+    mostrarNotificacao('Excluído!', 'success');
+  }
+}
+
+function editarDescricaoArquivo(i) {
+  const a = dados.arquivos[i];
+  abrirModal(`✏️ Editar — ${a.nome}`, `
+    <div style="display:grid;gap:12px">
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Categoria</label>
+        <select id="eArqCat" class="crud-select">
+          ${['Plantas','Contratos','Orçamentos','Memoriais','Fotos de Referência','Relatórios','Outros'].map(c=>`<option ${a.categoria===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Descrição</label>
+        <input id="eArqDesc" class="crud-input" value="${a.descricao||''}" placeholder="Descrição do arquivo">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px">Nome do arquivo</label>
+        <input id="eArqNome" class="crud-input" value="${a.nome}">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEdicaoArquivo(${i})">💾 Salvar</button>
+      </div>
+    </div>`);
+}
+
+function salvarEdicaoArquivo(i) {
+  dados.arquivos[i].categoria = document.getElementById('eArqCat').value;
+  dados.arquivos[i].descricao = document.getElementById('eArqDesc').value.trim();
+  dados.arquivos[i].nome      = document.getElementById('eArqNome').value.trim() || dados.arquivos[i].nome;
+  agendarSync();
+  fecharModal();
+  renderizarAdmin();
+  mostrarNotificacao('Arquivo atualizado!', 'success');
+}
+
+function filtrarArquivos(categoria) {
+  if(!dados.arquivos) return;
+  const filtrado = dados.arquivos.filter(a => a.categoria === categoria);
+  const lista = document.getElementById('listaArquivos');
+  if(!lista) return;
+  lista.innerHTML = filtrado.map((a, idx) => {
+    const i = dados.arquivos.indexOf(a);
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:28px;flex-shrink:0">${iconeArquivo(a.nome)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.nome}</div>
+        <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap">
+          <span style="font-size:10px;background:var(--surface2);padding:2px 8px;border-radius:10px;color:var(--text2)">${a.categoria}</span>
+          <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">${fmtTamanho(a.tamanho)}</span>
+          <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">📅 ${fmtDataBR(a.data)}</span>
+          ${a.descricao ? `<span style="font-size:10px;color:var(--text2);font-style:italic">${a.descricao}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px" onclick="editarDescricaoArquivo(${i})">✏️</button>
+        <button class="btn btn-primary" style="font-size:11px;padding:6px 10px" onclick="baixarArquivo(${i})">⬇️ Baixar</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:6px 10px" onclick="excluirArquivo(${i})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ══════════════════════════════════════════════
 // ÁREA DO CLIENTE
