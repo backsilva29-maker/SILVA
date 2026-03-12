@@ -163,6 +163,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(232,160,32,.04);}
 
+/* AVATARES CLIENTE */
+@keyframes avatarWork{0%,100%{transform:translateY(0) rotate(-8deg);}50%{transform:translateY(-6px) rotate(8deg);}}
+@keyframes avatarSleep{0%,100%{transform:rotate(-5deg) scale(0.95);}50%{transform:rotate(5deg) scale(1.05);}}
+@keyframes avatarDone{0%{transform:scale(1) rotate(0);}20%{transform:scale(1.4) rotate(-15deg);}40%{transform:scale(1.3) rotate(15deg);}60%{transform:scale(1.4) rotate(-10deg);}80%{transform:scale(1.3) rotate(10deg);}100%{transform:scale(1.2) rotate(0);}}
+@keyframes avatarFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes zzzFloat{0%{opacity:0;transform:translate(0,0) scale(0.6);}50%{opacity:1;}100%{opacity:0;transform:translate(10px,-18px) scale(1);}}
+@keyframes starBurst{0%{transform:scale(0) rotate(0);opacity:1;}100%{transform:scale(2.5) rotate(180deg);opacity:0;}}
+@keyframes cardPulse{0%,100%{box-shadow:0 0 0 0 transparent;}50%{box-shadow:0 0 0 4px var(--accent)44;}}
+@keyframes shimmerCard{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.avatar-box{position:relative;width:54px;height:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.avatar-emoji{font-size:36px;display:block;line-height:1;}
+.avatar-working{animation:avatarWork .7s ease-in-out infinite;}
+.avatar-sleeping{animation:avatarSleep 2s ease-in-out infinite;filter:grayscale(.4);}
+.avatar-done{animation:avatarDone .6s ease forwards, avatarFloat 2s ease-in-out infinite 0.6s;}
+.avatar-zzz{position:absolute;top:-2px;right:-4px;font-size:11px;animation:zzzFloat 1.6s ease-in-out infinite;}
+.avatar-zzz2{position:absolute;top:-12px;right:2px;font-size:9px;animation:zzzFloat 1.6s ease-in-out infinite .5s;}
+.avatar-star{position:absolute;top:-6px;right:-6px;font-size:14px;animation:starBurst 1s ease forwards;}
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .sidebar{display:none;}
@@ -388,7 +408,7 @@ async function carregarDoServidor() {
       if(!dados.fotos)    dados.fotos    = [];
       if(!dados.diario)   dados.diario   = [];
       if(!dados.arquivos) dados.arquivos = [];
-      localStorage.setItem('torre_liris_cache', JSON.stringify(dados));
+      localStorage.setItem('torre_liris_cache', JSON.stringify(dados)); // salva normalizado
       setSyncStatus('online');
       return true;
     }
@@ -435,20 +455,24 @@ function iniciarPolling() {
   if(pollingInterval) clearInterval(pollingInterval);
   pollingInterval = setInterval(async () => {
     if(document.hidden) return;
+    // Não faz polling se há sync pendente
+    if(syncStatus === 'syncing') return;
     const remoto = await sb.get();
     if(remoto && remoto.grupos) {
-      const cacheLocal = localStorage.getItem('torre_liris_cache');
-      const localStr = cacheLocal ? cacheLocal : '{}';
-      const remotoStr = JSON.stringify(remoto);
-      if(remotoStr !== localStr) {
+      // Garante campos obrigatórios antes de comparar
+      if(!remoto.fotos)    remoto.fotos    = [];
+      if(!remoto.diario)   remoto.diario   = [];
+      if(!remoto.arquivos) remoto.arquivos = [];
+      const remotoStr  = JSON.stringify(remoto);
+      const cacheLocal = localStorage.getItem('torre_liris_cache') || '{}';
+      if(remotoStr !== cacheLocal) {
         dados = remoto;
-        if(!dados.fotos)    dados.fotos    = [];
-        if(!dados.diario)   dados.diario   = [];
-        if(!dados.arquivos) dados.arquivos = [];
         localStorage.setItem('torre_liris_cache', remotoStr);
         setSyncStatus('online','Atualizado de outro dispositivo ↻');
-        if(!adminMode) renderizarCliente();
-        setTimeout(()=>setSyncStatus('online'),3000);
+        // Re-renderiza qualquer modo ativo
+        if(adminMode) renderizarAdmin();
+        else          renderizarCliente();
+        setTimeout(()=>setSyncStatus('online'), 3000);
       }
     }
   }, 15000);
@@ -556,7 +580,7 @@ function renderizarAdmin() {
           <span id="syncTxt">${syncStatus==='online'?'Sincronizado ✓':syncStatus==='offline'?'Cache local':'...'}</span>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="font-size:11px" onclick="carregarDoServidor().then(()=>{renderizarAdmin();mostrarNotificacao('Dados atualizados!','success');})">↻ Atualizar</button>
+          <button class="btn btn-ghost" style="font-size:11px" title="Busca dados mais recentes do servidor" onclick="carregarDoServidor().then(()=>{renderizarAdmin();mostrarNotificacao('Dados atualizados do servidor!','success');})">↻ Buscar do Servidor</button>
           <button class="btn btn-success" onclick="salvarNoServidor()">☁️ Salvar na Nuvem</button>
         </div>
       </div>
@@ -1305,6 +1329,244 @@ function filtrarArquivos(categoria) {
 }
 
 // ══════════════════════════════════════════════
+// AVATARES — mapeamento por tipo de etapa
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// AVATARES — detecção inteligente por palavras-chave
+// Escaneia nome do grupo + todas as tarefas e faz votação
+// ══════════════════════════════════════════════
+const AVATAR_RULES = [
+  { emoji:'⛏️',  label:'Demolidor',      keys:/demoli|entulho|remoç|quebra/ },
+  { emoji:'⚡',  label:'Eletricista',     keys:/elétric|eletric|ilumina|tomad|quadro|disjunt|fio|cabo elét/ },
+  { emoji:'🔧',  label:'Encanador',       keys:/hidrá|hidra|encanam|água|esgoto|gás|tubul|registro|sifão/ },
+  { emoji:'🪨',  label:'Marmoreiro',      keys:/piso|pavim|porcela|mármo|marmore|cerâmic|azulejo|regulari/ },
+  { emoji:'🎨',  label:'Gesseiro',        keys:/gesso|forro|sancas|moldur|drywall/ },
+  { emoji:'🖌️', label:'Pintor',          keys:/pintur|massa|tinta|selad|lixa|primer/ },
+  { emoji:'🚪',  label:'Carpinteiro',     keys:/esquadri|porta|janela|carpint|rodap|batente|dobradiç/ },
+  { emoji:'❄️',  label:'Técnico Clima',   keys:/refriger|ar.cond|ar-cond|split|duto|ventil/ },
+  { emoji:'🖥️', label:'Técnico TI',      keys:/rede|lógic|cabeam|internet|switch|roteador|tomada.dados/ },
+  { emoji:'📐',  label:'Marmoreiro',      keys:/rodapé|soleir|peitoril/ },
+  { emoji:'🧹',  label:'Limpeza',         keys:/limpe|limpez|varre|retir|lixo/ },
+  { emoji:'📋',  label:'Engenheiro',      keys:/prelimin|placa|admin|projeto|ART|vistor|levant/ },
+  { emoji:'🧱',  label:'Pedreiro',        keys:/parede|alvenar|tijolo|bloco|argamas|assentam/ },
+  { emoji:'🏗️', label:'Pedreiro',        keys:/revestim|chapisco|reboco|emboç|impermeab/ },
+];
+
+function detectarAvatar(textos) {
+  // Conta votos por regra em todos os textos fornecidos
+  const votos = AVATAR_RULES.map(r => ({
+    ...r,
+    score: textos.filter(t => r.keys.test((t||'').toLowerCase())).length
+  }));
+  const melhor = votos.reduce((a,b) => b.score > a.score ? b : a);
+  return melhor.score > 0 ? melhor : null;
+}
+
+function getAvatar(nomeGrupo, tarefas) {
+  // 1. Tenta pelas tarefas (mais específico)
+  const textosTarefas = (tarefas||[]).map(t => t.nome);
+  const porTarefas = detectarAvatar(textosTarefas);
+  if(porTarefas) return porTarefas.emoji;
+  // 2. Fallback: pelo nome do grupo
+  const porGrupo = detectarAvatar([nomeGrupo]);
+  if(porGrupo) return porGrupo.emoji;
+  // 3. Fallback genérico
+  return '👷';
+}
+
+function getAvatarLabel(nomeGrupo, tarefas) {
+  const textosTarefas = (tarefas||[]).map(t => t.nome);
+  const porTarefas = detectarAvatar(textosTarefas);
+  if(porTarefas) return porTarefas.label;
+  const porGrupo = detectarAvatar([nomeGrupo]);
+  if(porGrupo) return porGrupo.label;
+  return 'Equipe';
+}
+
+function renderAvatarHTML(g, pg) {
+  const cor = g.cor || '#e8a020';
+  const corCapacete = cor;
+  const corViseira = cor + 'cc';
+  // Tom de pele neutro, roupa cinza escura
+  const pele = '#f0c898';
+  const roupa = '#3a3f4a';
+  const roupaClara = '#4a5068';
+
+  // Ícone de ferramenta por tipo de etapa (pequeno, canto)
+  const tool = getAvatar(g.nome, g.tarefas);
+
+  if (pg >= 100) {
+    // OPERÁRIO CELEBRANDO — braços levantados, estrelas ao redor
+    return `<div class="avatar-box" style="width:62px;height:72px">
+      <svg width="62" height="72" viewBox="0 0 62 72" class="avatar-working" style="animation:avatarDone .7s ease forwards,avatarFloat 2s ease-in-out infinite .7s">
+        <!-- Sombra -->
+        <ellipse cx="31" cy="69" rx="13" ry="3" fill="rgba(0,0,0,.18)"/>
+        <!-- Pernas -->
+        <rect x="22" y="46" width="8" height="16" rx="4" fill="${roupa}"/>
+        <rect x="32" y="46" width="8" height="16" rx="4" fill="${roupaClara}"/>
+        <!-- Sapatos -->
+        <rect x="20" y="58" width="11" height="6" rx="3" fill="#222"/>
+        <rect x="31" y="58" width="11" height="6" rx="3" fill="#2a2a2a"/>
+        <!-- Corpo -->
+        <rect x="19" y="28" width="24" height="22" rx="6" fill="${roupa}"/>
+        <!-- Cinto segurança -->
+        <rect x="19" y="38" width="24" height="3" rx="1.5" fill="${cor}66"/>
+        <!-- Braço esq — levantado -->
+        <rect x="8" y="16" width="8" height="18" rx="4" fill="${pele}" transform="rotate(-30 12 25)"/>
+        <!-- Braço dir — levantado -->
+        <rect x="46" y="16" width="8" height="18" rx="4" fill="${pele}" transform="rotate(30 50 25)"/>
+        <!-- Pescoço -->
+        <rect x="27" y="20" width="8" height="10" rx="4" fill="${pele}"/>
+        <!-- Cabeça -->
+        <ellipse cx="31" cy="16" rx="10" ry="10" fill="${pele}"/>
+        <!-- Orelhas -->
+        <ellipse cx="21" cy="16" rx="2.5" ry="3" fill="${pele}"/>
+        <ellipse cx="41" cy="16" rx="2.5" ry="3" fill="${pele}"/>
+        <!-- Capacete -->
+        <ellipse cx="31" cy="10" rx="12" ry="9" fill="${corCapacete}"/>
+        <rect x="18" y="12" width="26" height="5" rx="2.5" fill="${corCapacete}"/>
+        <rect x="16" y="14" width="30" height="4" rx="2" fill="${corViseira}" opacity=".7"/>
+        <!-- Rosto feliz -->
+        <circle cx="26" cy="17" r="1.5" fill="#333"/>
+        <circle cx="36" cy="17" r="1.5" fill="#333"/>
+        <path d="M26 21 Q31 25 36 21" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Estrelas -->
+        <text x="2" y="12" font-size="10" style="animation:starBurst .8s ease forwards">⭐</text>
+        <text x="48" y="10" font-size="9" style="animation:starBurst .8s .2s ease forwards">✨</text>
+        <text x="24" y="4" font-size="8" style="animation:starBurst .8s .1s ease forwards">🌟</text>
+      </svg>
+    </div>`;
+
+  } else if (pg > 0) {
+    // OPERÁRIO TRABALHANDO — inclinado, balançando ferramenta
+    return `<div class="avatar-box" style="width:62px;height:72px">
+      <svg width="62" height="72" viewBox="0 0 62 72" class="avatar-working">
+        <!-- Sombra -->
+        <ellipse cx="31" cy="69" rx="12" ry="3" fill="rgba(0,0,0,.18)"/>
+        <!-- Pernas abertas (em ação) -->
+        <rect x="20" y="46" width="8" height="15" rx="4" fill="${roupa}" transform="rotate(8 24 46)"/>
+        <rect x="32" y="46" width="8" height="15" rx="4" fill="${roupaClara}" transform="rotate(-5 36 46)"/>
+        <!-- Sapatos -->
+        <rect x="18" y="57" width="11" height="6" rx="3" fill="#222" transform="rotate(8 23 60)"/>
+        <rect x="31" y="57" width="11" height="6" rx="3" fill="#2a2a2a" transform="rotate(-5 36 60)"/>
+        <!-- Corpo inclinado -->
+        <rect x="19" y="27" width="24" height="22" rx="6" fill="${roupa}" transform="rotate(-5 31 38)"/>
+        <!-- Refletivo -->
+        <rect x="21" y="30" width="20" height="3" rx="1.5" fill="${cor}88" transform="rotate(-5 31 31)"/>
+        <rect x="21" y="36" width="20" height="3" rx="1.5" fill="${cor}88" transform="rotate(-5 31 37)"/>
+        <!-- Braço trabalhando (direito) -->
+        <rect x="40" y="22" width="8" height="20" rx="4" fill="${pele}" transform="rotate(40 44 32)"/>
+        <!-- Braço apoio (esquerdo) -->
+        <rect x="12" y="28" width="8" height="16" rx="4" fill="${pele}" transform="rotate(-20 16 36)"/>
+        <!-- Ferramenta na mão -->
+        <text x="48" y="22" font-size="13">${tool}</text>
+        <!-- Pescoço -->
+        <rect x="27" y="19" width="8" height="10" rx="4" fill="${pele}"/>
+        <!-- Cabeça ligeiramente rotacionada -->
+        <ellipse cx="31" cy="14" rx="10" ry="10" fill="${pele}" transform="rotate(-8 31 14)"/>
+        <!-- Orelhas -->
+        <ellipse cx="21" cy="15" rx="2.5" ry="3" fill="${pele}"/>
+        <ellipse cx="41" cy="13" rx="2.5" ry="3" fill="${pele}"/>
+        <!-- Capacete -->
+        <ellipse cx="31" cy="8" rx="12" ry="9" fill="${corCapacete}" transform="rotate(-8 31 8)"/>
+        <rect x="18" y="10" width="26" height="5" rx="2.5" fill="${corCapacete}" transform="rotate(-8 31 12)"/>
+        <rect x="16" y="12" width="30" height="4" rx="2" fill="${corViseira}" opacity=".7" transform="rotate(-8 31 14)"/>
+        <!-- Rosto concentrado -->
+        <ellipse cx="26" cy="15" rx="1.5" ry="2" fill="#333" transform="rotate(-8 26 15)"/>
+        <ellipse cx="36" cy="13" rx="1.5" ry="2" fill="#333" transform="rotate(-8 36 13)"/>
+        <path d="M27 19 Q31 18 35 19" stroke="#333" stroke-width="1.2" fill="none" stroke-linecap="round" transform="rotate(-8 31 19)"/>
+        <!-- Partículas de trabalho -->
+        <circle cx="50" cy="30" r="2" fill="${cor}" opacity=".6" style="animation:zzzFloat 1s .1s infinite"/>
+        <circle cx="54" cy="22" r="1.5" fill="${cor}" opacity=".4" style="animation:zzzFloat 1s .4s infinite"/>
+      </svg>
+    </div>`;
+
+  } else {
+    // OPERÁRIO DORMINDO — sentado, cabeça caída
+    return `<div class="avatar-box" style="width:62px;height:72px">
+      <svg width="62" height="72" viewBox="0 0 62 72" class="avatar-sleeping">
+        <!-- Sombra -->
+        <ellipse cx="31" cy="69" rx="14" ry="3" fill="rgba(0,0,0,.15)"/>
+        <!-- Pernas cruzadas (sentado) -->
+        <rect x="16" y="48" width="28" height="10" rx="5" fill="${roupa}"/>
+        <!-- Sapatos -->
+        <rect x="12" y="55" width="12" height="7" rx="3.5" fill="#222"/>
+        <rect x="38" y="55" width="12" height="7" rx="3.5" fill="#2a2a2a"/>
+        <!-- Corpo -->
+        <rect x="18" y="28" width="26" height="24" rx="7" fill="${roupa}"/>
+        <!-- Cinto -->
+        <rect x="18" y="39" width="26" height="3" rx="1.5" fill="${cor}44"/>
+        <!-- Braços relaxados -->
+        <rect x="6" y="34" width="14" height="7" rx="3.5" fill="${pele}" transform="rotate(15 13 37)"/>
+        <rect x="42" y="34" width="14" height="7" rx="3.5" fill="${pele}" transform="rotate(-15 49 37)"/>
+        <!-- Pescoço -->
+        <rect x="27" y="20" width="8" height="11" rx="4" fill="${pele}"/>
+        <!-- Cabeça caída para frente -->
+        <ellipse cx="31" cy="17" rx="10" ry="10" fill="${pele}" transform="rotate(15 31 17)"/>
+        <!-- Orelhas -->
+        <ellipse cx="21" cy="17" rx="2.5" ry="3" fill="${pele}"/>
+        <ellipse cx="41" cy="16" rx="2.5" ry="3" fill="${pele}"/>
+        <!-- Capacete caído -->
+        <ellipse cx="33" cy="10" rx="12" ry="9" fill="${corCapacete}" transform="rotate(15 33 10)"/>
+        <rect x="20" y="12" width="26" height="5" rx="2.5" fill="${corCapacete}" transform="rotate(15 33 14)"/>
+        <rect x="18" y="14" width="30" height="4" rx="2" fill="${corViseira}" opacity=".6" transform="rotate(15 33 16)"/>
+        <!-- Olhos fechados -->
+        <path d="M25 18 Q27 17 29 18" stroke="#333" stroke-width="1.5" fill="none" transform="rotate(15 27 18)"/>
+        <path d="M33 17 Q35 16 37 17" stroke="#333" stroke-width="1.5" fill="none" transform="rotate(15 35 17)"/>
+        <!-- Boca dormindo -->
+        <path d="M27 22 Q31 24 35 22" stroke="#333" stroke-width="1.2" fill="none" stroke-linecap="round" transform="rotate(15 31 23)"/>
+      </svg>
+      <span class="avatar-zzz" style="top:2px;right:0px">💤</span>
+      <span class="avatar-zzz2" style="top:-8px;right:6px">💤</span>
+    </div>`;
+  }
+}
+
+// Confetti quando 100%
+function dispararConfetti() {
+  const existing = document.getElementById('confetti-canvas');
+  if(existing) return; // já disparou
+  const canvas = document.createElement('canvas');
+  canvas.id = 'confetti-canvas';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const cores = ['#e8a020','#10b981','#3b82f6','#f43f5e','#a855f7','#f59e0b','#06b6d4','#84cc16'];
+  const particles = Array.from({length:160}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    w: Math.random()*10+4, h: Math.random()*14+6,
+    color: cores[Math.floor(Math.random()*cores.length)],
+    speed: Math.random()*4+2,
+    spin: (Math.random()-.5)*0.3,
+    angle: Math.random()*360,
+    wobble: Math.random()*3
+  }));
+
+  let frame = 0;
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.y += p.speed;
+      p.x += Math.sin(frame * 0.02 + p.wobble) * 1.5;
+      p.angle += p.spin;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame < 220) requestAnimationFrame(loop);
+    else { canvas.style.transition='opacity 1s'; canvas.style.opacity='0'; setTimeout(()=>canvas.remove(), 1000); }
+  }
+  loop();
+}
+
+// ══════════════════════════════════════════════
 // ÁREA DO CLIENTE
 // ══════════════════════════════════════════════
 function renderizarCliente() {
@@ -1328,7 +1590,20 @@ function renderizarCliente() {
   document.getElementById('app').innerHTML = `
   <div style="background:linear-gradient(135deg,#0d0f14,#13161e);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;animation:bobbing 2s ease-in-out infinite">🏠</div>
+      <div style="width:42px;height:42px;background:linear-gradient(135deg,${dados.grupos[0]?.cor||'var(--accent)'},var(--accent));border-radius:12px;display:flex;align-items:center;justify-content:center;animation:bobbing 2s ease-in-out infinite;box-shadow:0 4px 16px rgba(232,160,32,.35);flex-shrink:0">
+          <svg width="26" height="26" viewBox="0 0 26 26">
+            <!-- Capacete -->
+            <ellipse cx="13" cy="9" rx="10" ry="7.5" fill="rgba(0,0,0,.55)"/>
+            <rect x="3" y="11" width="20" height="4" rx="2" fill="rgba(0,0,0,.55)"/>
+            <!-- Cabeça -->
+            <ellipse cx="13" cy="17" rx="5" ry="5" fill="rgba(255,255,255,.9)"/>
+            <!-- Olhos -->
+            <circle cx="11" cy="17" r="1" fill="rgba(0,0,0,.7)"/>
+            <circle cx="15" cy="17" r="1" fill="rgba(0,0,0,.7)"/>
+            <!-- Sorriso -->
+            <path d="M11 20 Q13 22 15 20" stroke="rgba(0,0,0,.6)" stroke-width="1" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
       <div>
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px">${dados.titulo}</div>
         <div style="font-size:10px;color:var(--text3)">${dados.endereco}</div>
@@ -1429,33 +1704,51 @@ function renderizarCliente() {
         <div style="font-size:12px;color:var(--text2)">Acompanhe cada etapa</div></div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-direction:column;gap:16px">
       ${dados.grupos.map((g,i)=>{
         const pg=calcularProgressoGrupo(g);
-        const ico=pg>=100?'✅':pg>0?'🔨':'⏳';
         const cs=pg>=100?'var(--accent3)':pg>0?'var(--accent)':'var(--text3)';
-        const ls=pg>=100?'Concluído':pg>0?'Em andamento':'Aguardando';
-        return `<div style="background:var(--surface);border:1px solid ${pg>0?g.cor+'44':'var(--border)'};border-radius:16px;padding:18px;overflow:hidden;position:relative;animation:fadeSlideDown ${.9+(i*.08)}s ease forwards;opacity:0;animation-delay:${.3+(i*.06)}s">
-          <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:${g.cor};border-radius:4px 0 0 4px"></div>
-          <div style="padding-left:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${ico}</span>
-              <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">${g.nome}</span></div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <span style="font-size:10px;background:${cs}22;color:${cs};padding:3px 10px;border-radius:20px;border:1px solid ${cs}44">${ls}</span>
-                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:${g.cor}">${pg}%</span>
+        const ls=pg>=100?'Concluído ✅':pg>0?'Em andamento 🔨':'Aguardando ⏳';
+        const borderGlow=pg>=100?`border:1.5px solid ${g.cor}88;box-shadow:0 4px 24px ${g.cor}22`:pg>0?`border:1.5px solid ${g.cor}55`:`border:1px solid var(--border)`;
+        const bgCard=pg>=100?`background:linear-gradient(135deg,var(--surface),${g.cor}0a)`:`background:var(--surface)`;
+        return `<div style="${bgCard};${borderGlow};border-radius:20px;padding:20px;overflow:hidden;position:relative;animation:fadeSlideDown ${.9+(i*.08)}s ease forwards;opacity:0;animation-delay:${.3+(i*.06)}s;transition:transform .2s,box-shadow .2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 32px ${g.cor}33'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+          <!-- Barra lateral colorida -->
+          <div style="position:absolute;top:0;left:0;bottom:0;width:5px;background:${g.cor};border-radius:4px 0 0 4px"></div>
+
+          <div style="padding-left:14px">
+            <!-- HEADER com avatar -->
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+              ${renderAvatarHTML(g, pg)}
+              <div style="flex:1;min-width:0">
+                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;margin-bottom:2px">${g.nome}</div>
+                <div style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">${getAvatarLabel(g.nome, g.tarefas)} · ${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio+g.duracao)}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0">
+                <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:26px;color:${g.cor};line-height:1">${pg}%</div>
+                <div style="font-size:10px;padding:2px 8px;border-radius:20px;background:${cs}22;color:${cs};border:1px solid ${cs}44;white-space:nowrap;margin-top:4px">${ls}</div>
               </div>
             </div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:10px">${fmtSemana(g.inicio)} → ${fmtSemana(g.inicio+g.duracao)} · ${g.duracao} semana${g.duracao>1?'s':''}</div>
-            <div style="background:var(--surface2);border-radius:10px;height:10px;overflow:hidden;margin-bottom:10px">
-              <div style="height:100%;width:${pg}%;background:${g.cor};border-radius:10px;transition:width 1.2s ease;box-shadow:0 0 10px ${g.cor}66"></div>
+
+            <!-- BARRA DE PROGRESSO -->
+            <div style="background:var(--surface2);border-radius:10px;height:12px;overflow:hidden;margin-bottom:10px;position:relative">
+              <div style="height:100%;width:${pg}%;background:linear-gradient(90deg,${g.cor}99,${g.cor});border-radius:10px;transition:width 1.4s cubic-bezier(.4,0,.2,1);box-shadow:0 0 12px ${g.cor}88;position:relative;overflow:hidden">
+                ${pg>0&&pg<100?`<div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%);background-size:200% 100%;animation:shimmerCard 1.8s ease-in-out infinite"></div>`:''}
+              </div>
             </div>
-            ${g.tarefas.length>0?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+
+            <!-- TAREFAS PILLS -->
+            ${g.tarefas.length>0?`<div style="display:flex;flex-wrap:wrap;gap:6px">
               ${g.tarefas.map(t=>{
-                const tI=t.progresso>=100?'✔':t.progresso>0?'▶':'○';
                 const tC=t.progresso>=100?'var(--accent3)':t.progresso>0?g.cor:'var(--text3)';
-                return `<div style="display:flex;align-items:center;gap:5px;background:var(--surface2);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--text2)">
-                  <span style="color:${tC};font-size:9px">${tI}</span> ${t.nome} <span style="color:${tC};font-weight:600">${t.progresso}%</span></div>`;
+                const tBg=t.progresso>=100?'rgba(16,185,129,.12)':t.progresso>0?g.cor+'18':'var(--surface2)';
+                const tBorder=t.progresso>=100?'rgba(16,185,129,.3)':t.progresso>0?g.cor+'44':'var(--border)';
+                const tIcon=t.progresso>=100?'✔':t.progresso>0?'▶':'○';
+                return `<div style="display:flex;align-items:center;gap:5px;background:${tBg};border:1px solid ${tBorder};border-radius:20px;padding:4px 12px;font-size:11px;color:var(--text2)">
+                  <span style="color:${tC};font-size:10px">${tIcon}</span>
+                  <span>${t.nome}</span>
+                  <span style="color:${tC};font-weight:700">${t.progresso}%</span>
+                </div>`;
               }).join('')}
             </div>`:''}
           </div>
@@ -1491,6 +1784,7 @@ function renderizarCliente() {
     const o=document.getElementById('op-wrap');
     if(b) b.style.width=prog+'%';
     if(o) o.style.left='calc('+Math.max(2,Math.min(prog,97))+'% - 18px)';
+    if(prog>=100) setTimeout(()=>dispararConfetti(), 800);
   },300);
 }
 
