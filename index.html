@@ -1584,6 +1584,29 @@ function dispararConfetti() {
 // ══════════════════════════════════════════════
 // ÁREA DO CLIENTE
 // ══════════════════════════════════════════════
+/* === GALERIA POR AMBIENTE (cliente) — add 15/06 === */
+let filtroFotoCliente = 'Todas';
+function fotosClienteInner(){
+  const fotos = dados.fotos || [];
+  const ambs = ['Todas', ...Array.from(new Set(fotos.map(f=>f.ambiente).filter(Boolean)))];
+  const chips = ambs.map(a=>{
+    const n = a==='Todas' ? fotos.length : fotos.filter(f=>f.ambiente===a).length;
+    const at = a===filtroFotoCliente;
+    return `<button data-amb="${a}" onclick="filtrarFotoCliente(this.dataset.amb)" style="cursor:pointer;border:1px solid ${at?'var(--accent)':'var(--border)'};background:${at?'var(--accent)':'transparent'};color:${at?'#15151f':'var(--text2)'};font-weight:${at?'700':'500'};padding:7px 15px;border-radius:20px;font-size:13px;white-space:nowrap;flex:0 0 auto">${a==='Todas'?'📷 Todas':'🏠 '+a} (${n})</button>`;
+  }).join('');
+  const lista = filtroFotoCliente==='Todas' ? fotos : fotos.filter(f=>f.ambiente===filtroFotoCliente);
+  const grid = lista.length
+    ? lista.map(f=>`<div class="photo-card" onclick="abrirModal('${f.ambiente}','<img src=\\'${f.url}\\' style=\\'width:100%;border-radius:12px\\'>')"><img src="${f.url}" alt="${f.ambiente}"><div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div><div class="photo-card-data">${f.data}</div></div></div>`).join('')
+    : '<div style="grid-column:1/-1;text-align:center;color:var(--text3);padding:24px">Nenhuma foto neste ambiente ainda.</div>';
+  return `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px">${chips}</div><div class="photo-grid">${grid}</div>`;
+}
+function filtrarFotoCliente(a){
+  filtroFotoCliente = a;
+  const el = document.getElementById('fotosClienteArea');
+  if(el) el.innerHTML = fotosClienteInner();
+}
+/* === fim galeria por ambiente === */
+
 function renderizarCliente() {
   const prog=calcularProgressoGeral();
   const totalT=dados.grupos.reduce((s,g)=>s+g.tarefas.length,0);
@@ -1788,12 +1811,7 @@ function renderizarCliente() {
         <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px">📸 Fotos da Obra</div>
         <div style="font-size:12px;color:var(--text2)">Veja como está ficando</div></div>
       </div>
-      <div class="photo-grid">
-        ${dados.fotos.map(f=>`<div class="photo-card" onclick="abrirModal('${f.ambiente}','<img src=\\'${f.url}\\' style=\\'width:100%;border-radius:12px\\'>')">
-          <img src="${f.url}" alt="${f.ambiente}">
-          <div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div><div class="photo-card-data">${f.data}</div></div>
-        </div>`).join('')}
-      </div>
+      <div id="fotosClienteArea">${fotosClienteInner()}</div>
     </div>`:''}
 
     <!-- RODAPÉ -->
