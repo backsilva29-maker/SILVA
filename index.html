@@ -947,7 +947,7 @@ function renderizarFotosAdmin() {
     <div class="photo-card">
       <img src="${f.url}" alt="${f.ambiente}" onclick="verFoto(${i})">
       <div class="photo-card-info">
-        <div class="photo-card-ambiente">${f.ambiente}</div>
+        <select class="crud-select" style="font-size:12px;width:100%" onchange="dados.fotos[${i}].ambiente=this.value;agendarSync();mostrarNotificacao('Ambiente atualizado!','success')">${(dados.ambientes.includes(f.ambiente)?dados.ambientes:[f.ambiente].concat(dados.ambientes)).map(a=>`<option ${a===f.ambiente?"selected":""}>${a}</option>`).join("")}</select>
         <div class="photo-card-data">${f.data}</div>
         <button class="btn btn-danger" style="margin-top:8px;font-size:11px" onclick="excluirFoto(${i})">🗑️ Excluir</button>
       </div>
