@@ -9,12 +9,12 @@
   <meta property="og:url" content="https://backsilva29-maker.github.io/SILVA/">
   <meta property="og:title" content="Torre L'iris Residence — Acompanhe sua obra">
   <meta property="og:description" content="Cronograma, fotos e progresso da sua obra em tempo real. Toque para abrir.">
-  <meta property="og:image" content="https://backsilva29-maker.github.io/SILVA/capa.jpg?v=2">
+  <meta property="og:image" content="https://rerphpfdrhnwvyyaxiio.supabase.co/storage/v1/object/public/capas/torre_liris_v5.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="pt_BR">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://backsilva29-maker.github.io/SILVA/capa.jpg?v=2">
+  <meta name="twitter:image" content="https://rerphpfdrhnwvyyaxiio.supabase.co/storage/v1/object/public/capas/torre_liris_v5.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -956,7 +956,8 @@ function renderizarCapaAdmin(){
   ${fotos.length===0?`<div style="border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text3)">Adicione fotos primeiro (aba 📸 Fotos).</div>`:`
   <canvas id="capaCanvas" width="1200" height="630" style="width:100%;max-width:620px;border-radius:12px;border:1px solid var(--border);display:block;margin-bottom:14px;background:#0a0a16"></canvas>
   <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
-    <button class="btn btn-success" onclick="baixarCapa()">💾 Baixar capa.jpg</button>
+    <button class="btn btn-success" onclick="publicarCapa()">🚀 Publicar capa</button>
+    <button class="btn btn-ghost" onclick="baixarCapa()">💾 Baixar</button>
     <button class="btn btn-ghost" onclick="desenharCapa()">🔄 Atualizar prévia</button>
   </div>
   <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Escolha as fotos da capa (máx. 6):</div>
@@ -1008,6 +1009,20 @@ function baixarCapa(){
   const cv=document.getElementById('capaCanvas'); if(!cv){mostrarNotificacao('Abra a aba Capa primeiro.','error');return;}
   cv.toBlob(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='capa.jpg'; a.click();
     mostrarNotificacao('capa.jpg baixada! Suba no GitHub para publicar.','success'); }, 'image/jpeg', 0.9);
+}
+function publicarCapa(){
+  const cv=document.getElementById('capaCanvas'); if(!cv){mostrarNotificacao('Abra a aba Capa.','error');return;}
+  mostrarNotificacao('Publicando capa...','info');
+  cv.toBlob(function(b){
+    fetch(SUPABASE_URL+'/storage/v1/object/capas/torre_liris_v5.jpg',{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'image/jpeg','x-upsert':'true','Cache-Control':'max-age=60'},
+      body:b
+    }).then(function(r){
+      if(r.ok) mostrarNotificacao('Capa publicada! Ja aparece no link do WhatsApp (use ?n novo).','success');
+      else mostrarNotificacao('Erro ao publicar ('+r.status+').','error');
+    }).catch(function(){ mostrarNotificacao('Falha de conexao ao publicar.','error'); });
+  },'image/jpeg',0.9);
 }
 /* === fim aba capa === */
 
