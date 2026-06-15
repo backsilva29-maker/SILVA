@@ -1585,26 +1585,30 @@ function dispararConfetti() {
 // ÁREA DO CLIENTE
 // ══════════════════════════════════════════════
 /* === GALERIA POR AMBIENTE (cliente) — add 15/06 === */
-let filtroFotoCliente = 'Todas';
+let ambienteAbertoCliente = null;
 function fotosClienteInner(){
   const fotos = dados.fotos || [];
-  const ambs = ['Todas', ...Array.from(new Set(fotos.map(f=>f.ambiente).filter(Boolean)))];
-  const chips = ambs.map(a=>{
-    const n = a==='Todas' ? fotos.length : fotos.filter(f=>f.ambiente===a).length;
-    const at = a===filtroFotoCliente;
-    return `<button data-amb="${a}" onclick="filtrarFotoCliente(this.dataset.amb)" style="cursor:pointer;border:1px solid ${at?'var(--accent)':'var(--border)'};background:${at?'var(--accent)':'transparent'};color:${at?'#15151f':'var(--text2)'};font-weight:${at?'700':'500'};padding:7px 15px;border-radius:20px;font-size:13px;white-space:nowrap;flex:0 0 auto">${a==='Todas'?'📷 Todas':'🏠 '+a} (${n})</button>`;
-  }).join('');
-  const lista = filtroFotoCliente==='Todas' ? fotos : fotos.filter(f=>f.ambiente===filtroFotoCliente);
-  const grid = lista.length
-    ? lista.map(f=>`<div class="photo-card" onclick="abrirModal('${f.ambiente}','<img src=\\'${f.url}\\' style=\\'width:100%;border-radius:12px\\'>')"><img src="${f.url}" alt="${f.ambiente}"><div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div><div class="photo-card-data">${f.data}</div></div></div>`).join('')
-    : '<div style="grid-column:1/-1;text-align:center;color:var(--text3);padding:24px">Nenhuma foto neste ambiente ainda.</div>';
-  return `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px">${chips}</div><div class="photo-grid">${grid}</div>`;
+  if(!fotos.length) return '<div style="color:var(--text3);padding:20px;text-align:center">Ainda não há fotos.</div>';
+  if(ambienteAbertoCliente === null){
+    const ambs = Array.from(new Set(fotos.map(f=>f.ambiente).filter(Boolean)));
+    const cards = ambs.map(a=>{
+      const n = fotos.filter(f=>f.ambiente===a).length;
+      const capa = fotos.find(f=>f.ambiente===a);
+      return `<div data-amb="${a}" onclick="abrirAmbienteCliente(this.dataset.amb)" style="cursor:pointer;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:1/1;border:1px solid var(--border)">
+        <img src="${capa.url}" style="width:100%;height:100%;object-fit:cover;filter:brightness(.62)">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;background:linear-gradient(transparent,rgba(0,0,0,.75))">
+          <div style="font-weight:700;color:#fff;font-size:15px">🏠 ${a}</div>
+          <div style="color:#d6d6d6;font-size:12px">${n} foto${n>1?'s':''}</div>
+        </div></div>`;
+    }).join('');
+    return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">${cards}</div>`;
+  }
+  const lista = fotos.filter(f=>f.ambiente===ambienteAbertoCliente);
+  const grid = lista.map(f=>`<div class="photo-card" onclick="abrirModal('${f.ambiente}','<img src=\\'${f.url}\\' style=\\'width:100%;border-radius:12px\\'>')"><img src="${f.url}" alt="${f.ambiente}"><div class="photo-card-info"><div class="photo-card-ambiente">${f.ambiente}</div><div class="photo-card-data">${f.data}</div></div></div>`).join('');
+  return `<div style="margin-bottom:14px;display:flex;align-items:center;gap:10px"><button onclick="voltarAmbientesCliente()" style="cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:20px;font-size:13px">← Ambientes</button><span style="color:var(--text);font-size:14px;font-weight:600">🏠 ${ambienteAbertoCliente}</span></div><div class="photo-grid">${grid}</div>`;
 }
-function filtrarFotoCliente(a){
-  filtroFotoCliente = a;
-  const el = document.getElementById('fotosClienteArea');
-  if(el) el.innerHTML = fotosClienteInner();
-}
+function abrirAmbienteCliente(a){ ambienteAbertoCliente=a; const el=document.getElementById('fotosClienteArea'); if(el) el.innerHTML=fotosClienteInner(); }
+function voltarAmbientesCliente(){ ambienteAbertoCliente=null; const el=document.getElementById('fotosClienteArea'); if(el) el.innerHTML=fotosClienteInner(); }
 /* === fim galeria por ambiente === */
 
 function renderizarCliente() {
